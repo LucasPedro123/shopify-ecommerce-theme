@@ -1,0 +1,20 @@
+:root {
+    --brand-primary: #514f74;
+    --brand-secondary: #fce1f4;
+    --color-background: #FFF9FB;
+    --color-light100: #fff;
+
+    --font-family-base: 'Inter', Arial, sans-serif;
+
+    --border-radius: 4px;
+    --border-radius-lg: 8px;
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 32px;
+    --spacing-xl: 48px;
+
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+}
