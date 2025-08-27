@@ -117,6 +117,7 @@
   </a>
   <div
     class="
+      product-highlight-section
       product-card__content
       layout-panel-flex
       layout-panel-flex--column
@@ -147,6 +148,15 @@
 {%- endif -%}
 
 {% stylesheet %}
+  .product-highlight-section:has(> .product-highlight-content){
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: space-between !important;
+    width: 100%;
+    max-width: 960px !important;
+    margin: auto !important;
+  }
+
   product-card-link,
   :not(product-card-link) product-card {
     width: 100%;

@@ -37,6 +37,7 @@
     section-resource-list
     spacing-style
     gap-style
+    section-product-list
   "
   style="
     --column-count-mobile: {{ section.settings.mobile_columns }};
@@ -138,6 +139,30 @@
     {%- content_for 'blocks' -%}
   </div>
 </div>
+
+{% stylesheet %}
+  .section-product-list{
+    margin-block: 56px;
+    color: var(--color-light100);
+    background-color: var(--brand-primary) !important;
+
+    .product-card__content{
+      padding-block: 10px;
+      background-color: var(--color-light100);
+      color: var(--color-light100) !important;
+      border-radius: 8px;
+
+      .text-block{
+        padding-inline: 20px;
+      }
+
+      .price{
+        font-size: 18px;
+        font-weight: 700;
+      }
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
