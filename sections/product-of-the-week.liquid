@@ -1,0 +1,104 @@
+{% schema %}
+{
+  "name": "Produto da Semana",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Produto da Semana"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Descrição",
+      "default": "Selecionamos especialmente para você!"
+    },
+    {
+      "type": "product",
+      "id": "featured_product",
+      "label": "Escolha o produto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produto da Semana"
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+  .product-of-week {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1536px;
+    height: 480px;
+    margin: 42px auto 12px;
+    padding: 0 12px;
+
+    .product-of-week_image {
+      box-shadow: 10px 10px 20px #ddd;
+      border-radius: 6px 0 0 6px;
+      margin-right: 12px;
+      height: 100%;
+      img{
+        height: 100%;
+        width: fit-content;
+        object-fit: contain;
+      }
+    }
+
+    .product-of-week_info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 480px;
+      height: 100%;
+      color: #fff;
+      padding: 40px;
+      border-radius: 0 6px 6px 0;
+      box-shadow: 10px 10px 20px #ddd;
+      background-color: var(--brand-primary);
+    }
+
+    button {
+      background-color: var(--brand-primary);
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  }
+{% endstylesheet %}
+
+<div class="product-of-week">
+  {% if section.settings.featured_product != blank %}
+    {% assign product = all_products[section.settings.featured_product] %}
+    {% if product %}
+      <a href="{{ product.url }}" class="product-of-week_image">
+        <img
+          src="{{ product.featured_image | img_url: '600x600' }}"
+          alt="{{ product.title }}"
+          width="600"
+          height="600"
+        >
+      </a>
+      <div class="product-of-week_info">
+        <h2>{{ section.settings.title }}</h2>
+        <p class="description">{{ section.settings.description }}</p>
+        <h3>{{ product.title }}</h3>
+        {% render 'price', product_resource: product %}
+        <form method="post" action="/cart/add">
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <button type="submit">Comprar agora</button>
+        </form>
+      </div>
+    {% else %}
+      <p>Nenhum produto selecionado.</p>
+    {% endif %}
+  {% endif %}
+</div>
