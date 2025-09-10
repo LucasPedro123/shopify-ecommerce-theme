@@ -1,5 +1,3 @@
-
-
 {% capture product_card_children %}
   <div class="featured-product-content-top product-highlight-content">
     {% content_for 'block', type: 'product-title', id: 'featured-product-title' %}
@@ -15,13 +13,12 @@
 {% render 'product-card', children: product_card_children, product: closest.product, product_card_gap: 8 %}
 
 {% stylesheet %}
-  .product-highlight-content{
+  .product-highlight-content {
     background: var(--brand-primary);
     border-radius: 0 6px 6px 0;
     box-shadow: 10px 10px 20px #ddd;
     color: var(--color-light100);
-    display: flex
-;
+    display: flex;
     flex-direction: column;
     gap: 18px;
     height: 100%;
@@ -30,11 +27,11 @@
     width: 480px;
   }
 
-  .product-highlight{
+  .product-highlight {
     display: flex !important;
     gap: var(--gap-md);
-    
-    .card-gallery{
+
+    .card-gallery {
       width: 100%;
       max-width: 400px;
       height: 100%;

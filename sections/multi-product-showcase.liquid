@@ -1,0 +1,74 @@
+<div 
+  class="multi-product-showcase" 
+  style="background-color: {{ section.settings.background_color }};"
+>
+  <div class="container">
+    <h2>
+      {% case section.settings.product_filter %}
+        {% when 'sale' %} Produtos em Oferta
+        {% when 'new' %} Novidades
+        {% when 'featured' %} Destaques
+      {% endcase %}
+    </h2>
+
+    <div class="product-grid">
+      {% assign products = collections.all.products %}
+
+      {% case section.settings.product_filter %}
+        {% when 'sale' %}
+          {% assign filtered_products = products | where: "compare_at_price", blank | where: "compare_at_price", nil %}
+        {% when 'new' %}
+          {% assign filtered_products = collections['novidades'].products %}
+        {% when 'featured' %}
+          {% assign filtered_products = collections['destaques'].products %}
+      {% endcase %}
+
+      {% for product in filtered_products limit: section.settings.product_limit %}
+        <div class="product-card">
+          {% render 'collection-card', card_product: product %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": "Exposição de Produtos",
+  "settings": [
+    {
+      "type": "select",
+      "id": "product_filter",
+      "label": "Tipo de produto",
+      "options": [
+        { "value": "sale", "label": "Em oferta" },
+        { "value": "new", "label": "Novidades" },
+        { "value": "featured", "label": "Destaques" }
+      ],
+      "default": "sale"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Cor de fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Quantidade de produtos",
+      "default": 4
+    }
+  ],
+  "presets": [
+  {
+    "name": "Exposição de Produtos",
+    "category": "Produtos"
+  }
+]
+}
+{% endschema %}
