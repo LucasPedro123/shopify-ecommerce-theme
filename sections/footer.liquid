@@ -1,373 +1,436 @@
+<footer class="footer section-wrapper">
+  <div class="footer-wrapper section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}">
+    <div class="footer-newsletter">
+      <h2 class="heading-200">{{ section.settings.newsletter_title }}</h2>
 
+      <div class="newsletter-container">
+        <h3>{{ section.settings.newsletter_heading }}</h3>
+        <p>{{ section.settings.newsletter_subtext }}</p>
 
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="
-    section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}
-    {% if section.settings.section_height != "" %} {{ section.settings.section_height | prepend: "section--height-" }}{% endif %}
-  "
->
-  {% render 'background-media',
-    background_media: section.settings.background_media,
-    background_video: section.settings.video,
-    background_video_position: section.settings.video_position,
-    background_image: section.settings.background_image,
-    background_image_position: section.settings.background_image_position
-  %}
+        {%- form 'customer', id: 'ContactFooter', class: 'input-group' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input
+            type="email"
+            name="contact[email]"
+            id="NewsletterEmailFooter"
+            placeholder="{{ section.settings.newsletter_placeholder }}"
+            required
+            spellcheck="false"
+            class="body-L"
+            autocomplete="off"
+          >
+          <button type="submit">
+            <img src="{{ section.settings.send_icon.src | img_url: '200x200'}}" width="50" height="50" alt="Enviar">
+          </button>
+        {%- endform -%}
+      </div>
+    </div>
 
-  <div
-    class="
-      spacing-style
-      layout-panel-flex
-      layout-panel-flex--{{ section.settings.content_direction }}
-      section-content-wrapper
-      {% if section.settings.vertical_on_mobile %} mobile-column{% endif %}
-    "
-    style="
-      {% render 'layout-panel-style', settings: section.settings %}
-      {%  render 'spacing-style', settings: section.settings %}
-    "
-  >
-    {% content_for 'blocks' %}
+    <div class="footer-content">
+      {%- for block in section.blocks -%}
+        {% case block.type %}
+          {% when 'menu' %}
+            <nav class="footer-col">
+              <h3 class="heading-200">{{ block.settings.heading }}</h3>
+              {%- for link in linklists[block.settings.menu].links -%}
+                <a class="body-L" href="{{ link.url }}">{{ link.title }}</a>
+              {%- endfor -%}
+            </nav>
+
+          {% when 'payment-icons' %}
+
+          {% when 'payment-icons' %}
+            <div class="footer-col">
+              <h3 class="heading-200">{{ block.settings.heading }}</h3>
+              <div class="payment-icons-row">
+                {% if block.settings.payment_content_1 != blank %}
+                  <img
+                    src="{{ block.settings.payment_content_1 | img_url: '200x200' }}"
+                    width="50"
+                    height="50"
+                    alt="Forma de pagamento 1"
+                  >
+                {% endif %}
+                {% if block.settings.payment_content_2 != blank %}
+                  <img
+                    src="{{ block.settings.payment_content_2 | img_url: '200x200' }}"
+                    width="50"
+                    height="50"
+                    alt="Forma de pagamento 2"
+                  >
+                {% endif %}
+                {% if block.settings.payment_content_3 != blank %}
+                  <img
+                    src="{{ block.settings.payment_content_3 | img_url: '200x200' }}"
+                    width="50"
+                    height="50"
+                    alt="Forma de pagamento 3"
+                  >
+                {% endif %}
+                {% if block.settings.payment_content_4 != blank %}
+                  <img
+                    src="{{ block.settings.payment_content_4 | img_url: '200x200' }}"
+                    width="50"
+                    height="50"
+                    alt="Forma de pagamento 4"
+                  >
+                {% endif %}
+                {% if block.settings.payment_content_5 != blank %}
+                  <img
+                    src="{{ block.settings.payment_content_5 | img_url: '200x200' }}"
+                    width="50"
+                    height="50"
+                    alt="Forma de pagamento 5"
+                  >
+                {% endif %}
+              </div>
+            </div>
+
+          {% when 'text' %}
+            <div class="footer-col">
+              <h3 class="heading-200">{{ block.settings.heading }}</h3>
+              <p class="body-L">{{ block.settings.text }}</p>
+            </div>
+
+          {% when 'contact' %}
+            <div class="footer-col">
+              <h3 class="heading-200">Contato</h3>
+              <ul class="info-list">
+                {% if block.settings.phone != blank %}
+                  <li>
+                    <a href="https://maps.app.goo.gl/xo53ypdvz2VeKLrT6">{{ block.settings.phone }}</a>
+                  </li>
+                {% endif %}
+                {% if block.settings.whatsapp != blank %}
+                  <li>
+                    <a
+                      href="https://api.whatsapp.com/send?phone={{ block.settings.whatsapp | remove: ' ' }}"
+                      target="_blank"
+                    >
+                      {{- block.settings.whatsapp -}}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.email != blank %}
+                  <li>
+                    <a href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+        {% endcase %}
+      {%- endfor -%}
+    </div>
   </div>
-</div>
+
+  <div class="footer-divider">
+    <div class="divider"></div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>{{ section.settings.bottom_text }}</p>
+    <div class="footer-bottom-group">
+      <a href="{{ section.settings.terms_url }}">Termos e Serviços</a>
+      <a href="{{ section.settings.privacy_url }}">Política de Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+{% stylesheet %}
+  .body-L{
+    font-size: 16px;
+  }
+
+  .heading-200{
+    font-size: 20px;
+  }
+
+  .footer {
+    width: 100%;
+    background-color: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 55px;
+    padding-top: 65px;
+
+    .footer-wrapper {
+      display: flex;
+      gap: 70px;
+      padding-inline: 65px;
+
+      @media (max-width: 1150px) {
+        padding-inline: 15px;
+      }
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
+
+      .footer-newsletter {
+        display: flex;
+        flex-direction: column;
+        gap: 31px;
+
+        h1 {
+          font-family: 'Playfair Display';
+          font-weight: 800;
+          font-size: 24px;
+          line-height: 32px;
+          color: #000;
+        }
+
+        h3 {
+          font-family: 'Playfair Display';
+          font-weight: 800;
+          font-size: 18px;
+          line-height: 32px;
+          color: #fff;
+        }
+
+        .newsletter-container {
+          max-width: 311px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 23px;
+          padding: 32px;
+          border-radius: 24px;
+          background-color: var(--brand-primary);
+          color: #fff;
+
+          .input-group {
+            border-radius: 8px;
+            padding: 5px 20px;
+            display: flex;
+            background-color: #fff;
+
+            input,
+            button {
+              background: transparent;
+              border: none;
+            }
+
+            input:focus,
+            button:focus {
+              outline: none;
+              border: none;
+            }
+
+            input {
+              color: #000;
+            }
+
+            button {
+              border-radius: 5px;
+              width: 40px;
+              height: 40px;
+              background-color: var(--brand-primary);
+            }
+          }
+        }
+      }
+
+      .footer-content {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 5%;
+        flex-wrap: nowrap;
+
+        @media (max-width: 1150px) {
+          flex-wrap: wrap;
+          row-gap: 40px;
+          justify-content: flex-start;
+        }
+
+        .footer-col {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+
+          .info-list{
+            text-decoration: none;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+
+          .payment-icons-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+          }
+
+          .payment-icons-row img {
+            height: 30px;
+            width: auto;
+            object-fit: contain;
+          }
+
+          a {
+            color: #000;
+            text-decoration: none;
+          }
+        }
+
+        @media (max-width: 1150px) {
+          flex-direction: column;
+        }
+      }
+
+      .footer-col-group {
+        display: flex;
+        flex-direction: column;
+        gap: 33px;
+      }
+    }
+
+    .footer-divider {
+      width: 100%;
+      height: 2px;
+      padding-inline: 65px;
+
+      @media (max-width: 1150px) {
+        padding-inline: 15px;
+      }
+
+      .divider {
+        background-color: #3a3a3aff;
+        height: 100%;
+        width: 100%;
+        border-radius: 5px;
+      }
+    }
+
+    .footer-bottom {
+      background-color: var(--brand-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: max-content;
+      padding-inline: 65px;
+      padding-block: 25px;
+
+      @media (max-width: 1150px) {
+        flex-direction: column;
+        padding-inline: 15px;
+      }
+
+      .footer-bottom-group {
+        display: flex;
+        gap: 15px;
+        height: fit-content;
+
+        a {
+          color: #fff;
+        }
+      }
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.footer",
-  "class": "section-wrapper",
+  "name": "Footer Estilo Tray",
   "tag": "footer",
-  "blocks": [
-    {
-      "type": "_divider"
-    },
-    {
-      "type": "@app"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "email-signup"
-    },
-    {
-      "type": "follow-on-shop"
-    },
-    {
-      "type": "footer-utilities"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "menu"
-    },
-    {
-      "type": "payment-icons"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "logo"
-    },
-    {
-      "type": "jumbo-text"
-    }
-  ],
-  "enabled_on": {
-    "groups": ["footer"]
-  },
+  "class": "footer",
   "settings": [
     {
-      "type": "header",
-      "content": "t:content.layout"
-    },
-    {
-      "type": "select",
-      "id": "content_direction",
-      "label": "t:settings.direction",
-      "options": [
-        {
-          "value": "column",
-          "label": "t:options.vertical"
-        },
-        {
-          "value": "row",
-          "label": "t:options.horizontal"
-        }
-      ],
-      "default": "column"
-    },
-    {
-      "type": "checkbox",
-      "id": "vertical_on_mobile",
-      "label": "t:settings.vertical_on_mobile",
-      "default": true,
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "horizontal_alignment",
-      "label": "t:settings.alignment",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.right"
-        },
-        {
-          "value": "space-between",
-          "label": "t:options.space_between"
-        }
-      ],
-      "default": "flex-start",
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "vertical_alignment",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.top"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.bottom"
-        }
-      ],
-      "default": "center",
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "align_baseline",
-      "label": "t:settings.align_baseline",
-      "default": false,
-      "visible_if": "{{ section.settings.vertical_alignment == 'flex-end' }}"
-    },
-    {
-      "type": "select",
-      "id": "horizontal_alignment_flex_direction_column",
-      "label": "t:settings.alignment",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "flex-start",
-      "visible_if": "{{ section.settings.content_direction != 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "vertical_alignment_flex_direction_column",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.top"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.bottom"
-        },
-        {
-          "value": "space-between",
-          "label": "t:options.space_between"
-        }
-      ],
-      "default": "center",
-      "visible_if": "{{ section.settings.content_direction == 'column' }}"
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "header",
-      "content": "t:content.size"
-    },
-    {
-      "type": "select",
-      "id": "section_width",
-      "label": "t:settings.width",
-      "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
-      ],
-      "default": "page-width"
-    },
-    {
-      "type": "select",
-      "id": "section_height",
-      "label": "t:settings.height",
-      "options": [
-        {
-          "value": "",
-          "label": "t:options.auto"
-        },
-        {
-          "value": "small",
-          "label": "t:options.small"
-        },
-        {
-          "value": "medium",
-          "label": "t:options.medium"
-        },
-        {
-          "value": "large",
-          "label": "t:options.large"
-        },
-        {
-          "value": "full-screen",
-          "label": "t:options.full_screen"
-        }
-      ],
-      "default": ""
-    },
-    {
-      "type": "header",
-      "content": "t:content.appearance"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "t:settings.color_scheme",
-      "default": "scheme-1"
-    },
-    {
-      "type": "select",
-      "id": "background_media",
-      "label": "t:settings.background_media",
-      "options": [
-        {
-          "value": "none",
-          "label": "t:options.none"
-        },
-        {
-          "value": "image",
-          "label": "t:options.image"
-        },
-        {
-          "value": "video",
-          "label": "t:options.video"
-        }
-      ],
-      "default": "none"
-    },
-    {
-      "type": "video",
-      "id": "video",
-      "label": "t:settings.video",
-      "visible_if": "{{ section.settings.background_media == 'video' }}"
-    },
-    {
-      "type": "select",
-      "id": "video_position",
-      "label": "t:settings.video_position",
-      "options": [
-        {
-          "value": "cover",
-          "label": "t:options.cover"
-        },
-        {
-          "value": "contain",
-          "label": "t:options.contain"
-        }
-      ],
-      "default": "cover",
-      "visible_if": "{{ section.settings.background_media == 'video' }}"
-    },
-    {
       "type": "image_picker",
-      "id": "background_image",
-      "label": "t:settings.image",
-      "visible_if": "{{ section.settings.background_media == 'image' }}"
+      "id": "send_icon",
+      "label": "Ícone enviar"
     },
     {
-      "type": "select",
-      "id": "background_image_position",
-      "label": "t:settings.image_position",
-      "options": [
-        {
-          "value": "cover",
-          "label": "t:options.cover"
-        },
-        {
-          "value": "fit",
-          "label": "t:options.fit"
-        }
-      ],
-      "default": "cover",
-      "visible_if": "{{ section.settings.background_media == 'image' }}"
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Título newsletter",
+      "default": "Minha Loja"
     },
     {
-      "type": "header",
-      "content": "t:content.padding"
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Heading newsletter",
+      "default": "Promoções"
     },
     {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "text",
+      "id": "newsletter_subtext",
+      "label": "Texto newsletter",
+      "default": "Cadastre seu e-mail e receba ofertas exclusivas"
     },
     {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Placeholder do campo",
+      "default": "Seu E-mail"
+    },
+    {
+      "type": "text",
+      "id": "bottom_text",
+      "label": "Texto do rodapé",
+      "default": "© 2025 Minha Loja"
+    },
+    {
+      "type": "url",
+      "id": "terms_url",
+      "label": "Link Termos"
+    },
+    {
+      "type": "url",
+      "id": "privacy_url",
+      "label": "Link Privacidade"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Institucional" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    },
+    {
+      "type": "payment-icons",
+      "name": "Formas de Pagamento",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Formas de Pagamento" },
+        { "type": "image_picker", "id": "payment_content_1", "label": "Ícone 1" },
+        { "type": "image_picker", "id": "payment_content_2", "label": "Ícone 2" },
+        { "type": "image_picker", "id": "payment_content_3", "label": "Ícone 3" },
+        { "type": "image_picker", "id": "payment_content_4", "label": "Ícone 4" },
+        { "type": "image_picker", "id": "payment_content_5", "label": "Ícone 5" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Texto",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Endereço" },
+        { "type": "textarea", "id": "text", "label": "Conteúdo" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Contato",
+      "settings": [
+        { "type": "text", "id": "phone", "label": "Telefone" },
+        { "type": "text", "id": "whatsapp", "label": "WhatsApp" },
+        { "type": "text", "id": "email", "label": "E-mail" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer estilo Tray",
+      "blocks": [{ "type": "menu" }, { "type": "payment-icons" }, { "type": "contact" }, { "type": "text" }]
     }
   ]
 }

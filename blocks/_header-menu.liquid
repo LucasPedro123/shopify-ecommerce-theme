@@ -64,7 +64,7 @@
       </div>
     {% endif %}
   {% else %}
-    <header-menu
+    {% comment %} <header-menu
       ref="headerMenu"
       class="header-menu mobile:hidden"
       data-animation-delay="{{ animation_speed }}"
@@ -80,7 +80,7 @@
         type="module"
         fetchpriority="low"
       ></script>
-    </header-menu>
+    </header-menu> {% endcomment %}
 {% endcase %}
 
 {% stylesheet %}

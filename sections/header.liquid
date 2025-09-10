@@ -1,5 +1,3 @@
-
-
 {% liquid
   assign order = 'logo,menu,localization,search,mobile_search,actions'
 
@@ -239,6 +237,38 @@
         <div class="header__columns spacing-style">
           {{ content }}
         </div>
+        <nav role="navigation" class="header_menu-links">
+          <ul>
+            {% for link in linklists[section.settings.main_menu].links %}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  {% if link.active %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{ link.title }}
+                </a>
+                {% if link.links != blank %}
+                  <ul>
+                    {% for child in link.links %}
+                      <li>
+                        <a
+                          href="{{ child.url }}"
+                          {% if child.active %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          {{ child.title }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
       </div>
     {% endif %}
   {% endfor %}
@@ -268,6 +298,27 @@
 
   body:has(> #header-group:empty) {
     --header-group-height: 0px;
+  }
+  .header__columns {
+    display: flex !important;
+    justify-content: space-between;
+  }
+  .header__column{
+    width: 100%;
+    position: relative;
+  }
+
+  .header_menu-links{
+    ul{
+      width: max-content;
+      display: flex;
+      gap: 20px;
+      padding: 0px;
+
+      li{
+        list-style: none;
+      }
+    }
   }
 
   .header[transparent] {
@@ -440,7 +491,7 @@
   }
 
   .header__column--right {
-    gap: var(--gap-xl);
+    /* gap: var(--gap-xl); */
     justify-content: flex-end;
     grid-area: right;
 
@@ -655,6 +706,12 @@
     {
       "type": "header",
       "content": "t:content.menu"
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Menu principal",
+      "default": "main-menu"
     },
     {
       "type": "select",
