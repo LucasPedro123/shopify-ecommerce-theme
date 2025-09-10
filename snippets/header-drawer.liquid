@@ -59,16 +59,62 @@
         color-{{ settings.drawer_color_scheme }}
       "
     >
-      <button
-        class="button button-unstyled close-button menu-drawer__close-button"
-        type="button"
-        aria-label="{{ 'actions.close' | t }}"
-        on:click="/close"
-      >
-        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
-          {{- 'icon-close.svg' | inline_asset_content -}}
-        </span>
-      </button>
+      <div class="menu-drawer__header">
+        <div class="menu-drawer_header-top">
+          <h3>HDM BEAUTY</h3>
+          <button
+            class="button button-unstyled close-button menu-drawer__close-button"
+            type="button"
+            aria-label="{{ 'actions.close' | t }}"
+            on:click="/close"
+          >
+            <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
+        <div class="menu-drawer_header-body">
+          <div class="menu-drawer_header-body_links">
+            <a class="menu-drawer_header-body_links-item" href="{{ links.register }}" target="_blank">
+              <img src="{{ 'profile-icon.svg' | asset_url }}" alt="Ícone de usuário" width="50" height="50">
+              <p class="body-S">Minha conta</p>
+            </a>
+            <a
+              class="menu-drawer_header-body_links-item"
+              href="/loja/central_anteriores.php?loja=1322733"
+              target="_blank"
+            >
+              <img src="{{ 'request.box-icon.svg' | asset_url }}" alt="Ícone de pedidos" width="50" height="50">
+              <p class="body-S">Pedidos</p>
+            </a>
+            <a
+              class="menu-drawer_header-body_links-item"
+              href="https://rastreamento.correios.com.br/app/index.php"
+              target="_blank"
+            >
+              <img src="{{ 'box-icon.svg' | asset_url }}" alt="Ícone de rastreio de pedido" width="50" height="50">
+              <p class="body-S">Rastreio</p>
+            </a>
+            <a
+              class="menu-drawer_header-body_links-item"
+              href="https://maps.app.goo.gl/YmfUETyFmto2Rpip6"
+              target="_blank"
+            >
+              <img
+                src="{{ 'location-icon.svg' | asset_url }}"
+                alt="Ícone de localização da loja"
+                width="50"
+                height="50"
+              >
+              <p class="body-S">Nossa Loja</p>
+            </a>
+          </div>
+          <div on:click="#search-modal/showDialog" class="menu-drawer_header-body_search">
+            <img src="{{ 'search-icon.svg' | asset_url }}" width="50" height="50">
+            <p>digite aqui o que procura...</p>
+          </div>
+        </div>
+      </div>
       <nav
         class="menu-drawer__navigation"
         style="
@@ -619,6 +665,67 @@
 </header-drawer>
 
 {% stylesheet %}
+  .menu-drawer__header {
+    background-color: var(--brand-primary);
+    padding-inline: var(--drawer-padding);
+    height: max-content;
+    padding-bottom: 30px;
+
+    .menu-drawer_header-top {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 30px;
+      font-size: 20px;
+      color: #fff;
+    }
+    .menu-drawer_header-body {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+
+      .menu-drawer_header-body_search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-inline: 12px;
+        background-color: #fff;
+        border-radius: 50px;
+        height: 45px;
+        img {
+          width: 25px;
+          height: 25px;
+        }
+      }
+
+      .menu-drawer_header-body_links {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .menu-drawer_header-body_links-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          justify-content: space-between;
+          color: #fff;
+          text-align: center;
+          img {
+            width: 25px;
+          }
+        }
+      }
+    }
+  }
+
+  .menu-drawer__menu {
+    padding-top: 30px;
+
+    li {
+      border-bottom: 1px solid #dddedf;
+    }
+  }
+
   .header__icon--menu {
     position: initial;
   }
@@ -992,7 +1099,6 @@
     top: auto;
     width: fit-content;
     height: fit-content;
-    padding: var(--padding-lg);
     will-change: transform;
   }
 
