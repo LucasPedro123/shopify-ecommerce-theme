@@ -30,10 +30,17 @@
     "product_recommendations": "Produtos recomendados",
     "product_media": "Mídia do produto",
     "featured_collection": "Coleção em destaque",
+<<<<<<< HEAD
     "add_to_cart": "Adicionar ao carrinho",
     "email_signup": "Inscrição por e-mail",
     "submit_button": "Botão de envio",
     "grid_layout_selector": "Seletor de layout em grade",
+=======
+    "add_to_cart": "Comprar",
+    "email_signup": "Assinante de e-mail",
+    "submit_button": "Botão Enviar",
+    "grid_layout_selector": "Seletor de layout de grade",
+>>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
     "image": "Imagem",
     "list_items": "Itens da lista",
     "facets": "Filtros",

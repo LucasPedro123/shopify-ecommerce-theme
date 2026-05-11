@@ -1,0 +1,167 @@
+{% stylesheet %}
+  .section-brands {
+    margin-block: 46px;
+    width: 100%;
+    height: 128px;
+    padding-inline: 5%;
+    scroll-padding-inline-start: var(--gutter-slide-width, 0);
+  }
+
+  .section-brands .brand-container {
+    background-color: #f8f9fa;
+    box-shadow: 0px 14px 42px -8px rgba(112, 144, 176, 0.15);
+    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .section-brands .brand-content {
+    display: grid;
+    place-items: center;
+    max-width: 200px;
+    height: 100%;
+    width: 100%;
+    border-left: 2px solid #ccc;
+  }
+
+  .section-brands .brand-items {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px;
+    overflow-x: auto;
+    cursor: grab;
+    gap: 18px;
+    scroll-behavior: smooth;
+  }
+
+  .section-brands .brand-item {
+    width: 138px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .section-brands .brand-item img {
+    width: 100%;
+    max-height: 80px;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+{% endstylesheet %}
+
+<div class="section-brands" data-slides="brands">
+  <div class="brand-container">
+    <div class="brand-items">
+      {% for block in section.blocks %}
+        {% if block.settings.brand_logo != blank %}
+          <div class="brand-item">
+            <img
+              src="{{ block.settings.brand_logo | img_url: '200x200' }}"
+              alt="{{ block.settings.brand_name | escape }}"
+            >
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="brand-content">
+      <h2 class="heading-100">{{ section.settings.title }}</h2>
+    </div>
+  </div>
+</div>
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function () {
+    const slider = document.querySelector('.section-brands .brand-items');
+    if (!slider) return;
+
+    let autoScrollInterval = null;
+
+    // Duplica os itens para criar o efeito infinito
+    slider.innerHTML += slider.innerHTML;
+
+    function startAutoScroll() {
+      if (autoScrollInterval) return;
+      autoScrollInterval = setInterval(() => {
+        slider.scrollLeft += 1.5;
+        if (slider.scrollLeft >= slider.scrollWidth / 2) {
+          slider.scrollLeft = 0;
+        }
+      }, 20);
+    }
+
+    function stopAutoScroll() {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+        autoScrollInterval = null;
+      }
+    }
+
+    function checkScreenSize() {
+      const width = window.innerWidth;
+      if (width <= 1184) {
+        startAutoScroll();
+      } else {
+        stopAutoScroll();
+      }
+    }
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    // Interação do usuário para parar scroll automático
+    slider.addEventListener('mousedown', stopAutoScroll);
+    slider.addEventListener('touchstart', stopAutoScroll);
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Seção de Marcas",
+  "tag": "section",
+  "class": "section-brands",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Marcas"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Marca",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "brand_logo",
+          "label": "Logo da marca"
+        },
+        {
+          "type": "text",
+          "id": "brand_name",
+          "label": "Nome da marca",
+          "default": "Marca"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Carrossel de Marcas",
+      "category": "Seções Personalizadas",
+      "blocks": [{ "type": "brand" }, { "type": "brand" }, { "type": "brand" }]
+    }
+  ]
+}
+{% endschema %}
