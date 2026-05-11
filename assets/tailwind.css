@@ -1,0 +1,18 @@
+/*
+ * assets/tailwind.css — PLACEHOLDER
+ *
+ * Este arquivo é gerado automaticamente pelo Tailwind CLI a partir de
+ * src/tailwind.css. Para popular com as utilidades reais, rode na raiz
+ * do tema:
+ *
+ *   npm install
+ *   npm run build:css        # build de produção (minificado)
+ *   # ou, durante o desenvolvimento:
+ *   npm run watch:css        # rebuilda a cada mudança
+ *
+ * Enquanto este arquivo ficar vazio, nenhuma classe `tw-*` terá efeito,
+ * mas o tema continua funcionando 100% via base.css (Tailwind convive
+ * em paralelo, sem reset preflight).
+ *
+ * Veja TAILWIND.md na raiz do repositório para o guia completo.
+ */
