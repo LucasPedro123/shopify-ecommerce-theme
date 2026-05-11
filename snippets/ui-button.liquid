@@ -1,0 +1,132 @@
+{%- doc -%}
+  ui-button — CVA-style (Class Variance Authority) button component.
+  Retorna as classes Tailwind corretas de acordo com `variant` e `size`.
+
+  Pattern: equivalente liquid de `cva()` do React — uma fonte única de verdade
+  para todos os botões do tema. Use SEMPRE este snippet em vez de criar markup
+  de botão manualmente em sections/blocks.
+
+  @param {string} [label]      - Texto do botão (obrigatório se não houver bloco interno).
+  @param {string} [href]       - Se preenchido, renderiza <a>; se não, <button>.
+  @param {string} [type]       - 'button' | 'submit' | 'reset'. Default: 'button'.
+  @param {string} [variant]    - 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive'.
+                                  Default: 'primary'.
+  @param {string} [size]       - 'sm' | 'md' | 'lg' | 'icon'. Default: 'md'.
+  @param {boolean} [full_width] - Ocupa 100% da largura. Default: false.
+  @param {boolean} [disabled]  - Default: false.
+  @param {string} [aria_label] - Acessibilidade. OBRIGATÓRIO quando size='icon'
+                                  ou quando o conteúdo for puramente visual.
+  @param {string} [aria_expanded] - 'true' | 'false' para botões que abrem menus/modais.
+  @param {string} [aria_controls] - ID do elemento controlado.
+  @param {string} [target]     - '_blank' etc. (apenas se href).
+  @param {string} [rel]        - rel attribute (apenas se href).
+  @param {string} [icon]       - Nome do snippet de ícone a renderizar à esquerda.
+  @param {string} [icon_right] - Nome do snippet de ícone a renderizar à direita.
+  @param {string} [extra_classes] - Classes adicionais (escape hatch).
+  @param {string} [id]         - ID HTML.
+
+  @example
+  {%- render 'ui-button', label: 'Comprar agora', variant: 'primary', size: 'lg', href: product.url -%}
+  {%- render 'ui-button', label: 'Adicionar ao carrinho', variant: 'primary', size: 'md',
+        type: 'submit', full_width: true,
+        aria_label: 'Adicionar ' | append: product.title | append: ' ao carrinho' -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign _variant = variant | default: 'primary'
+  assign _size = size | default: 'md'
+  assign _type = type | default: 'button'
+
+  # ----- Base classes (sempre aplicadas) -----
+  assign base = 'tw-inline-flex tw-items-center tw-justify-center tw-gap-2xs tw-font-body tw-font-medium tw-leading-tight tw-transition tw-duration-theme tw-ease-theme-out focus-visible:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-primary focus-visible:tw-ring-offset-2 disabled:tw-opacity-50 disabled:tw-cursor-not-allowed tw-select-none tw-cursor-pointer'
+
+  # ----- Variant -----
+  case _variant
+    when 'primary'
+      assign variant_cls = 'tw-bg-btn-primary tw-text-btn-primary-fg tw-border tw-border-btn-primary-border hover:tw-bg-btn-primary-hover hover:tw-text-btn-primary-hover-fg tw-rounded-btn'
+    when 'secondary'
+      assign variant_cls = 'tw-bg-btn-secondary tw-text-btn-secondary-fg tw-border tw-border-btn-secondary-border hover:tw-bg-btn-secondary-hover hover:tw-text-btn-secondary-hover-fg tw-rounded-btn-secondary'
+    when 'outline'
+      assign variant_cls = 'tw-bg-transparent tw-text-primary tw-border tw-border-primary hover:tw-bg-primary hover:tw-text-background tw-rounded-btn'
+    when 'ghost'
+      assign variant_cls = 'tw-bg-transparent tw-text-foreground tw-border tw-border-transparent hover:tw-bg-foreground/5 tw-rounded-btn'
+    when 'destructive'
+      assign variant_cls = 'tw-bg-error tw-text-white tw-border tw-border-error hover:tw-opacity-90 tw-rounded-btn'
+    else
+      assign variant_cls = 'tw-bg-btn-primary tw-text-btn-primary-fg tw-border tw-border-btn-primary-border hover:tw-bg-btn-primary-hover hover:tw-text-btn-primary-hover-fg tw-rounded-btn'
+  endcase
+
+  # ----- Size -----
+  case _size
+    when 'sm'
+      assign size_cls = 'tw-text-sm tw-px-sm tw-py-2xs tw-min-h-[2.25rem]'
+    when 'md'
+      assign size_cls = 'tw-text-base tw-px-md tw-py-xs tw-min-h-[2.75rem]'
+    when 'lg'
+      assign size_cls = 'tw-text-lg tw-px-lg tw-py-sm tw-min-h-[3.25rem]'
+    when 'icon'
+      assign size_cls = 'tw-w-11 tw-h-11 tw-p-0'
+    else
+      assign size_cls = 'tw-text-base tw-px-md tw-py-xs tw-min-h-[2.75rem]'
+  endcase
+
+  # ----- Modifiers -----
+  assign width_cls = ''
+  if full_width
+    assign width_cls = 'tw-w-full'
+  endif
+
+  assign all_classes = base | append: ' ' | append: variant_cls | append: ' ' | append: size_cls | append: ' ' | append: width_cls
+  if extra_classes != blank
+    assign all_classes = all_classes | append: ' ' | append: extra_classes
+  endif
+
+  # Render como <a> se href, senão <button>
+  assign tag = 'button'
+  if href != blank
+    assign tag = 'a'
+  endif
+-%}
+
+{%- if tag == 'a' -%}
+  <a
+    href="{{ href }}"
+    class="{{ all_classes | strip_newlines }}"
+    {%- if id != blank %} id="{{ id }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+    {%- if aria_expanded != blank %} aria-expanded="{{ aria_expanded }}"{% endif -%}
+    {%- if aria_controls != blank %} aria-controls="{{ aria_controls }}"{% endif -%}
+    {%- if target != blank %} target="{{ target }}"{% endif -%}
+    {%- if target == '_blank' and rel == blank %} rel="noopener noreferrer"{% elsif rel != blank %} rel="{{ rel }}"{% endif -%}
+    {%- if disabled %} aria-disabled="true" tabindex="-1"{% endif -%}
+    role="button"
+  >
+    {%- if icon != blank -%}
+      <span aria-hidden="true" class="tw-inline-flex">{%- render icon -%}</span>
+    {%- endif -%}
+    {%- if label != blank -%}<span>{{ label }}</span>{%- endif -%}
+    {{ contents }}
+    {%- if icon_right != blank -%}
+      <span aria-hidden="true" class="tw-inline-flex">{%- render icon_right -%}</span>
+    {%- endif -%}
+  </a>
+{%- else -%}
+  <button
+    type="{{ _type }}"
+    class="{{ all_classes | strip_newlines }}"
+    {%- if id != blank %} id="{{ id }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+    {%- if aria_expanded != blank %} aria-expanded="{{ aria_expanded }}"{% endif -%}
+    {%- if aria_controls != blank %} aria-controls="{{ aria_controls }}"{% endif -%}
+    {%- if disabled %} disabled aria-disabled="true"{% endif -%}
+  >
+    {%- if icon != blank -%}
+      <span aria-hidden="true" class="tw-inline-flex">{%- render icon -%}</span>
+    {%- endif -%}
+    {%- if label != blank -%}<span>{{ label }}</span>{%- endif -%}
+    {{ contents }}
+    {%- if icon_right != blank -%}
+      <span aria-hidden="true" class="tw-inline-flex">{%- render icon_right -%}</span>
+    {%- endif -%}
+  </button>
+{%- endif -%}
