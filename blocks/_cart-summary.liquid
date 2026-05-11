@@ -1,8 +1,6 @@
-
-
 {% assign block_settings = block.settings %}
 {%- capture cart_summary_inner_class -%}
-  cart__summary-inner
+  cart-summary__inner
   {% if block_settings.extend_summary == false and block_settings.inherit_color_scheme == false -%}
     color-{{ block_settings.color_scheme }} inherit-parent-scheme--mobile
   {%- endif %}
@@ -16,224 +14,554 @@
     class="section-background {% if block_settings.inherit_color_scheme == false %} color-{{ block_settings.color_scheme }} inherit-parent-scheme--mobile{% endif %}"
   ></div>
 {% endif %}
+
 <div
-  class="cart__summary-container border-style{% if block_settings.extend_summary == true %} cart__container--extend {% if block_settings.inherit_color_scheme == false %} color-{{ block_settings.color_scheme }} inherit-parent-scheme--mobile{% endif %}{% endif %}{% if block_settings.border_radius > 0 %} has-border-radius{% endif %}"
+  class="cart-summary border-style {% if block_settings.extend_summary == true %} cart-summary--extend {% if block_settings.inherit_color_scheme == false %} color-{{ block_settings.color_scheme }} inherit-parent-scheme--mobile {% endif %} {% endif %} {% if block_settings.border_radius > 0 %} has-border-radius{% endif %}"
   style="{% render 'border-override', settings: block_settings %}"
   {{ block.shopify_attributes }}
 >
   <div class="{{ cart_summary_inner_class }}">
-    {% render 'cart-summary' %}
+    <div class="cart-summary__content-box">
+
+      <div class="cart-summary__totals-grid">
+        <div class="cart-summary__totals-row">
+          <span
+            >Produto ({{ cart.item_count }}
+            {% if cart.item_count == 1 %}item{% else %}itens{% endif %})</span
+          >
+          <div style="display:flex; gap:8px;">
+            {% assign total_compare = 0 %}
+            {% for item in cart.items %}
+              {% if item.variant.compare_at_price > item.original_price %}
+                {% assign compare_amount = item.variant.compare_at_price | times: item.quantity %}
+                {% assign total_compare = total_compare | plus: compare_amount %}
+              {% else %}
+                {% assign original_amount = item.original_price | times: item.quantity %}
+                {% assign total_compare = total_compare | plus: original_amount %}
+              {% endif %}
+            {% endfor %}
+
+            {% if total_compare > cart.original_total_price %}
+              <s style="color:#888;">{{ total_compare | money }}</s>
+            {% endif %}
+            <span>{{ cart.original_total_price | money }}</span>
+          </div>
+        </div>
+
+        {%- if cart.total_discount > 0 or total_compare > cart.original_total_price -%}
+          <div class="cart-summary__totals-row cart-summary__totals-row--discount">
+            <span>Descontos</span>
+            <span>
+              {%- assign total_discount_calc = total_compare | minus: cart.total_price -%}
+              - {{ total_discount_calc | money }}
+            </span>
+          </div>
+        {%- endif -%}
+
+        <div class="cart-summary__totals-row cart-summary__totals-row--shipping hidden" id="hdm-summary-shipping-row">
+           <span>Frete</span>
+           <div class="hdm-summary-shipping-price" id="hdm-summary-shipping-price">
+             </div>
+        </div>
+
+        <div class="cart-summary__totals-row cart-summary__totals-row--subtotal" id="hdm-summary-subtotal-row">
+          <strong>Subtotal</strong>
+          <strong id="hdm-summary-subtotal-price">{{ cart.total_price | money }}</strong>
+        </div>
+
+      <div class="cart-summary__coupon-widget">
+        <details class="coupon-details">
+          <summary class="coupon-summary">
+            Tem cupom de desconto?
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="coupon-icon"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </summary>
+          <div class="coupon-input-group">
+            <div class="coupon-input-wrapper">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#662483" stroke-width="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
+              <input type="text" id="hdm-coupon-input" placeholder="Código do cupom">
+            </div>
+            <button type="button" id="hdm-apply-coupon" class="coupon-apply-btn">Aplicar</button>
+          </div>
+        </details>
+      </div>
+
+      <button
+        type="submit"
+        class="cart__checkout-button button button--primary"
+        name="add"
+        form="cart-form"
+      >
+        Finalizar Compra
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          style="margin-left: 8px;"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <a href="{{ routes.all_products_collection_url }}" class="cart-summary__continue-btn"> Continuar comprando </a>
+
+      <div class="cart-summary__trust-badges">
+        <a
+          target="_blank"
+          href="https://transparencyreport.google.com/safe-browsing/search?url=hdmbeauty.com.br"
+        >
+          <img
+            src="{{ 'security-google-icon.svg' | asset_url }}"
+            width="80"
+            height="auto"
+            alt="Site 100% Seguro"
+            loading="lazy"
+          >
+        </a>
+        <div id="ra-verified-seal"></div>
+      </div>
+    </div>
   </div>
 </div>
 
+<script>
+  // 1. O INTERCEPTADOR GLOBAL (Vigia as requisições AJAX do Tema)
+  if (!window.hdmCartInterceptorActive) {
+    window.hdmCartInterceptorActive = true;
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await originalFetch.apply(this, args);
+      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+      
+      // Se a loja fez alguma requisição para alterar o carrinho (Adicionar, remover, atualizar qty)
+      if (url.includes('/cart/change') || url.includes('/cart/add') || url.includes('/cart/update') || url.includes('/cart/clear')) {
+        response.clone().json().then(cartData => {
+          // Dispara um evento avisando nossa lógica que o carrinho mudou
+          // Timeout de 400ms para dar tempo do tema re-renderizar o HTML nativo
+          setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('hdm:cart_updated', { detail: cartData }));
+          }, 400);
+        }).catch(() => {});
+      }
+      return response;
+    };
+  }
+
+  // 2. A LÓGICA PRINCIPAL (Sempre exibe o frete)
+  window.runHDMCartLogic = function(cartData = null) {
+    // Ligações Visuais do Cupom
+    const couponInput = document.getElementById('hdm-coupon-input');
+    const applyButton = document.getElementById('hdm-apply-coupon');
+    const checkoutButtons = document.querySelectorAll('button[name="checkout"], button.cart__checkout-button');
+    const cartForm = document.getElementById('cart-form') || document.querySelector('form[action="/cart"]');
+
+    if (applyButton && couponInput && !applyButton.dataset.bound) {
+      applyButton.dataset.bound = 'true';
+      applyButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (couponInput.value.trim() !== '') {
+          applyButton.textContent = 'Aplicado!';
+          applyButton.style.backgroundColor = '#e8f5e9';
+          applyButton.style.color = '#166534';
+          applyButton.style.borderColor = '#166534';
+        }
+      });
+    }
+
+    if (cartForm && couponInput) {
+      checkoutButtons.forEach((btn) => {
+        if (!btn.dataset.bound) {
+          btn.dataset.bound = 'true';
+          btn.addEventListener('click', function () {
+            const couponCode = couponInput.value.trim();
+            if (couponCode !== '') {
+              let hiddenDiscountInput = cartForm.querySelector('input[name="discount"]');
+              if (!hiddenDiscountInput) {
+                hiddenDiscountInput = document.createElement('input');
+                hiddenDiscountInput.type = 'hidden';
+                hiddenDiscountInput.name = 'discount';
+                cartForm.appendChild(hiddenDiscountInput);
+              }
+              hiddenDiscountInput.value = couponCode;
+            }
+          });
+        }
+      });
+    }
+
+    // --- LÓGICA DE CÁLCULO DE FRETE E SUBTOTAL ---
+    const shippingRow = document.getElementById('hdm-summary-shipping-row');
+    const shippingPriceContainer = document.getElementById('hdm-summary-shipping-price');
+    const savedCEP = localStorage.getItem('hdm_user_cep');
+
+    // MÁGICA DE PROTEÇÃO: Encontra o container do Subtotal de forma infalível
+    let subtotalPriceContainer = document.getElementById('hdm-summary-subtotal-price');
+    if (!subtotalPriceContainer) {
+        const subtotalRow = document.querySelector('.cart-summary__totals-row--subtotal');
+        if (subtotalRow) {
+            subtotalPriceContainer = subtotalRow.querySelectorAll('strong')[1]; // O segundo strong é o preço
+        }
+    }
+
+    if (!shippingRow || !shippingPriceContainer || !subtotalPriceContainer) return;
+
+    // Pega o valor real do carrinho (Blindado contra F5)
+    let currentCartTotalCents = 0;
+    
+    if (cartData && cartData.total_price !== undefined) {
+        // Veio de um evento AJAX (Clicou em aumentar ou remover item)
+        currentCartTotalCents = cartData.total_price;
+        subtotalPriceContainer.setAttribute('data-original-total', currentCartTotalCents);
+    } else {
+        // Carregamento inicial (Deu F5 na página). Pega o valor do Liquid do servidor
+        const liquidTotal = {{ cart.total_price | default: 0 }};
+        const attrTotal = parseInt(subtotalPriceContainer.getAttribute('data-original-total'));
+        currentCartTotalCents = !isNaN(attrTotal) ? attrTotal : liquidTotal;
+    }
+
+    // Se o carrinho estiver vazio, esconde o frete e zera o subtotal
+    if (currentCartTotalCents === 0) {
+        shippingRow.classList.add('hidden');
+        subtotalPriceContainer.innerHTML = 'R$ 0,00';
+        return;
+    }
+
+    const freeShippingThreshold = 6000; // R$ 60,00 em centavos
+
+    const formatCurrency = (valueInCents) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valueInCents / 100);
+    };
+
+    // Reseta visualmente o subtotal na tela para o valor dos itens antes do frete chegar
+    subtotalPriceContainer.innerHTML = formatCurrency(currentCartTotalCents);
+
+    if (savedCEP) {
+        const cleanCEP = savedCEP.replace(/\D/g, '');
+        
+        fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`)
+        .then(res => res.json())
+        .then(viaCepData => {
+            if(viaCepData.erro) throw new Error('CEP inválido');
+            const formattedCep = encodeURIComponent(savedCEP);
+            const province = encodeURIComponent(viaCepData.uf);
+            const city = encodeURIComponent(viaCepData.localidade);
+            const queryParams = `shipping_address[zip]=${formattedCep}&shipping_address[country]=BR&shipping_address[province]=${province}&shipping_address[city]=${city}`;
+            
+            return fetch(`/cart/prepare_shipping_rates.json?${queryParams}`, { method: 'POST' })
+                .then(() => fetch(`/cart/async_shipping_rates.json?${queryParams}`));
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data && data.shipping_rates && data.shipping_rates.length > 0) {
+                const sortedRates = data.shipping_rates.sort((a,b) => parseFloat(a.price) - parseFloat(b.price));
+                const cheapestPriceCents = parseFloat(sortedRates[0].price) * 100;
+
+                // GARANTIA: Sempre mostramos a linha descritiva do frete se o CEP foi calculado
+                shippingRow.classList.remove('hidden');
+
+                // CASO 1: Atingiu Frete Grátis (>= R$ 60)
+                if (currentCartTotalCents >= freeShippingThreshold || cheapestPriceCents === 0) {
+                    
+                    let priceToStrikeCents = cheapestPriceCents;
+                    if (cheapestPriceCents === 0 && sortedRates.length > 1) {
+                        priceToStrikeCents = parseFloat(sortedRates[sortedRates.length - 1].price) * 100;
+                    }
+
+                    if (priceToStrikeCents > 0) {
+                         const formattedStrikethrough = formatCurrency(priceToStrikeCents);
+                         shippingPriceContainer.innerHTML = `<s style="color:#888; font-size:13px; margin-right: 6px;">${formattedStrikethrough}</s><span style="color: #7c79e7; font-weight: 700; font-size: 15px;">Grátis</span>`;
+                    } else {
+                         shippingPriceContainer.innerHTML = `<span style="color: #7c79e7; font-weight: 700; font-size: 15px;">Grátis</span>`;
+                    }
+                    
+                    // Como é grátis, o subtotal é apenas o valor dos produtos
+                    subtotalPriceContainer.innerHTML = formatCurrency(currentCartTotalCents);
+                } 
+                // CASO 2: Não Atingiu Frete Grátis (< R$ 60)
+                else {
+                    // Mostra o preço do frete na linha dele
+                    const formattedShipping = formatCurrency(cheapestPriceCents);
+                    shippingPriceContainer.innerHTML = `<span style="color: #333; font-weight: 500; font-size: 14px;">${formattedShipping}</span>`;
+                    
+                    // Subtotal Transparente: Produtos + Frete
+                    const newSubtotalCents = currentCartTotalCents + cheapestPriceCents;
+                    subtotalPriceContainer.innerHTML = formatCurrency(newSubtotalCents);
+                }
+            }
+        })
+        .catch(err => console.log('Silenced HDM Shipping Error:', err));
+    }
+  };
+
+  // 3. INICIALIZAÇÃO
+  document.addEventListener('DOMContentLoaded', function () {
+      window.runHDMCartLogic();
+
+      // Escuta global caso o cliente clique no botão OK da calculadora de frete
+      document.body.addEventListener('click', function(e) {
+          if (e.target && e.target.id === 'hdm-cep-submit') {
+             setTimeout(() => window.runHDMCartLogic(), 800);
+          }
+      });
+  });
+
+  // 4. RE-AVALIAÇÃO PÓS-AJAX (Interceptador)
+  window.addEventListener('hdm:cart_updated', function(e) {
+      window.runHDMCartLogic(e.detail);
+  });
+</script>
 {% stylesheet %}
-  .cart__summary-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .cart__summary-item.tax-note {
-    font-size: var(--cart-font-size--sm);
-  }
-
-  .cart__discount-label {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-  }
-
-  .cart__total {
-    align-items: baseline;
-    font-weight: var(--font-weight-bold);
-  }
-
-  .cart__tax-note {
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
-  }
-
-  .cart__discount-label svg {
-    width: var(--icon-size-sm);
-    height: var(--icon-size-sm);
-    display: inline-block;
-  }
-
-  .cart__summary-inner {
+  .cart-summary__inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-2xl);
-    container-type: inline-size;
     padding: 0;
     position: sticky;
-    top: 0;
+    top: 40px; /* Gruda na tela ao rolar */
     align-self: start;
+    width: 100%;
+  }
 
-    @media screen and (min-width: 750px) {
-      padding: var(--padding-5xl);
-      grid-row: 1 / -1;
+  .cart-summary__content-box {
+    width: 100%;
+    /* background: #fafafa; */
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid #eaeaea;
+  }
+
+  /* Totalizadores (Produtos e Subtotal) */
+  .cart-summary__totals-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 24px 0;
+    border-bottom: 1px dashed #dcdcdc;
+    padding-bottom: 24px;
+  }
+
+  .cart-summary__totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .cart-summary__totals-row.hidden {
+      display: none !important;
+  }
+
+  .cart-summary__totals-row--discount {
+    color: #7C79E7;
+  }
+
+  .cart-summary__totals-row--subtotal {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #111;
+  }
+  
+  .hdm-summary-shipping-price {
+      display: flex;
+      align-items: center;
+  }
+
+  /* Acordeão de Cupom */
+  .cart-summary__coupon-widget {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+
+  .coupon-details summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .coupon-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .coupon-details[open] .coupon-icon {
+    transform: rotate(180deg);
+  }
+
+  .coupon-input-group {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px 16px;
+  }
+
+  .coupon-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .coupon-input-wrapper svg {
+    position: absolute;
+    left: 12px;
+  }
+
+  .coupon-input-wrapper input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px 0 40px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .coupon-input-wrapper input:focus {
+    border-color: #7C79E7;
+  }
+
+  .coupon-apply-btn {
+    height: 40px;
+    padding: 0 20px;
+    background: #f4f4f4;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .coupon-apply-btn:hover {
+    background: #e5e5e5;
+  }
+
+  /* Botões de Ação */
+  .cart__checkout-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7C79E7; /* Roxo principal da referência */
+    color: #fff;
+    padding: 18px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .cart__checkout-button:hover {
+    background-color:rgb(101, 97, 219);
+  }
+
+  .cart-summary__continue-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px;
+    margin-top: 16px;
+    background-color: #fff;
+    border: 1px solid #7C79E7;
+    color: #7C79E7;
+    font-weight: 600;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .cart-summary__continue-btn:hover {
+    background-color: #f3e8ff;
+  }
+
+  /* Selos de Confiança */
+  .cart-summary__trust-badges {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eaeaea;
+
+    .ra-widget-verified-content{
+      border: none !important;
+      padding: 0 !important;
     }
   }
 
-  body:has(> #header-group .header[sticky]) .cart__summary-inner {
-    top: var(--header-height, 0);
+  .cart-summary__trust-badges img {
+    object-fit: contain;
+      width: 115px;
+    height: auto;
+    mix-blend-mode: multiply; /* Tira o fundo branco se o PNG não for transparente */
   }
 
-  .cart__summary-container {
-    @media screen and (max-width: 749px) {
-      border: none;
-    }
+  /* Comportamentos do Tema Original Preservados */
+  .cart-summary--extend { height: 100%; }
 
-    @media screen and (min-width: 750px) {
+  @media screen and (min-width: 750px) {
+    .cart-summary {
       display: grid;
       grid-template-rows: subgrid;
       grid-row: 1 / -1;
-    }
-  }
-
-  .cart__summary-container:not(.cart__container--extend),
-  .cart__summary-container:not(.cart__container--extend) .cart__summary-inner {
-    height: auto;
-  }
-
-  .cart__container--extend {
-    height: 100%;
-
-    @media screen and (min-width: 750px) {
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-  }
-
-  /* If extend is on, only include top and bottom borders when the border radius is 0. */
-  .cart__container--extend:not(.has-border-radius) {
-    @media screen and (min-width: 750px) {
-      border-top: none;
-      border-bottom: none;
-    }
-  }
-
-  .cart__container--extend .cart__summary-inner {
-    height: 100%;
-    padding: var(--padding-md) 0 var(--padding-4xl);
-
-    @media screen and (min-width: 750px) {
-      grid-row: 2 / -1;
-      padding-inline: var(--page-margin);
-      width: var(--sidebar-width);
-    }
-  }
-
-  /* If extend is off, apply the border radius to the inner summary container */
-  .cart__summary-inner.has-border-radius {
-    border-radius: var(--border-radius);
-  }
-
-  @media screen and (max-width: 749px) {
-    .inherit-parent-scheme--mobile {
-      --color-background: inherit;
-      --color-background-rgb: inherit;
-      --color-foreground: inherit;
-      --color-foreground-rgb: inherit;
-      --color-primary: inherit;
-      --color-primary-rgb: inherit;
-      --color-primary-hover: inherit;
-      --color-primary-hover-rgb: inherit;
-      --color-border: inherit;
-      --color-border-rgb: inherit;
-      --color-shadow: inherit;
-      --color-shadow-rgb: inherit;
-      --color-foreground-heading: inherit;
-      --color-primary-button-text: inherit;
-      --color-primary-button-background: inherit;
-      --color-primary-button-border: inherit;
-      --color-primary-button-hover-text: inherit;
-      --color-primary-button-hover-background: inherit;
-      --color-primary-button-hover-border: inherit;
-      --color-secondary-button-text: inherit;
-      --color-secondary-button-background: inherit;
-      --color-secondary-button-border: inherit;
-      --color-secondary-button-hover-text: inherit;
-      --color-secondary-button-hover-background: inherit;
-      --color-secondary-button-hover-border: inherit;
-      --color-input-text: inherit;
-      --color-input-text-rgb: inherit;
-      --color-input-background: inherit;
     }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.summary",
+  "name": "Resumo do Carrinho",
   "tag": null,
   "settings": [
     {
       "type": "checkbox",
       "id": "extend_summary",
-      "label": "t:settings.extend_summary",
+      "label": "Estender Resumo",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "inherit_color_scheme",
-      "label": "t:settings.inherit_color_scheme",
+      "label": "Herdar Esquema de Cores",
       "default": false
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "t:settings.color_scheme",
+      "label": "Esquema de Cores",
       "default": "scheme-3",
       "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
     },
     {
-      "type": "header",
-      "content": "t:content.borders"
-    },
-    {
-      "type": "select",
-      "id": "border",
-      "label": "t:settings.style",
-      "options": [
-        {
-          "value": "none",
-          "label": "t:options.none"
-        },
-        {
-          "value": "solid",
-          "label": "t:options.solid"
-        }
-      ],
-      "default": "none"
-    },
-    {
-      "type": "range",
-      "id": "border_width",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "t:settings.thickness",
-      "default": 1,
-      "visible_if": "{{ block.settings.border != 'none' }}"
-    },
-    {
-      "type": "range",
-      "id": "border_opacity",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "label": "t:settings.opacity",
-      "default": 100,
-      "visible_if": "{{ block.settings.border != 'none' }}"
-    },
-    {
       "type": "range",
       "id": "border_radius",
-      "label": "t:settings.border_radius",
+      "label": "Raio da Borda",
       "min": 0,
       "max": 100,
       "step": 1,
@@ -243,7 +571,7 @@
   ],
   "presets": [
     {
-      "name": "t:names.summary"
+      "name": "Resumo do Carrinho"
     }
   ]
 }

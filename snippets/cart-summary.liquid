@@ -1,126 +1,139 @@
 {%- doc -%}
-  Renders the cart summary totals.
+  Renders the cart summary totals with Premium Checkout UI.
 {%- enddoc -%}
 
-<div class="cart__summary-totals">
-  {% # We need to keep this node in place to allow morphing to work properly # %}
-  <div class="cart__original-total-container cart-primary-typography">
-    {%- if cart.cart_level_discount_applications.size > 0 -%}
-      <span class="cart__summary-item cart__original-total">
-        <span class="cart__original-total-label">{{ 'content.cart_subtotal' | t }}</span>
-        <span class="cart__original-total-value cart-secondary-typography">
-          {{- cart.original_total_price | money -}}
-        </span>
-      </span>
-      <div class="cart__summary-discounts">
-        <ul
-          class="discounts list-unstyled"
-          role="list"
-          aria-label="{{ 'content.discounts' | t }}"
-        >
-          {%- for discount in cart.cart_level_discount_applications -%}
-            <li class="cart__summary-item cart__discount">
-              <span class="cart__discount-label">
-                {{- 'icon-discount.svg' | inline_asset_content -}}
-                {{ discount.title | escape }}
-              </span>
-              <span class="cart__discount-value cart-secondary-typography"
-                >-{{ discount.total_allocated_amount | money -}}
-              </span>
-            </li>
-          {%- endfor -%}
-        </ul>
+<div class="cart-totals">
+  <div class="cart-totals__original-container cart-primary-typography custom-summary-box">
+     <div class="cart-summary__totals-grid" style="margin: 0px; padding-bottom: 0px;">
+        <div class="cart-summary__totals-row">
+          <span
+            >Produto ({{ cart.item_count }}
+            {% if cart.item_count == 1 %}item{% else %}itens{% endif %})</span
+          >
+          <div style="display:flex; gap:8px;">
+            {% assign total_compare = 0 %}
+            {% for item in cart.items %}
+              {% if item.variant.compare_at_price > item.original_price %}
+                {% assign compare_amount = item.variant.compare_at_price | times: item.quantity %}
+                {% assign total_compare = total_compare | plus: compare_amount %}
+              {% else %}
+                {% assign original_amount = item.original_price | times: item.quantity %}
+                {% assign total_compare = total_compare | plus: original_amount %}
+              {% endif %}
+            {% endfor %}
+
+            {% if total_compare > cart.original_total_price %}
+              <s style="color:#888;">{{ total_compare | money }}</s>
+            {% endif %}
+            <span>{{ cart.original_total_price | money }}</span>
+          </div>
+        </div>
+
+        {%- if cart.total_discount > 0 or total_compare > cart.original_total_price -%}
+          <div class="cart-summary__totals-row cart-summary__totals-row--discount">
+            <span>Descontos</span>
+            <span>
+              {%- assign total_discount_calc = total_compare | minus: cart.total_price -%}
+              - {{ total_discount_calc | money }}
+            </span>
+          </div>
+        {%- endif -%}
+
+        <div class="cart-summary__totals-row cart-summary__totals-row--subtotal">
+          <strong>Subtotal</strong>
+          <strong>{{ cart.total_price | money }}</strong>
+        </div>
       </div>
-    {%- endif -%}
-  </div>
-
-  {% if settings.show_cart_note or settings.show_add_discount_code %}
-    <div class="cart-actions">
-      {% if settings.show_cart_note %}
-        {% render 'cart-note' %}
-      {% endif %}
-
-      {% if settings.show_add_discount_code %}
-        {% render 'cart-discount', section_id: section.id %}
-      {% endif %}
-    </div>
-  {% endif %}
-
-  {%- liquid
-    if settings.currency_code_enabled_cart_total
-      assign total_price = cart.total_price | money_with_currency
-    else
-      assign total_price = cart.total_price | money
-    endif
-  -%}
-
-  <div class="cart__total-container">
-    <span
-      class="cart__summary-item cart__total"
-      role="status"
-    >
-      <span class="cart__total-label cart-primary-typography">{{ 'content.cart_estimated_total' | t }}</span>
-      <text-component
-        ref="cartTotal"
-        value="{{ total_price | strip_html }}"
-        class="cart__total-value cart-secondary-typography"
-        {% comment %} Used by payment_terms web component {% endcomment %}
-        data-cart-subtotal
-      >
-        {{ total_price }}
-      </text-component>
-    </span>
-    {% if settings.show_installments %}
-      <span class="cart__summary-item cart__installments">
-        {% form 'cart', cart %}
-          {{ form | payment_terms }}
-        {% endform %}
-      </span>
-    {% endif %}
-    <div class="cart__summary-item tax-note cart-primary-typography">
-      {% render 'tax-info', has_discounts_enabled: settings.show_add_discount_code %}
-    </div>
   </div>
 </div>
 
 <div class="cart__ctas">
-  <button
-    type="submit"
-    id="checkout"
-    class="cart__checkout-button button"
-    name="checkout"
-    {% if cart == empty %}
-      disabled
-    {% endif %}
-    form="cart-form"
+  <a
+  id="checkout-bottom"
+  class="cart__checkout-button button button--primary"
+  href="{{ routes.cart_url }}"
+>
+  Finalizar Compra
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    style="margin-left: 8px;"
   >
-    {{ 'content.checkout' | t }}
-  </button>
-
-  {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
-    <div class="additional-checkout-buttons additional-checkout-buttons--vertical">
-      {{ content_for_additional_checkout_buttons }}
-    </div>
-  {% endif %}
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</a>
+   <div class="cart-summary__trust-badges" style="margin-top: 0px !important;">
+        <a
+          target="_blank"
+          href="https://transparencyreport.google.com/safe-browsing/search?url=hdmbeauty.com.br"
+        >
+          <img
+          src="{{ 'security-google-icon.svg' | asset_url }}"
+          width="80"
+          height="auto"
+          alt="Site 100% Seguro"
+          loading="lazy"
+        >
+        </a>
+      </div>
 </div>
 
-{% stylesheet %}
-  .cart-actions {
+<style>
+  .custom-summary-box {
+    background: #fcfcfc;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #eaeaea;
+  }
+  .custom-summary-row {
     display: flex;
-    flex-direction: column;
-    gap: var(--gap-2xs);
-    border-block: 1px solid var(--color-border);
-    padding-block: var(--padding-sm);
-    margin-block-start: var(--margin-3xs);
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .custom-summary-row:last-child {
+    margin-bottom: 0;
+  }
+  .custom-summary-label {
+    font-size: 14px;
+    color: #666;
+  }
+  .custom-summary-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+  }
+  .discount-row {
+    color: #166534;
+  }
+  .discount-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #166534;
+  }
+  .discount-value {
+    color: #166534;
+  }
+  .total-row {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #ccc;
+  }
+  .custom-summary-label-total {
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+  }
+  .custom-summary-value-total {
+    font-size: 20px;
+    font-weight: 800;
+    color: #000;
   }
 
-  .cart__summary-totals:not(:has(.cart-actions)) {
-    margin-block-start: var(--margin-3xs);
-    border-block-start: 1px solid var(--color-border);
-    padding-block-start: var(--margin-xl);
-  }
-
-  .cart__installments {
-    color: var(--color-foreground);
-  }
-{% endstylesheet %}
+</style>

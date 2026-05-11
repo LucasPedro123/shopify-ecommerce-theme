@@ -6,110 +6,44 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "breadcrumb_rXPhef": {
+      "type": "breadcrumb",
+      "name": "Breadcrumbs (HDM)",
+      "settings": {
+        "text_color": "#666666",
+        "link_hover_color": "#000000",
+        "bg_color": "rgba(0,0,0,0)",
+        "full_width": false,
+        "alignment": "flex-start",
+        "padding_top": 28,
+        "padding_bottom": 0
+      }
+    },
     "main": {
       "type": "main-blog",
       "blocks": {
-        "title": {
-          "type": "text",
-          "name": "Title",
+        "sidebar_ad_KwQDAL": {
+          "type": "sidebar_ad",
           "settings": {
-            "text": "<p>{{ closest.blog.title }}</p>",
-            "width": "fit-content",
-            "max_width": "narrow",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-primary--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 48,
-            "padding-block-end": 48,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "static-blog-post-card": {
-          "type": "_blog-post-card",
-          "static": true,
-          "settings": {
-            "alignment": "left"
-          },
-          "blocks": {
-            "heading": {
-              "type": "_heading",
-              "name": "t:names.title",
-              "static": true,
-              "settings": {
-                "type_preset": "h4",
-                "font": "var(--font-primary--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "",
-                "text": "",
-                "read_only": true,
-                "alignment": "left",
-                "show_alignment": false,
-                "padding-block-start": 0,
-                "padding-block-end": 10,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "blog-post-details": {
-              "type": "_blog-post-info-text",
-              "name": "t:names.details",
-              "static": true,
-              "settings": {
-                "show_date": true,
-                "show_author": false,
-                "type_preset": "",
-                "alignment": "left",
-                "show_alignment": false,
-                "padding-block-start": 0,
-                "padding-block-end": 0
-              },
-              "blocks": {}
-            },
-            "image": {
-              "type": "_blog-post-image",
-              "static": true,
-              "settings": {
-                "height": "large",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 4
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": []
+            "image": "shopify://shop_images/Design_sem_nome_10.gif",
+            "link": ""
+          }
         }
       },
       "block_order": [
-        "title"
+        "sidebar_ad_KwQDAL"
       ],
       "settings": {
-        "color_scheme": "",
-        "padding-block-start": 0,
-        "padding-block-end": 48
+        "recommended_collection": "lola-from-rio",
+        "color_scheme": ""
       }
     }
   },
   "order": [
+    "breadcrumb_rXPhef",
     "main"
   ]
 }

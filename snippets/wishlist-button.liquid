@@ -1,0 +1,156 @@
+{% doc %}
+  Renders a wishlist toggle button for a given product.
+
+  Stores the product in localStorage so it can be used across the theme.
+
+  @param {product} product - The product whose wishlist state will be toggled
+
+  @example
+{% enddoc %}
+
+<button 
+  class="custom-pc-wishlist button-unstyled" 
+  data-product-handle="{{ product.handle }}" 
+  data-product-title="{{ product.title | escape }}"
+  aria-label="Adicionar aos Favoritos"
+  type="button"
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    stroke="currentColor"
+    stroke-width="2"
+    fill="none"
+    class="wishlist-icon"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+  </svg>
+</button>
+
+{% stylesheet %}
+  .custom-pc-wishlist {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+    pointer-events: auto;
+    color: currentColor;
+    outline: none;
+    -webkit-tap-highlight-color: transparent; /* Remove o fundo azul ao tocar no mobile */
+  }
+
+  .custom-pc-wishlist:hover {
+    color: #e11d48;
+  }
+
+  /* Efeito de clique do botão base */
+  .custom-pc-wishlist:active {
+    transform: scale(0.9);
+  }
+
+  /* Transição suave para quando o cliente desmarca o favorito (Unlike) */
+  .custom-pc-wishlist .wishlist-icon {
+    transition: fill 0.3s ease, stroke 0.3s ease;
+    transform-origin: center;
+  }
+
+  /* Keyframes da Animação Estilo Instagram (Heart Burst) */
+  @keyframes heart-burst {
+    0% {
+      transform: scale(1);
+    }
+    15% {
+      transform: scale(1.35); /* Expansão exagerada inicial */
+    }
+    40% {
+      transform: scale(0.85); /* Contração para dar o efeito elástico */
+    }
+    70% {
+      transform: scale(1.1); /* Leve expansão de estabilização */
+    }
+    100% {
+      transform: scale(1); /* Tamanho final */
+    }
+  }
+
+  /* Aplicação da animação quando o estado é ativo */
+  .custom-pc-wishlist.is-active .wishlist-icon {
+    fill: #e11d48; 
+    stroke: #e11d48;
+    animation: heart-burst 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', () => {
+    const WISHLIST_KEY = 'hdm_wishlist';
+    const wishlistButtons = document.querySelectorAll('.custom-pc-wishlist');
+
+    const getWishlist = () => {
+      try {
+        const stored = window.localStorage.getItem(WISHLIST_KEY);
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    };
+
+    const saveWishlist = (list) => {
+      try {
+        window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+      } catch (e) {}
+    };
+
+    const initWishlistButtons = () => {
+      const currentWishlist = getWishlist();
+      wishlistButtons.forEach((button) => {
+        const handle = button.dataset.productHandle;
+        const isInWishlist = currentWishlist.some((item) => item.handle === handle);
+        if (isInWishlist) {
+          button.classList.add('is-active');
+          button.setAttribute('aria-pressed', 'true');
+        } else {
+          button.setAttribute('aria-pressed', 'false');
+        }
+      });
+    };
+
+    const toggleWishlist = (handle, title, button) => {
+      let currentWishlist = getWishlist();
+      const index = currentWishlist.findIndex((item) => item.handle === handle);
+
+      if (index > -1) {
+        currentWishlist.splice(index, 1);
+        button.classList.remove('is-active');
+        button.setAttribute('aria-pressed', 'false');
+      } else {
+        currentWishlist.push({ handle, title });
+        button.classList.add('is-active');
+        button.setAttribute('aria-pressed', 'true');
+      }
+
+      saveWishlist(currentWishlist);
+      window.dispatchEvent(new Event('wishlistUpdated'));
+    };
+
+    wishlistButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const handle = button.dataset.productHandle;
+        const title = button.dataset.productTitle;
+        if (handle) {
+          toggleWishlist(handle, title, button);
+        }
+      });
+    });
+
+    initWishlistButtons();
+  });
+{% endjavascript %}

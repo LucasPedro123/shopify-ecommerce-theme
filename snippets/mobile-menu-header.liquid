@@ -1,0 +1,28 @@
+{%- comment -%} HDM Beauty - Mobile Menu Header {%- endcomment -%}
+<div class="mobile-menu-header">
+  {%- if customer -%}
+    <div class="mobile-menu-header__avatar">
+      {{ customer.first_name | slice: 0 | capitalize }}{{ customer.last_name | slice: 0 | capitalize }}
+    </div>
+    <div class="mobile-menu-header__greeting">
+      {%- assign hour = 'now' | date: "%H" | plus: 0 -%}
+      {%- if hour < 12 -%}Bom dia
+      {%- elsif hour < 18 -%}Boa tarde
+      {%- else -%}Boa noite{%- endif -%}, <strong>{{ customer.first_name }}!</strong>
+    </div>
+    <a href="{{ routes.account_url }}" class="mobile-menu-header__btn">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      Acessar meu perfil
+    </a>
+  {%- else -%}
+    <div class="mobile-menu-header__avatar">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#662483" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <div class="mobile-menu-header__greeting">
+      Olá! Bem-vindo(a) à <strong>HDM Beauty</strong>
+    </div>
+    <a href="{{ routes.account_login_url }}" class="mobile-menu-header__btn">
+      Entrar ou Cadastrar
+    </a>
+  {%- endif -%}
+</div>

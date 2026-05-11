@@ -6,23 +6,17 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "cart-section": {
       "type": "main-cart",
       "blocks": {
-        "cart-page-title": {
-          "type": "_cart-title",
-          "static": true,
+        "cart_shipping_calculator_VqBQfB": {
+          "type": "cart-shipping-calculator",
+          "name": "Calculadora de frete",
           "settings": {
-            "title": "Cart",
-            "show_count": true,
-            "type_preset": "h4",
-            "alignment": "left",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "title": "Consulte o frete e o prazo de entrega"
           },
           "blocks": {}
         },
@@ -47,219 +41,106 @@
           "settings": {
             "extend_summary": true,
             "inherit_color_scheme": false,
-            "color_scheme": "scheme-2",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
+            "color_scheme": "scheme-4",
             "border_radius": 0
           },
           "blocks": {}
         }
       },
+      "block_order": [
+        "cart_shipping_calculator_VqBQfB"
+      ],
       "settings": {
         "section_width": "page-width",
-        "color_scheme": "",
-        "padding-block-start": 24,
-        "padding-block-end": 0
+        "color_scheme": ""
       }
     },
-    "product_list_NNFgcy": {
-      "type": "product-list",
+    "cart_reviews_slider_wQxXYj": {
+      "type": "cart-reviews-slider",
       "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
+        "review_MfQbEF": {
+          "type": "review",
           "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_fifeh4": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>You may also like</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_eibbma": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "link",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_fifeh4",
-            "product_list_button_eibbma"
-          ]
+            "image": "shopify://shop_images/O0Hx1GnL4_mid.jpg",
+            "stars": 5,
+            "review_text": "Esse Primer é maravilhoso , só comprem , eu tenho a pele oleosa e ele deu super certo. Amei o atendimento da loja , a entrega foi super rápida , acabaram de conquista uma cliente ❤️",
+            "author_name": "Sthepany"
+          }
         },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
+        "review_ULbaG6": {
+          "type": "review",
           "settings": {
-            "product_card_gap": 4,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_PEPpfq": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_WNMpHe": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_yXfkPX": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_PEPpfq",
-            "product_title_WNMpHe",
-            "price_yXfkPX"
-          ]
+            "image": "shopify://shop_images/WP-jXsr6l_mid_1.jpg",
+            "stars": 5,
+            "review_text": "Amei, a loja foi muito querida. Enviou até um brinde 😍 o produto é maravilhoso, deixa a pele pronta para receber a base e ajuda a segurar a make, e olha que eu sou bastante. Perfeito, recomendo",
+            "author_name": "Quelita Souza"
+          }
+        },
+        "review_fFxgCk": {
+          "type": "review",
+          "settings": {
+            "image": "shopify://shop_images/LfB1_7SW__mid.jpg",
+            "stars": 5,
+            "review_text": "GENTE, AINDA NÃO POSSO FALAR NADA, ACABOU DE CHEGAR ! TUDO QUE POSSO DIZER. É QUE ME FOI MUITO RECOMENDADO E CHEGOU RÁPIDO.\nA LOJA É SHOW VEIO COM MUITO CAPRICHO E BRINDES, ENTÃO COMM CERTEZA COMPRAREI NOVAMENTE PRODUTOS DESSE VENDEDOR",
+            "author_name": "Denise M"
+          }
+        },
+        "review_jf7zgr": {
+          "type": "review",
+          "settings": {
+            "image": "shopify://shop_images/0xzyOzmzR_mid.jpg",
+            "stars": 5,
+            "review_text": "É a segunda vez que compro de tão bom que é!",
+            "author_name": "Maria Eduarda"
+          }
+        },
+        "review_T7EFtM": {
+          "type": "review",
+          "settings": {
+            "image": "shopify://shop_images/BLMQoqD2m_mid.jpg",
+            "stars": 5,
+            "review_text": "Ameiiii",
+            "author_name": "Rayra Thuanny"
+          }
+        },
+        "review_GpJB7G": {
+          "type": "review",
+          "settings": {
+            "image": "shopify://shop_images/NbOS-An7G_mid.jpg",
+            "stars": 5,
+            "review_text": "Amei comprar nessa loja, me surpreendi com a rapidez na entrega e ainda recebi um brinde, simplesmente 1000/10 amei e super recomendo.",
+            "author_name": "Gabrielle Ferreira"
+          }
+        },
+        "review_EcCLCR": {
+          "type": "review",
+          "settings": {
+            "image": "shopify://shop_images/MuyZ4Xtlv_mid.jpg",
+            "stars": 5,
+            "review_text": "Se os produtos tiverem a altura desse cuidado e atenção o pacote estará completo. Gente, acabou de chegar,com muito carinho envolvido e um mimo. Só ouvi coisa positivas sobre o produto. Comprei por indicação de uma amiga. Obrigada. Agora é usar e aguardar os resultados. ❣️❣️.",
+            "author_name": "Giovana Battazza F."
+          }
         }
       },
-      "name": "Featured collection",
+      "block_order": [
+        "review_MfQbEF",
+        "review_ULbaG6",
+        "review_fFxgCk",
+        "review_jf7zgr",
+        "review_T7EFtM",
+        "review_GpJB7G",
+        "review_EcCLCR"
+      ],
+      "name": "Avaliações no Carrinho",
       "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 4,
-        "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "bg_color": "#ffffff",
+        "autoplay": true,
+        "autoplay_speed": 5
       }
     }
   },
   "order": [
     "cart-section",
-    "product_list_NNFgcy"
+    "cart_reviews_slider_wQxXYj"
   ]
 }

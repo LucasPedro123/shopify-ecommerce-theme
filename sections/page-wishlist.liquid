@@ -1,0 +1,275 @@
+{{ 'section-custom-product-slider.css' | asset_url | stylesheet_tag }}
+
+<section 
+  class="page-width custom-wishlist-section" 
+  aria-labelledby="wishlist-page-title"
+  style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <header class="wishlist-header center">
+    <h1 id="wishlist-page-title" class="title h2">Meus Favoritos</h1>
+    <p class="wishlist-subtitle">Seus produtos mais desejados, guardados para você.</p>
+  </header>
+
+  <ul 
+    id="wishlist-grid-container" 
+    class="custom-wishlist-grid" 
+    role="list"
+  >
+    </ul>
+
+  <div id="wishlist-empty-state" class="wishlist-empty-state hidden center">
+    <svg viewBox="0 0 24 24" width="48" height="48" stroke="#ccc" stroke-width="1.5" fill="none">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+    <h2 class="h3">Sua lista está vazia</h2>
+    <p>Explore a loja e adicione produtos aos favoritos clicando no coração.</p>
+    <a href="{{ routes.all_products_collection_url }}" class="button custom-checkout-btn">Explorar Produtos</a>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const gridContainer = document.getElementById('wishlist-grid-container');
+  const emptyState = document.getElementById('wishlist-empty-state');
+  
+  const formatMoney = (cents) => {
+    if (!cents) return 'R$ 0,00';
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+  };
+
+  const renderWishlistPage = async () => {
+    let wishlist = [];
+    
+    // Blindagem de Dados do LocalStorage
+    try {
+      const storedData = localStorage.getItem('hdm_wishlist');
+      if (storedData) {
+        wishlist = JSON.parse(storedData);
+        if (typeof wishlist === 'string') wishlist = JSON.parse(wishlist);
+      }
+    } catch (error) {
+      console.warn('HDM: Erro na wishlist.', error);
+      wishlist = [];
+    }
+
+    if (!Array.isArray(wishlist)) wishlist = [];
+
+    const safeHandles = wishlist.map(item => {
+      if (typeof item === 'object' && item !== null) return item.handle || item.name;
+      return item;
+    }).filter(Boolean);
+
+    // Lógica de UI/UX para lista vazia
+    if (safeHandles.length === 0) {
+      gridContainer.innerHTML = '';
+      gridContainer.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      return;
+    } else {
+      emptyState.classList.add('hidden');
+      gridContainer.classList.remove('hidden');
+    }
+
+    gridContainer.innerHTML = '<p class="center" style="width: 100%; grid-column: 1 / -1;">Carregando seus favoritos...</p>';
+    
+    let html = '';
+
+    // Fetch na API para montar os cards dinamicamente
+    for (const handle of safeHandles.reverse()) {
+      try {
+        const response = await fetch(`/products/${handle}.js`);
+        if (!response.ok) continue; // Se o produto foi deletado da loja, pula
+        const product = await response.json();
+        
+        const imageUrl = product.featured_image || (product.images && product.images.length > 0 ? product.images[0] : '');
+        
+        // Montagem das Badges
+        let badgesHtml = '';
+        if (product.tags && product.tags.includes('Cabelo')) {
+          badgesHtml += `<span class="custom-pc-badge">CABELO</span>`;
+        }
+        if (product.compare_at_price > product.price) {
+          badgesHtml += `<span class="custom-pc-badge custom-pc-badge--sale">OFERTA</span>`;
+        }
+
+        // Montagem do Preço
+        let priceHtml = '';
+        if (product.compare_at_price > product.price) {
+          priceHtml = `
+            <span class="custom-pc-price-compare">de <del>${formatMoney(product.compare_at_price)}</del></span>
+            <div class="custom-pc-price-current">
+              <span class="custom-pc-price-prefix">por</span>
+              <span class="custom-pc-price-amount">${formatMoney(product.price)}</span>
+            </div>
+          `;
+        } else {
+          priceHtml = `
+            <div class="custom-pc-price-current">
+              <span class="custom-pc-price-amount">${formatMoney(product.price)}</span>
+            </div>
+          `;
+        }
+
+        // Remove o html tags da descrição para truncar limpo
+        const plainDescription = product.description ? product.description.replace(/<[^>]*>?/gm, '').split(' ').slice(0, 15).join(' ') + '...' : '';
+
+        // INJEÇÃO DO HTML IDÊNTICO AO SEU LIQUID (Semântico: li > article)
+        html += `
+          <li class="wishlist-grid-item">
+            <article class="custom-product-card">
+              <div class="custom-pc-badges">
+                ${badgesHtml}
+                <button class="custom-pc-wishlist is-active" data-product-handle="${product.handle}" aria-label="Remover dos favoritos">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" class="wishlist-icon">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <a href="${product.url}" class="custom-pc-image-link" aria-label="Ver detalhes de ${product.title}">
+                <img src="${imageUrl}" class="custom-pc-img" alt="${product.title}" loading="lazy">
+              </a>
+
+              <div class="custom-pc-info center">
+                <div class="custom-pc-text-area">
+                  <h3 class="custom-pc-title">
+                    <a href="${product.url}">${product.title}</a>
+                  </h3>
+                  <p class="custom-pc-vendor">
+                    by <span><a href="/collections/${product.vendor.toLowerCase().replace(/ /g, '-')}">${product.vendor}</a></span>
+                  </p>
+                  <p class="custom-pc-description">${plainDescription}</p>
+                </div>
+
+                <div class="custom-pc-action-area">
+                  <div class="custom-pc-price">
+                    ${priceHtml}
+                  </div>
+                  <a href="${product.url}" class="button button--secondary" style="width: 100%; margin-top: 10px;">Ver Produto</a>
+                </div>
+              </div>
+            </article>
+          </li>
+        `;
+      } catch (error) {
+        console.error('HDM Wishlist Page Error:', error);
+      }
+    }
+
+    gridContainer.innerHTML = html;
+
+    // Adiciona o evento de desfavoritar diretamente nos corações renderizados
+    const activeButtons = gridContainer.querySelectorAll('.custom-pc-wishlist');
+    activeButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const handle = btn.dataset.productHandle;
+        
+        // Remove do Local Storage
+        const currentList = JSON.parse(localStorage.getItem('hdm_wishlist')) || [];
+        const newList = currentList.filter(item => item !== handle && item.handle !== handle);
+        localStorage.setItem('hdm_wishlist', JSON.stringify(newList));
+        
+        // Animação de remoção suave na tela
+        const li = btn.closest('.wishlist-grid-item');
+        li.style.opacity = '0';
+        li.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          renderWishlistPage(); // Renderiza de novo para limpar a tela
+          window.dispatchEvent(new Event('wishlistUpdated')); // Atualiza o header
+        }, 300);
+      });
+    });
+  };
+
+  renderWishlistPage();
+});
+</script>
+
+<style>
+  /* Estrutura da Página e Grid */
+  .custom-wishlist-section {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .wishlist-header {
+    margin-bottom: 40px;
+  }
+  .wishlist-subtitle {
+    color: #666;
+  }
+
+  /* O Grid Responsivo */
+  .custom-wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .custom-wishlist-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .custom-wishlist-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Transição de exclusão */
+  .wishlist-grid-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Estado Vazio */
+  .wishlist-empty-state {
+    padding: 60px 20px;
+    background: #fafafa;
+    border-radius: 16px;
+    margin-top: 20px;
+  }
+  .wishlist-empty-state svg {
+    margin-bottom: 16px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Página de Favoritos",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Superior",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Inferior",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Grade de Favoritos"
+    }
+  ]
+}
+{% endschema %}

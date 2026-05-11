@@ -1,0 +1,106 @@
+{% liquid
+  assign show_section = false
+  
+  if section.settings.target_collections == blank
+    assign show_section = true
+  else
+    assign target_handles = section.settings.target_collections | downcase | split: ','
+    for handle in target_handles
+      assign clean_handle = handle | strip
+      if collection.handle == clean_handle
+        assign show_section = true
+        break
+      endif
+    endfor
+  endif
+%}
+
+{% if collection and section.settings.collection_banner and collection.id == section.settings.collection_banner.id %}
+  {% if show_section and section.blocks.size > 0 %}
+    {{ 'section-collection-banners.css' | asset_url | stylesheet_tag }}
+
+    <section class="hdm-collection-banners hdm-collection-banners--{{ section.settings.layout_type }}">
+      <div class="page-width">
+        <div class="hdm-cb-container">
+          
+          {% for block in section.blocks %}
+            <a href="{{ block.settings.link_url | default: '#' }}" class="hdm-cb-item" {{ block.shopify_attributes }}>
+              {% if block.settings.image != blank %}
+                <img 
+                  src="{{ block.settings.image | image_url: width: 1200 }}" 
+                  alt="{{ block.settings.image.alt | default: collection.title | escape }}" 
+                  class="hdm-cb-image"
+                  loading="lazy"
+                >
+              {% else %}
+                {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg hdm-cb-image' }}
+              {% endif %}
+            </a>
+          {% endfor %}
+
+        </div>
+      </div>
+    </section>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Banners Condicionais HDM",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection_banner",
+      "label": "Coleção para exibir este banner"
+    },
+    {
+      "type": "paragraph",
+      "content": "Estes banners são imagens puras (sem texto em HTML). Configure onde e como eles devem aparecer."
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "Estilo do Layout",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "Banners Verticais (Lado a Lado)"
+        },
+        {
+          "value": "horizontal",
+          "label": "Banner Horizontal (Largo e Fino)"
+        }
+      ],
+      "default": "vertical"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "banner_image",
+      "name": "Imagem do Banner",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link da Imagem"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banners Condicionais HDM",
+      "blocks": [
+        { "type": "banner_image" },
+        { "type": "banner_image" },
+        { "type": "banner_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

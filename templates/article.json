@@ -6,92 +6,55 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "breadcrumb_zWEzTF": {
+      "type": "breadcrumb",
+      "name": "Breadcrumbs (HDM)",
+      "settings": {
+        "text_color": "#666666",
+        "link_hover_color": "#000000",
+        "bg_color": "transparent",
+        "full_width": false,
+        "alignment": "flex-start",
+        "padding_top": 20,
+        "padding_bottom": 0
+      }
+    },
     "section": {
       "type": "main-blog-post",
       "blocks": {
-        "blog-post-title": {
-          "type": "text",
-          "name": "Title",
-          "static": true,
+        "promo_banner_By4LQd": {
+          "type": "promo_banner",
           "settings": {
-            "text": "<h1>{{ article.title }}</h1>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "center",
-            "type_preset": "h2",
-            "font": "var(--font-primary--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "image": "shopify://shop_images/Design_sem_nome_10.gif",
+            "link": "shopify://collections/cabelo"
+          }
         },
-        "blog-post-details": {
-          "type": "_blog-post-info-text",
-          "name": "Details",
-          "static": true,
+        "product_highlight_hDRJDw": {
+          "type": "product_highlight",
           "settings": {
-            "show_date": true,
-            "show_author": false,
-            "type_preset": "",
-            "alignment": "center",
-            "show_alignment": true,
-            "padding-block-start": 24,
-            "padding-block-end": 0
-          },
-          "blocks": {}
-        },
-        "blog-post-image": {
-          "type": "image",
-          "name": "Featured image",
-          "static": true,
-          "settings": {
-            "image_ratio": "landscape",
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "blog-post-content": {
-          "type": "_blog-post-content",
-          "static": true,
-          "settings": {},
-          "blocks": {}
+            "title": "Recomendado para você",
+            "product": "australian-gold-gel-creme-fps-30-protetor-solar-200g"
+          }
         }
       },
+      "block_order": [
+        "promo_banner_By4LQd",
+        "product_highlight_hDRJDw"
+      ],
       "settings": {
-        "content_direction": "column",
-        "gap": 32,
         "color_scheme": "",
-        "padding-block-start": 40,
-        "padding-block-end": 80
+        "show_image": true,
+        "show_date": true,
+        "show_author": true,
+        "show_share_buttons": true
       }
     }
   },
   "order": [
+    "breadcrumb_zWEzTF",
     "section"
   ]
 }

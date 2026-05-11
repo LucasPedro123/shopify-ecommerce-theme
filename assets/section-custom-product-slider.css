@@ -1,0 +1,399 @@
+/* Container Principal */
+.custom-ps-wrapper {
+  padding-top: 74px;
+  padding-bottom: 50px;
+  position: relative;
+  place-items: center;
+}
+
+.custom-ps-header {
+  margin-bottom: 30px;
+}
+
+.custom-ps-title {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 43px;
+    text-align: center;
+    color: #000000;
+    margin: 0;
+}
+
+/* Container do Slider */
+.custom-ps-slider-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-ps-slider {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 20px;
+  padding: 10px 0;
+  margin: 0;
+  list-style: none;
+  cursor: grab;
+}
+
+.custom-ps-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-ps-slide {
+  flex: 0 0 calc(50% - 10px);
+  scroll-snap-align: start;
+  min-width: 0; 
+  padding: 21px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media screen and (min-width: 750px) {
+  .custom-ps-slide {
+    flex: 0 0 calc(33.333% - 13.33px);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .custom-ps-slide {
+    flex: 0 0 calc(25% - 15px);
+  }
+}
+
+/* Card do Produto */
+.custom-product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  background: #fff;
+}
+
+/* Badges e Wishlist */
+.custom-pc-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  pointer-events: none; /* Deixa o clique passar para a imagem */
+}
+
+.custom-pc-badge {
+  background-color: #8b628b; /* Roxo puxado da sua imagem */
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  pointer-events: auto;
+}
+
+.custom-pc-wishlist {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #c4c4c4;
+  padding: 0;
+  transition: color 0.2s ease;
+  pointer-events: auto;
+}
+
+.custom-pc-wishlist:hover {
+  color: #e57373;
+}
+
+/* Imagem do Produto */
+.custom-pc-image-link {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.custom-pc-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+.custom-pc-image-link:hover .custom-pc-img {
+  transform: scale(1.05); /* Leve zoom ao focar no produto */
+}
+
+/* Informações do Produto */
+.custom-pc-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.custom-pc-title {
+    padding: 10px 26px;
+    margin: 0 0 5px 0;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.custom-pc-title a {
+  color: #000;
+  text-decoration: none;
+}
+
+.custom-pc-vendor {
+    margin: 0 0 13px 0;
+    font-weight: 400;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    color: #898989;
+}
+
+.custom-pc-vendor span {
+  text-decoration: underline;
+}
+
+.custom-pc-description{
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 19px;
+    color: #000000;
+    text-align: center;
+    margin: 0 0 13px 0;
+}
+
+/* Preço */
+.custom-pc-price {
+  margin-bottom: 13px;
+  margin-top: auto;
+}
+
+.custom-pc-price-prefix {
+    margin-right: 4px;
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 150%;
+    color: #000000;
+}
+
+.custom-pc-price-amount {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 150%;
+ 
+    color: #000000;
+}
+
+/* Botão Adicionar ao Carrinho */
+.custom-pc-form {
+  margin-top: auto;
+}
+
+.custom-pc-btn-add {
+  width: 100%;
+  padding: 12px 10px;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-pc-btn-add:hover:not([disabled]) {
+  border-color: #000;
+  background-color: #f9f9f9;
+}
+
+.custom-pc-btn-add[disabled] {
+  background-color: #f5f5f5;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.custom-ps-slider-container .custom-hero-arrow--left {
+  left: -18px; /* Joga um pouco para fora do grid */
+}
+
+.custom-ps-slider-container .custom-hero-arrow--right {
+  right: -18px;
+}
+
+.custom-ps-footer {
+  margin-top: 48px;
+}
+
+.custom-ps-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.3s ease;
+}
+
+.custom-ps-dot.is-active {
+  background-color: #7C79E7;
+}
+
+.custom-ps-dots{
+    display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .custom-ps-slide, .custom-pc-title{
+    padding: 0px;
+  }
+
+  .custom-pc-title{
+    max-width: 20ch; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+    
+  .custom-ps-dots {
+    gap: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .custom-ps-slider-container .custom-hero-arrow {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 349px) {
+
+    .custom-pc-title, .custom-pc-description, .add-to-cart-text{
+        font-size: 11px;
+    }
+
+}
+
+/* Garante que o Card expanda a altura toda disponível no Grid/Slider */
+.custom-product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Transforma a área de info num flex que preenche o espaço vazio */
+.custom-pc-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Puxa todo o espaço vertical livre */
+  width: 100%;
+}
+
+/* Área de Textos: Vamos limitar as linhas para padronizar visualmente */
+.custom-pc-text-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  
+  .custom-pc-title{
+    padding: 0px 26px;
+  }
+  
+}
+
+.custom-pc-title a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 32px; 
+}
+
+.custom-pc-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 15px;
+}
+
+.custom-pc-action-area {
+  margin-top: auto; 
+  width: 100%;
+}
+
+.custom-pc-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 40px;
+  justify-content: flex-end;
+
+  text-align: center;
+  margin-block: 13px;
+}
+
+/* Preço Antigo (Riscado) */
+.custom-pc-price-compare {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 2px;
+
+  del{
+    font-size: 16px;
+  }
+}
+
+/* Preço Atual */
+.custom-pc-price-current {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.custom-pc-price-prefix {
+  font-size: 11px;
+  color: #666;
+}
+
+.custom-pc-price-amount {
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+}
+
+/* Badge Extra (Se o produto tiver desconto, ganha uma flag diferente) */
+.custom-pc-badge--sale {
+  background-color: #000; /* Pode mudar pra vermelho se quiser dar mais destaque */
+}

@@ -1,23 +1,82 @@
+{% capture cart_page_more_blocks_content %}
+  <div class="cart-page__more-blocks">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'gift_packaging' -%}
+          <div class="cart-gift-block" {{ block.shopify_attributes }}>
+            <div class="cart-gift-header">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#662483" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="8" width="18" height="12" rx="2" ry="2"></rect>
+                <path d="M12 8v12"></path>
+                <path d="M11.5 8c0-2.5-3-3.5-5-2.5s-2 3.5 0 5l5.5-2.5z"></path>
+                <path d="M12.5 8c0-2.5 3-3.5 5-2.5s2 3.5 0 5l-5.5-2.5z"></path>
+              </svg>
+              <h3>{{ block.settings.title }}</h3>
+            </div>
+            
+            <div class="cart-gift-grid">
+              {%- if block.settings.gift_1 != blank -%}
+                {%- assign gift1 = all_products[block.settings.gift_1] -%}
+                <div class="cart-gift-card">
+                  <div class="cart-gift-card__info">
+                    {%- if block.settings.gift_1_badge != blank -%}
+                      <span class="cart-gift-badge">{{ block.settings.gift_1_badge }}</span>
+                    {%- endif -%}
+                    <strong>{{ gift1.title | default: 'Caixa' }}</strong>
+                    <p>{{ block.settings.gift_1_desc }}</p>
+                  </div>
+                  <button type="button" class="cart-gift-add" data-variant-id="{{ gift1.selected_or_first_available_variant.id }}" aria-label="Adicionar presente">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                </div>
+              {%- endif -%}
 
+              {%- if block.settings.gift_2 != blank -%}
+                {%- assign gift2 = all_products[block.settings.gift_2] -%}
+                <div class="cart-gift-card">
+                  <div class="cart-gift-card__info">
+                    {%- if block.settings.gift_2_badge != blank -%}
+                      <span class="cart-gift-badge">{{ block.settings.gift_2_badge }}</span>
+                    {%- endif -%}
+                    <strong>{{ gift2.title | default: 'Sacola' }}</strong>
+                    <p>{{ block.settings.gift_2_desc }}</p>
+                  </div>
+                  <button type="button" class="cart-gift-add" data-variant-id="{{ gift2.selected_or_first_available_variant.id }}" aria-label="Adicionar presente">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+{% endcapture %}
 
-<cart-items-component
-  class="cart-items-component"
-  data-section-id="{{ section.id }}"
->
+<cart-items-component class="cart-items-component" data-section-id="{{ section.id }}">
   <div class="section-background color-{{ section.settings.color_scheme }}"></div>
-  <div
-    class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
-  >
+  <div class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}">
     <div
       class="cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
       style="{% render 'spacing-style', settings: section.settings %}"
     >
-      <div class="cart-page__title">
-        {%- content_for 'block', id: 'cart-page-title', type: '_cart-title' %}
-      </div>
+      <div class="cart-page__main">
+        {% comment %}
+          <div class="cart-page__title">
+            {%- content_for 'block', id: 'cart-page-title', type: '_cart-title' %}
+          </div>
+        {% endcomment %}
 
-      <div class="cart-page__items">
-        {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
+        <div class="cart-page__items">
+          <div class="cart-page__more-blocks">
+            {%- content_for 'blocks' -%}
+          </div>
+          {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
+        </div>
+
+        {%- unless cart.empty? -%}
+          {{ cart_page_more_blocks_content }}
+        {%- endunless -%}
       </div>
 
       {%- unless cart.empty? -%}
@@ -25,175 +84,187 @@
           {%- content_for 'block', id: 'cart-page-summary', type: '_cart-summary' -%}
         </div>
       {%- endunless -%}
-
-      <div class="cart-page__more-blocks">
-        {%- content_for 'blocks' -%}
-      </div>
     </div>
   </div>
 </cart-items-component>
 
-{% stylesheet %}
-  .cart-page {
-    --cart-font-size--2xs: var(--font-size--2xs);
-    --cart-font-size--xs: var(--font-size--xs);
-    --cart-font-size--sm: var(--font-size--sm);
-    --cart-font-size--md: var(--font-size--md);
-    --cart-font-size--2xl: var(--font-size--2xl);
+<script>
+  // Script para adicionar a embalagem de presente via AJAX
+  document.querySelectorAll('.cart-gift-add').forEach((button) => {
+    button.addEventListener('click', function () {
+      const variantId = this.getAttribute('data-variant-id');
+      if (!variantId) return;
 
+      let formData = {
+        items: [{ id: variantId, quantity: 1 }],
+      };
+
+      fetch(window.Shopify.routes.root + 'cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          window.location.reload(); // Recarrega a página para atualizar o carrinho com o presente
+        })
+        .catch((error) => console.error('Erro ao adicionar presente:', error));
+    });
+  });
+</script>
+
+{% stylesheet %}
+  /* Layout Base em Grid (Esquerda vs Direita) */
+  .cart-page {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0 var(--padding-5xl);
+    gap: 40px;
+    align-items: start;
+    margin-top: 74px;
   }
 
+  @media screen and (min-width: 990px) {
+    .cart-page {
+      grid-template-columns: 1fr 380px; /* Coluna Principal e Sidebar exatos da referência */
+    }
+  }
+
+  .cart-page__main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cart-page__summary {
+    position: sticky;
+    top: 20px;
+    background: #fff; /* Fundo branco caso haja sombra */
+  }
+
+  /* Bloco de Embalagem de Presente */
+
+  .cart-gift-block {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .cart-gift-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cart-gift-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #111;
+  }
+
+  .cart-gift-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-gift-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cart-gift-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .cart-gift-card:hover {
+    border-color: #662483;
+  }
+
+  .cart-gift-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 15px;
+  }
+
+  .cart-gift-badge {
+    background: #f3e8ff;
+    color: #662483;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 4px;
+  }
+
+  .cart-gift-card__info strong {
+    font-size: 14px;
+    color: #111;
+  }
+
+  .cart-gift-card__info p {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .cart-gift-add {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Estados Vazios */
   .cart-page--empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-
-  .cart-page--empty .cart-page__title,
-  .cart-page--empty .cart-page__more-blocks {
-    margin-top: var(--margin-6xl);
-  }
-
-  .cart-page__more-blocks {
-    width: 100%;
-  }
-
-  .cart-page--empty .cart-title {
     text-align: center;
-  }
-
-  .cart-page__main {
-    grid-column: 1;
-  }
-
-  .cart-page__summary {
-    padding-top: var(--padding-xl);
-  }
-
-  @media screen and (min-width: 750px) {
-    .cart-page {
-      grid-template-columns: 1fr min(50vw, var(--sidebar-width));
-      grid-template-rows: min-content min-content 1fr;
-    }
-
-    .cart-page__summary {
-      display: grid;
-      height: 100%;
-      grid-column: 2;
-      grid-row: 1 / -1;
-      align-self: stretch;
-      grid-template-rows: subgrid;
-      padding-top: 0;
-
-      /* needed to support blurred effect from hero section */
-      position: relative;
-    }
-
-    .section--page-width .cart-page:has(.cart__container--extend) {
-      grid-column: 2 / 4;
-      grid-template-columns: 1fr minmax(
-          var(--sidebar-width),
-          calc((100vw - var(--page-width)) / 2 + var(--sidebar-width))
-        );
-    }
-
-    .cart__container--extend {
-      height: 100%;
-    }
-  }
-
-  @media screen and (min-width: 1400px) {
-    .cart-page {
-      grid-template-columns: 1fr var(--sidebar-width);
-    }
+    min-height: 40vh;
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.cart",
+  "name": "Página do Carrinho",
   "disabled_on": {
     "groups": ["header", "footer"]
   },
-  "blocks": [
-    {
-      "type": "@theme"
-    },
-    {
-      "type": "@app"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "video"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "spacer"
-    }
-  ],
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
     {
       "type": "select",
       "id": "section_width",
-      "label": "t:settings.width",
+      "label": "Largura",
       "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
+        { "value": "page-width", "label": "Página" },
+        { "value": "full-width", "label": "Total" }
       ],
       "default": "page-width"
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "t:settings.color_scheme",
+      "label": "Esquema de Cores",
       "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding"
-    },
-    {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
     }
   ]
 }

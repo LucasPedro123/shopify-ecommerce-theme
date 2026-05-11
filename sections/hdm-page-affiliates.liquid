@@ -1,0 +1,1266 @@
+{%- comment -%}
+  HDM Beauty - Landing Page Afiliados
+  Layout inspirado em programas de afiliados premium de cosméticos.
+{%- endcomment -%}
+
+{%- style -%}
+  .hdm-affiliates-section {
+    --primary-color: {{ section.settings.primary_color }};
+    --primary-light: {{ section.settings.primary_light_color }};
+    --text-color: {{ section.settings.text_color }};
+    --bg-color: {{ section.settings.bg_color }};
+    background-color: var(--bg-color);
+    font-family: var(--font-body-family, sans-serif);
+    color: var(--text-color);
+    overflow: hidden;
+  }
+
+  /* 1. HERO SECTION */
+  .hdm-aff-hero {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hdm-aff-hero__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    align-items: stretch;
+  }
+  .hdm-aff-hero__image-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    min-height: 350px;
+  }
+  .hdm-aff-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .hdm-aff-hero__content {
+    background-color: var(--primary-light);
+    border-radius: 16px;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .hdm-aff-hero__logo {
+    max-width: 200px;
+    margin-bottom: 20px;
+  }
+  .hdm-aff-hero__title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .hdm-aff-btn {
+    background-color: #111;
+    color: #fff;
+    padding: 16px 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, background-color 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+  .hdm-aff-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Títulos de Seção Genéricos */
+  .hdm-aff-section-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 80px 0 50px;
+    color: #111;
+  }
+
+  /* 2. BENEFÍCIOS */
+  .hdm-aff-benefits {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+  .hdm-aff-benefit-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 180px;
+  }
+  .hdm-aff-benefit-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    transition: transform 0.3s;
+  }
+  .hdm-aff-benefit-card:hover .hdm-aff-benefit-icon {
+    transform: translateY(-5px);
+  }
+  .hdm-aff-benefit-icon svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+  }
+  .hdm-aff-benefit-icon span {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: #111;
+  }
+  .hdm-aff-benefit-text {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  /* 3. PRÉ-REQUISITOS */
+  .hdm-aff-reqs {
+    max-width: 1000px;
+    margin: 80px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .hdm-aff-reqs__image {
+    width: 100%;
+    border-radius: 16px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+  }
+  .hdm-aff-reqs__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hdm-aff-reqs__item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    text-transform: uppercase;
+  }
+  .hdm-aff-reqs__item svg {
+    flex-shrink: 0;
+    color: var(--primary-color);
+  }
+
+  /* 4. PASSO A PASSO */
+  .hdm-aff-steps {
+    max-width: 1000px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .hdm-aff-steps__image-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .hdm-aff-steps__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hdm-aff-steps__content {
+    background-color: var(--primary-light);
+    border-radius: 16px;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hdm-aff-steps__list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+    counter-reset: hdm-step-counter;
+  }
+  .hdm-aff-steps__item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    counter-increment: hdm-step-counter;
+  }
+  .hdm-aff-steps__item::before {
+    content: counter(hdm-step-counter);
+    font-size: 32px;
+    font-weight: 300;
+    color: #111;
+    margin-right: 20px;
+    min-width: 25px;
+  }
+  .hdm-aff-steps__item:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 5. MARCAS EM DESTAQUE (GRID VERTICAL) */
+  .hdm-aff-brands {
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .hdm-aff-brand-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    text-decoration: none;
+  }
+  .hdm-aff-brand-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    z-index: 1;
+  }
+  .hdm-aff-brand-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+    z-index: 2;
+  }
+  .hdm-aff-brand-card:hover .hdm-aff-brand-image {
+    transform: scale(1.05);
+  }
+  .hdm-aff-brand-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    width: 100%;
+  }
+  .hdm-aff-brand-title {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.2;
+  }
+  .hdm-aff-brand-subtitle {
+    color: var(--primary-light);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* 6. FAQ (ACCORDION) */
+  .hdm-aff-faq {
+    max-width: 800px;
+    margin: 80px auto 100px;
+    padding: 0 20px;
+  }
+  .hdm-aff-faq-item {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+  .hdm-aff-faq-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    cursor: pointer;
+    list-style: none;
+  }
+  .hdm-aff-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+  .hdm-aff-faq-summary svg {
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+  }
+  .hdm-aff-faq-item[open] .hdm-aff-faq-summary svg {
+    transform: rotate(180deg);
+  }
+  .hdm-aff-faq-content {
+    padding: 0 20px 20px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .hdm-aff-cta-container {
+    text-align: center;
+    margin: 60px 0;
+  }
+
+  /* 7. FORMULÁRIO DE INSCRIÇÃO (AFILIADOS) */
+  .hdm-aff-form-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 50px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    border: 1px solid #f1f1f1;
+  }
+  
+  .hdm-aff-form-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+
+  .hdm-aff-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hdm-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .hdm-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hdm-form-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .hdm-form-input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #333;
+    font-family: inherit;
+    background-color: #fafafa;
+    transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s;
+  }
+
+  .hdm-form-input::placeholder {
+    color: #aaa;
+  }
+
+  .hdm-form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px var(--primary-light);
+  }
+
+  .hdm-form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .hdm-form-submit-wrapper {
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  .hdm-aff-submit-btn {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 18px 50px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .hdm-aff-submit-btn:hover {
+    background-color: #111;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+
+  /* Mensagens de Sucesso e Erro */
+  .hdm-form-message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .hdm-form-message--success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  .hdm-form-message--error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  /* 7. FORMULÁRIO DE INSCRIÇÃO MULTI-STEP */
+  .hdm-aff-form-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 50px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    border: 1px solid #f1f1f1;
+  }
+  
+  .hdm-aff-form-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+
+  /* Barra de Progresso */
+  .hdm-progress-wrapper {
+    margin-bottom: 30px;
+  }
+  .hdm-progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .hdm-progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 33.33%;
+    transition: width 0.4s ease;
+  }
+  .hdm-progress-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+  }
+
+  /* Etapas (Passos) */
+  .hdm-form-step {
+    display: none;
+    animation: fadeInStep 0.4s ease;
+  }
+  .hdm-form-step.is-active {
+    display: block;
+  }
+  @keyframes fadeInStep {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hdm-step-title-form {
+    font-size: 20px;
+    color: #111;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 10px;
+  }
+
+  /* Campos e Layout */
+  .hdm-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .hdm-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .hdm-form-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .hdm-form-help {
+    font-size: 12px;
+    color: #888;
+    margin-top: -5px;
+    line-height: 1.3;
+  }
+
+  .hdm-form-input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: #fafafa;
+    transition: all 0.3s;
+  }
+  .hdm-form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px var(--primary-light);
+  }
+
+  /* Radios e Checkboxes Customizados */
+  .hdm-radio-group {
+    display: flex;
+    gap: 20px;
+  }
+  .hdm-radio-group label, .hdm-checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #444;
+  }
+  .hdm-checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 10px;
+    background: #fafafa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eaeaea;
+  }
+
+  /* Botões de Controle */
+  .hdm-form-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eaeaea;
+  }
+
+  .hdm-aff-submit-btn, .hdm-aff-btn-secondary {
+    padding: 16px 40px;
+    border-radius: 12;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .hdm-aff-submit-btn {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    margin-left: auto;
+  }
+  .hdm-aff-submit-btn:hover {
+    background-color: #111;
+    transform: translateY(-2px);
+  }
+  .hdm-aff-btn-secondary {
+    background-color: #f1f1f1;
+    color: #555;
+  }
+  .hdm-aff-btn-secondary:hover {
+    background-color: #e5e5e5;
+    color: #111;
+  }
+
+  .hidden { display: none !important; }
+
+  @media screen and (max-width: 768px) {
+    .hdm-form-row { grid-template-columns: 1fr; gap: 0; }
+    .hdm-aff-form-container { padding: 30px 20px; margin: 40px 20px; }
+    .hdm-form-controls { flex-direction: column-reverse; }
+    .hdm-aff-submit-btn, .hdm-aff-btn-secondary { width: 100%; text-align: center; }
+  }
+
+  /* Responsividade do Formulário */
+  @media screen and (max-width: 768px) {
+    .hdm-aff-form-container {
+      padding: 30px 20px;
+      margin: 40px 20px;
+    }
+    .hdm-form-row {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .hdm-aff-submit-btn {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  /* RESPONSIVIDADE */
+  @media screen and (max-width: 990px) {
+    .hdm-aff-hero__grid, .hdm-aff-steps {
+      grid-template-columns: 1fr;
+    }
+    .hdm-aff-reqs {
+      display: flex;
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+    .hdm-aff-reqs__item {
+      justify-content: center;
+    }
+    .hdm-aff-brands {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media screen and (max-width: 750px) {
+    .hdm-aff-brands {
+      grid-template-columns: 1fr;
+    }
+    .hdm-aff-benefit-card {
+      width: 45%;
+    }
+  }
+{%- endstyle -%}
+
+<section class="hdm-affiliates-section">
+  
+  <div class="hdm-aff-hero">
+    <div class="hdm-aff-hero__grid">
+      <div class="hdm-aff-hero__image-wrapper">
+        {%- if section.settings.hero_image != blank -%}
+          <img src="{{ section.settings.hero_image | image_url: width: 1000 }}" class="hdm-aff-hero__image" alt="Afiliados" loading="eager">
+        {%- else -%}
+          <div style="background: #e5e5e5; width:100%; height:100%; min-height:400px; display:flex; align-items:center; justify-content:center;">Selecione a Imagem</div>
+        {%- endif -%}
+      </div>
+      <div class="hdm-aff-hero__content">
+        {%- if section.settings.hero_logo != blank -%}
+          <img src="{{ section.settings.hero_logo | image_url: width: 400 }}" class="hdm-aff-hero__logo" alt="Logo Afiliados">
+        {%- endif -%}
+        <h1 class="hdm-aff-hero__title">{{ section.settings.hero_title }}</h1>
+        <a href="#hdm-formulario-afiliado" class="hdm-aff-btn">{{ section.settings.cta_text }}</a>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="hdm-aff-section-title">Saiba os benefícios em ser afiliado</h2>
+  <div class="hdm-aff-benefits">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'benefit' -%}
+        <div class="hdm-aff-benefit-card">
+          <div class="hdm-aff-benefit-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <span>{{ block.settings.title }}</span>
+          </div>
+          <p class="hdm-aff-benefit-text">{{ block.settings.text }}</p>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  <div class="hdm-aff-reqs">
+    
+    <ul class="hdm-aff-reqs__list">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'prerequisite' -%}
+          <li class="hdm-aff-reqs__item">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            {{ block.settings.text }}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+    {%- if section.settings.reqs_image != blank -%}
+      <img src="{{ section.settings.reqs_image | image_url: width: 600 }}" class="hdm-aff-reqs__image" alt="Pré-requisitos" loading="lazy">
+    {%- else -%}
+      <div style="background: #f4f4f4; border-radius:100px; padding: 40px; text-align:center; font-weight:bold;">Imagem da Textura de Creme</div>
+    {%- endif -%}
+  </div>
+
+  <div class="hdm-aff-steps">
+    <div class="hdm-aff-steps__image-wrapper">
+      {%- if section.settings.steps_image != blank -%}
+        <img src="{{ section.settings.steps_image | image_url: width: 800 }}" class="hdm-aff-steps__image" alt="Passo a Passo" loading="lazy">
+      {%- else -%}
+        <div style="background: #e5e5e5; width:100%; height:100%; min-height:400px; display:flex; align-items:center; justify-content:center;">Selecione a Imagem</div>
+      {%- endif -%}
+    </div>
+    <div class="hdm-aff-steps__content">
+      <ol class="hdm-aff-steps__list">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+            <li class="hdm-aff-steps__item">{{ block.settings.text }}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ol>
+      <div style="text-align: center;">
+        <a href="#hdm-formulario-afiliado" class="hdm-aff-btn">{{ section.settings.cta_text }}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdm-aff-brands">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'brand' -%}
+        <a href="{{ block.settings.link }}" class="hdm-aff-brand-card">
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" class="hdm-aff-brand-image" alt="{{ block.settings.title }}" loading="lazy">
+          {%- endif -%}
+          <div class="hdm-aff-brand-overlay"></div>
+          <div class="hdm-aff-brand-content">
+            <h3 class="hdm-aff-brand-title">{{ block.settings.title }}</h3>
+            {%- if block.settings.subtitle != blank -%}
+              <div class="hdm-aff-brand-subtitle">{{ block.settings.subtitle }}</div>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+ <div class="hdm-aff-form-container" id="hdm-formulario-afiliado">
+    <h2 class="hdm-aff-section-title" style="margin-top: 0; margin-bottom: 15px;">Formulário de Inscrição</h2>
+    <p class="hdm-aff-form-subtitle">Preencha os dados abaixo para nossa equipe avaliar seu perfil. Entraremos em contato em breve!</p>
+    
+    {% form 'contact', id: 'AffiliateApplicationForm', class: 'hdm-aff-form' %}
+      
+      {%- if form.posted_successfully? -%}
+        <div class="hdm-form-message hdm-form-message--success" tabindex="-1" autofocus>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Sua inscrição foi enviada com sucesso! Fique de olho no seu e-mail e WhatsApp.
+        </div>
+      {%- else -%}
+
+        {%- if form.errors -%}
+          <div class="hdm-form-message hdm-form-message--error" tabindex="-1" autofocus>
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            Houve um erro ao enviar. Verifique os campos e tente novamente.
+          </div>
+        {%- endif -%}
+
+        <div class="hdm-progress-wrapper">
+          <div class="hdm-progress-bar"><div class="hdm-progress-fill" id="hdm-progress-fill"></div></div>
+          <span class="hdm-progress-text" id="hdm-progress-text">Passo 1 de 3</span>
+        </div>
+
+        <div class="hdm-form-step is-active" data-step="1">
+          <h3 class="hdm-step-title-form">Dados Pessoais</h3>
+          
+          <div class="hdm-form-field">
+            <label class="hdm-form-label" for="AffiliateForm-Name">Seu nome completo ou nome social *</label>
+            <input class="hdm-form-input" type="text" id="AffiliateForm-Name" name="contact[Nome]" placeholder="Como você se chama?" required>
+            <small class="hdm-form-help">*Nome social refere-se a designação pela qual a pessoa não cis se identifica e é socialmente reconhecida.</small>
+          </div>
+
+          <div class="hdm-form-row">
+            <div class="hdm-form-field">
+              <label class="hdm-form-label" for="AffiliateForm-Email">Seu melhor e-mail *</label>
+              <input class="hdm-form-input" type="email" id="AffiliateForm-Email" name="contact[email]" placeholder="O que você vê com frequência!" required>
+            </div>
+            <div class="hdm-form-field">
+              <label class="hdm-form-label" for="AffiliateForm-Phone">WhatsApp para contato *</label>
+              <input class="hdm-form-input" type="tel" id="AffiliateForm-Phone" name="contact[WhatsApp]" placeholder="(00) 00000-0000" required>
+            </div>
+          </div>
+
+          <div class="hdm-form-row">
+            <div class="hdm-form-field">
+              <label class="hdm-form-label" for="AffiliateForm-CPF">Informe o seu CPF *</label>
+              <input class="hdm-form-input" type="text" id="AffiliateForm-CPF" name="contact[CPF]" placeholder="000.000.000-00" required>
+            </div>
+            <div class="hdm-form-field">
+              <label class="hdm-form-label">Você tem mais do que 18 anos? *</label>
+              <div class="hdm-radio-group">
+                <label><input type="radio" name="contact[Maior_de_18]" value="Sim" required> Sim</label>
+                <label><input type="radio" name="contact[Maior_de_18]" value="Não" required> Não</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hdm-form-step" data-step="2">
+          <h3 class="hdm-step-title-form">Seu Perfil e Conteúdo</h3>
+
+          <div class="hdm-form-field">
+            <label class="hdm-form-label" for="AffiliateForm-Social">Perfis nas redes sociais *</label>
+            <input class="hdm-form-input" type="url" id="AffiliateForm-Social" name="contact[Rede_Social]" placeholder="Insira o link da sua rede social mais utilizada" required>
+          </div>
+
+          <div class="hdm-form-field">
+            <label class="hdm-form-label">Sinalize até 3 opções que você considera o foco do seu trabalho: *</label>
+            <small class="hdm-form-help">Aqui, entende-se apenas como um direcional e não um limitador.</small>
+            
+            <div class="hdm-checkbox-group" id="hdm-content-focus">
+              <label><input type="checkbox" value="Cabelo"> Conteúdos mais focados em cabelo</label>
+              <label><input type="checkbox" value="Maquiagem"> Conteúdos mais focados em maquiagem</label>
+              <label><input type="checkbox" value="Skincare"> Conteúdos mais focados em skincare</label>
+              <label><input type="checkbox" value="Perfumes"> Conteúdos mais focados em perfumes</label>
+              <label><input type="checkbox" value="Gerais Beleza"> Conteúdos gerais sobre beleza</label>
+              <label><input type="checkbox" value="Dicas/Achadinhos"> Foco em divulgação de promoções e achadinhos</label>
+              <label><input type="checkbox" value="Lifestyle"> Lifestyle (dia a dia, viagem, moda, etc)</label>
+              <label><input type="checkbox" value="Profissional"> Profissional (cabeleireira, maquiadora, estética)</label>
+              <label><input type="checkbox" value="Outros"> Não me enquadro em nenhuma das opções acima</label>
+            </div>
+            <input type="hidden" name="contact[Foco_Trabalho]" id="AffiliateForm-FocusHidden" required>
+          </div>
+        </div>
+
+        <div class="hdm-form-step" data-step="3">
+          <h3 class="hdm-step-title-form">Dados Fiscais e Endereço</h3>
+
+          <div class="hdm-form-field">
+            <label class="hdm-form-label" for="AffiliateForm-Address">Qual é o seu endereço residencial? *</label>
+            <input class="hdm-form-input" type="text" id="AffiliateForm-Address" name="contact[Endereco_Residencial]" placeholder="Rua, Número, Bairro, Cidade - Estado" required>
+          </div>
+
+          <div class="hdm-form-field">
+            <label class="hdm-form-label">Possui CNPJ ativo? *</label>
+            <div class="hdm-radio-group">
+              <label><input type="radio" name="contact[Possui_CNPJ]" value="Sim" id="cnpj-sim" required> Sim</label>
+              <label><input type="radio" name="contact[Possui_CNPJ]" value="Não" id="cnpj-nao" required> Não</label>
+            </div>
+          </div>
+
+          <div class="hdm-cnpj-wrapper hidden" id="hdm-cnpj-fields">
+            <div class="hdm-form-row">
+              <div class="hdm-form-field">
+                <label class="hdm-form-label" for="AffiliateForm-CNPJNumber">Qual o Nº do seu CNPJ? *</label>
+                <input class="hdm-form-input" type="text" id="AffiliateForm-CNPJNumber" name="contact[Numero_CNPJ]" placeholder="00.000.000/0000-00">
+              </div>
+              <div class="hdm-form-field">
+                <label class="hdm-form-label" for="AffiliateForm-RazaoSocial">Qual é a sua Razão Social? *</label>
+                <input class="hdm-form-input" type="text" id="AffiliateForm-RazaoSocial" name="contact[Razao_Social]" placeholder="Nome da sua empresa">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hdm-form-controls">
+          <button type="button" class="hdm-aff-btn-secondary hidden" id="hdm-btn-prev">Voltar</button>
+          <button type="button" class="hdm-aff-submit-btn" id="hdm-btn-next">Próximo Passo</button>
+          <button type="submit" class="hdm-aff-submit-btn hidden" id="hdm-btn-submit">Finalizar Inscrição</button>
+        </div>
+
+      {%- endif -%}
+    {% endform %}
+  </div>
+
+  <div class="hdm-aff-faq">
+    <h2 class="hdm-aff-section-title" style="text-align: left; margin: 0 0 20px;">Perguntas Frequentes</h2>
+    
+    <div class="hdm-aff-faq-container">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'faq' -%}
+          <details class="hdm-aff-faq-item">
+            <summary class="hdm-aff-faq-summary">
+              {{ block.settings.question }}
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="hdm-aff-faq-content">
+              {{ block.settings.answer }}
+            </div>
+          </details>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const detailsElements = document.querySelectorAll('.hdm-aff-faq-item');
+
+    const steps = document.querySelectorAll('.hdm-form-step');
+    const btnNext = document.getElementById('hdm-btn-next');
+    const btnPrev = document.getElementById('hdm-btn-prev');
+    const btnSubmit = document.getElementById('hdm-btn-submit');
+    const progressFill = document.getElementById('hdm-progress-fill');
+    const progressText = document.getElementById('hdm-progress-text');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const detailsElements = document.querySelectorAll('.hdm-aff-faq-item');
+      detailsElements.forEach((targetDetail) => {
+        targetDetail.addEventListener('click', () => {
+          detailsElements.forEach((detail) => {
+            if (detail !== targetDetail) {
+              detail.removeAttribute('open');
+            }
+          });
+        });
+      });
+    });
+    
+    let currentStep = 0;
+    if(!steps.length) return;
+
+    // --- LÓGICA MULTI-STEP ---
+    function updateSteps() {
+      steps.forEach((step, index) => {
+        step.classList.toggle('is-active', index === currentStep);
+      });
+
+      // Atualiza Progresso
+      const percentage = ((currentStep + 1) / steps.length) * 100;
+      progressFill.style.width = `${percentage}%`;
+      progressText.textContent = `Passo ${currentStep + 1} de ${steps.length}`;
+
+      // Controle de Botões
+      btnPrev.classList.toggle('hidden', currentStep === 0);
+      
+      if (currentStep === steps.length - 1) {
+        btnNext.classList.add('hidden');
+        btnSubmit.classList.remove('hidden');
+      } else {
+        btnNext.classList.remove('hidden');
+        btnSubmit.classList.add('hidden');
+      }
+    }
+
+    function validateCurrentStep() {
+      const currentStepEl = steps[currentStep];
+      const inputs = currentStepEl.querySelectorAll('input[required], textarea[required], select[required]');
+      let isValid = true;
+      
+      // Validação do checkbox (Foco de conteúdo - Passo 2)
+      if(currentStep === 1) {
+        const checkboxes = document.querySelectorAll('#hdm-content-focus input[type="checkbox"]:checked');
+        const hiddenFocus = document.getElementById('AffiliateForm-FocusHidden');
+        if(checkboxes.length === 0) {
+          alert('Por favor, selecione ao menos 1 foco de conteúdo.');
+          return false;
+        }
+        // Concatena as opções selecionadas para o Shopify ler
+        hiddenFocus.value = Array.from(checkboxes).map(cb => cb.value).join(', ');
+      }
+
+      for (let input of inputs) {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          isValid = false;
+          break;
+        }
+      }
+      return isValid;
+    }
+
+    if(btnNext) {
+      btnNext.addEventListener('click', () => {
+        if (validateCurrentStep()) {
+          currentStep++;
+          updateSteps();
+        }
+      });
+    }
+
+    if(btnPrev) {
+      btnPrev.addEventListener('click', () => {
+        currentStep--;
+        updateSteps();
+      });
+    }
+
+    // --- LÓGICA MÁXIMO 3 CHECKBOXES ---
+    const checkboxes = document.querySelectorAll('#hdm-content-focus input[type="checkbox"]');
+    checkboxes.forEach(box => {
+      box.addEventListener('change', () => {
+        const checkedBoxes = document.querySelectorAll('#hdm-content-focus input[type="checkbox"]:checked');
+        if (checkedBoxes.length > 3) {
+          box.checked = false;
+          alert('Você só pode selecionar até 3 opções.');
+        }
+      });
+    });
+
+    // --- LÓGICA CONDICIONAL CNPJ ---
+    const radioCnpjSim = document.getElementById('cnpj-sim');
+    const radioCnpjNao = document.getElementById('cnpj-nao');
+    const cnpjWrapper = document.getElementById('hdm-cnpj-fields');
+    const cnpjInput = document.getElementById('AffiliateForm-CNPJNumber');
+    const razaoInput = document.getElementById('AffiliateForm-RazaoSocial');
+
+    function toggleCNPJFields() {
+      if (radioCnpjSim.checked) {
+        cnpjWrapper.classList.remove('hidden');
+        cnpjInput.setAttribute('required', 'required');
+        razaoInput.setAttribute('required', 'required');
+      } else {
+        cnpjWrapper.classList.add('hidden');
+        cnpjInput.removeAttribute('required');
+        razaoInput.removeAttribute('required');
+        cnpjInput.value = ''; // Limpa os campos se ele desistir
+        razaoInput.value = '';
+      }
+    }
+
+    if(radioCnpjSim) radioCnpjSim.addEventListener('change', toggleCNPJFields);
+    if(radioCnpjNao) radioCnpjNao.addEventListener('change', toggleCNPJFields);
+
+    updateSteps(); // Inicia o estado
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Landing Page Afiliados",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cores da Marca"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Cor Principal (Botões e Ícones)",
+      "default": "#662483"
+    },
+    {
+      "type": "color",
+      "id": "primary_light_color",
+      "label": "Cor Principal Clara (Fundos)",
+      "default": "#eaddf6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Cor do Texto",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de Fundo da Página",
+      "default": "#fafafa"
+    },
+    {
+      "type": "header",
+      "content": "Seção Hero (Topo)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Imagem Esquerda"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_logo",
+      "label": "Logo (Opcional)"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Título",
+      "default": "Seja um afiliado aumente sua renda"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Texto do Botão",
+      "default": "Inscreva-se"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link de Inscrição"
+    },
+    {
+      "type": "header",
+      "content": "Seção Pré-requisitos"
+    },
+    {
+      "type": "image_picker",
+      "id": "reqs_image",
+      "label": "Imagem (Ex: Textura do Creme)"
+    },
+    {
+      "type": "header",
+      "content": "Seção Passo a Passo"
+    },
+    {
+      "type": "image_picker",
+      "id": "steps_image",
+      "label": "Imagem do Passo a Passo"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefício (Círculo)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Aumentar sua renda"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Texto Menor",
+          "default": "Com comissões sobre vendas e bônus."
+        }
+      ]
+    },
+    {
+      "type": "prerequisite",
+      "name": "Pré-requisito",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Ser entusiasta da beleza"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Passo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto do Passo",
+          "default": "Inscreva-se no programa"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Marca em Destaque",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem de Fundo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Nome da Marca"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtítulo (Opcional)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link da Marca"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "Pergunta Frequente",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Pergunta",
+          "default": "Como funciona o pagamento?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Resposta"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Afiliados HDM Beauty",
+      "blocks": [
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "prerequisite" },
+        { "type": "prerequisite" },
+        { "type": "prerequisite" },
+        { "type": "step" },
+        { "type": "step" },
+        { "type": "step" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

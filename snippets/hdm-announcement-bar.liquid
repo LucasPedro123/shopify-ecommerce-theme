@@ -1,0 +1,475 @@
+{% comment %}
+  ═══════════════════════════════════════════════════════════════════
+  HDM BEAUTY — Announcement Bar
+  Arquivo: sections/hdm-announcement-bar.liquid
+
+  Slider vertical (Y-axis) com loop infinito.
+  Posicionar ACIMA do hdm-header no tema.
+  ═══════════════════════════════════════════════════════════════════
+{% endcomment %}
+
+{%- comment -%}
+  Slides hardcoded — editar diretamente aqui até o lojista
+  ter interface no painel. Cada slide pode ter:
+    • texto principal (html permitido para <strong> e <em>)
+    • badge de cupom (opcional)
+    • url de destino (opcional — torna o slide clicável)
+{%- endcomment -%}
+
+{%- liquid
+  assign slides = '1,2,3,4' | split: ','
+-%}
+
+<section
+  class="hdm-ann"
+  style="z-index: 3;"
+  id="hdm-announcement-bar"
+  aria-label="Promoções e ofertas"
+  itemscope
+  itemtype="https://schema.org/WPAdBlock"
+>
+  <div class="hdm-ann__track-wrapper">
+    <ul class="hdm-ann__track" id="hdm-ann-track" role="list" aria-live="polite">
+      {%- comment -%} SLIDE 1 {%- endcomment -%}
+      {% comment %}
+        <li class="hdm-ann__slide" role="listitem">
+          <a class="hdm-ann__slide-inner" href="/collections/promocoes" aria-label="Ganhe 2 minis acima de R$ 249 com cupom DUPLA">
+            <span class="hdm-ann__text">
+              <strong>GANHE 1 ESMALTE</strong> acima de R$&nbsp;249
+            </span>
+            <span class="hdm-ann__pill" aria-label="Cupom">CUPOM: <strong>DUPLA</strong></span>
+            <span class="hdm-ann__sep" aria-hidden="true">+</span>
+            <span class="hdm-ann__text">
+              <strong>2 MINIS</strong> acima de R$&nbsp;369 no app
+            </span>
+            <span class="hdm-ann__pill" aria-label="Cupom">CUPOM: <strong>MINIS</strong></span>
+          </a>
+        </li>
+      {% endcomment %}
+
+      {%- comment -%} SLIDE 2 {%- endcomment -%}
+      <li class="hdm-ann__slide" role="listitem">
+        <a
+          class="hdm-ann__slide-inner"
+          href="https://hdmbeauty.com.br/collections/presente-dia-das-maes-hdm-beauty"
+          aria-label="Dia das Mães — Presentes especiais"
+        >
+          <span class="hdm-ann__text hdm-ann__text--maes"> DIA DAS <strong>MÃES</strong> </span>
+        </a>
+      </li>
+
+      {%- comment -%} SLIDE 5 — Presentes com desconto (fundo vinho) {%- endcomment -%}
+      <li class="hdm-ann__slide hdm-ann__slide--presentes" role="listitem">
+        <a class="hdm-ann__slide-inner" href="https://hdmbeauty.com.br/collections/presente-dia-das-maes-hdm-beauty" aria-label="Presentes com até 40% OFF">
+          <span class="hdm-ann__text hdm-ann__text--presentes">
+            Presentes com até <strong class="hdm-ann__underline">40% OFF</strong>
+          </span>
+        </a>
+      </li>
+
+      {%- comment -%} SLIDE 6 — Urgência retirada na loja (fundo vermelho) {%- endcomment -%}
+      <li class="hdm-ann__slide hdm-ann__slide--urgencia" role="listitem">
+        <a class="hdm-ann__slide-inner" href="https://hdmbeauty.com.br/pages/entrega-em-24h" aria-label="Entrega no mesmo dia! Peça já! em até 24h!">
+          <span class="hdm-ann__text hdm-ann__text--urgencia">
+            <strong>Entrega no mesmo dia!</strong> Peça já! <strong>em até 24h!</strong>
+          </span>
+        </a>
+      </li>
+
+      {%- comment -%} SLIDE 3 {%- endcomment -%}
+      {% comment %} <li class="hdm-ann__slide" role="listitem">
+        <a class="hdm-ann__slide-inner" href="/collections/truss" aria-label="Sua experiência Truss começa aqui">
+          <span class="hdm-ann__text"> SUA EXPERIÊNCIA <em>HDM</em> COMEÇA AQUI! </span>
+        </a>
+      </li> {% endcomment %}
+
+      {%- comment -%} SLIDE 4 {%- endcomment -%}
+      <li class="hdm-ann__slide" role="listitem">
+        <a
+          class="hdm-ann__slide-inner"
+          href="/policies/shipping-policy"
+          aria-label="Aproveite frete grátis em compras acima de R$ 299"
+        >
+          <span class="hdm-ann__text"> <strong>APROVEITE FRETE GRÁTIS</strong> EM COMPRAS ACIMA DE R$&nbsp;60 </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  {%- comment -%} Dots de navegação — acessibilidade e UX {%- endcomment -%}
+  {% comment %} <nav class="hdm-ann__dots" aria-label="Navegação do banner">
+    <button class="hdm-ann__dot hdm-ann__dot--active" data-index="0" aria-label="Slide 1" aria-current="true"></button>
+    <button class="hdm-ann__dot" data-index="1" aria-label="Slide 2"></button>
+    <button class="hdm-ann__dot" data-index="2" aria-label="Slide 3"></button>
+    <button class="hdm-ann__dot" data-index="3" aria-label="Slide 4"></button>
+  </nav> {% endcomment %}
+</section>
+
+<script>
+  (function () {
+    'use strict';
+
+    const SLIDE_DURATION = 4000; // ms por slide
+    const TRANSITION_MS = 500; // ms da animação CSS
+
+    const track = document.getElementById('hdm-ann-track');
+    const section = document.getElementById('hdm-announcement-bar');
+    const dots = section?.querySelectorAll('.hdm-ann__dot');
+
+    if (!track) return;
+
+    const slides = Array.from(track.querySelectorAll('.hdm-ann__slide'));
+    const total = slides.length;
+    if (total <= 1) return;
+
+    let current = 0;
+    let timer = null;
+    let isPaused = false;
+
+    // Clona o primeiro slide no final para loop imperceptível
+    const clone = slides[0].cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    track.appendChild(clone);
+
+    const SLIDE_H = section.querySelector('.hdm-ann__track-wrapper').offsetHeight;
+
+    // Substitua a função goTo inteira por esta:
+    function goTo(index, animate = true) {
+      const slideHeight = slides[0].offsetHeight; // altura real em px de 1 slide
+
+      if (!animate) {
+        track.style.transition = 'none';
+      } else {
+        track.style.transition = `transform ${TRANSITION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+      }
+
+      track.style.transform = `translateY(-${index * slideHeight}px)`;
+
+      // Dots
+      dots?.forEach((d, i) => {
+        d.classList.toggle('hdm-ann__dot--active', i === index % total);
+        d.setAttribute('aria-current', i === index % total ? 'true' : 'false');
+      });
+
+      // ARIA
+      slides.forEach((s, i) => {
+        s.setAttribute('aria-hidden', i !== index % total ? 'true' : 'false');
+      });
+    }
+
+    function next() {
+      current++;
+
+      if (current === total) {
+        goTo(current, true);
+        setTimeout(() => {
+          track.style.transition = 'none';
+          track.offsetHeight; // força reflow
+          current = 0;
+          goTo(0, false);
+        }, TRANSITION_MS + 50);
+      } else {
+        goTo(current, true);
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (!isPaused) next();
+      }, SLIDE_DURATION);
+    }
+
+    // Pause on hover
+    section.addEventListener('mouseenter', () => {
+      isPaused = true;
+    });
+    section.addEventListener('mouseleave', () => {
+      isPaused = false;
+    });
+
+    // Touch pause
+    section.addEventListener(
+      'touchstart',
+      () => {
+        isPaused = true;
+      },
+      { passive: true }
+    );
+    section.addEventListener(
+      'touchend',
+      () => {
+        setTimeout(() => {
+          isPaused = false;
+        }, 2000);
+      },
+      { passive: true }
+    );
+
+    // Dots click
+    dots?.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const idx = parseInt(dot.dataset.index, 10);
+        current = idx;
+        goTo(current, true);
+        startTimer(); // reinicia o timer
+      });
+    });
+
+    // Inicializa
+    goTo(0, false);
+    startTimer();
+  })();
+</script>
+
+{% stylesheet %}
+    /* ═══════════════════════════════════════════════════════════
+       HDM ANNOUNCEMENT BAR
+       ═══════════════════════════════════════════════════════════ */
+
+    .hdm-ann {
+      --ann-height:      44px;
+      --ann-bg:          #ffffff;
+      --ann-color:       #111111;
+      --ann-font-size:   0.8125rem;   /* 13px */
+      --ann-pill-bg:     #111111;
+      --ann-pill-color:  #ffffff;
+      --ann-dot-size:    6px;
+      --ann-dot-active:  #111111;
+      --ann-dot-idle:    #cccccc;
+
+      position: relative;
+      width: 100%;
+      background: var(--ann-bg);
+      border-bottom: 1px solid #ebebeb;
+      overflow: hidden;
+      height: var(--ann-height);
+      z-index: 400; /* acima do header fixo */
+    }
+
+    /* ── Track wrapper — clipa o overflow vertical ── */
+    .hdm-ann__track-wrapper {
+      width: 100%;
+      height: var(--ann-height);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Track — coluna vertical de slides ── */
+    .hdm-ann__track {
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      /* transform é controlado pelo JS */
+      will-change: transform;
+    }
+
+    /* ── Cada slide ── */
+    .hdm-ann__slide {
+      flex: 0 0 var(--ann-height);
+      height: var(--ann-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Link interno — ocupa o slide inteiro ── */
+    .hdm-ann__slide-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: var(--ann-color);
+      padding-inline: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    /* ── Texto ── */
+    .hdm-ann__text {
+      font-family: var(--font-body--family, sans-serif);
+      font-size: var(--ann-font-size);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ann-color);
+    }
+
+    .hdm-ann__text strong {
+      font-weight: 700;
+    }
+
+    .hdm-ann__text em {
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    /* Slide Dia das Mães — fundo escuro especial */
+    .hdm-ann__slide:has(.hdm-ann__text--maes) {
+      background: linear-gradient(90deg, #1a0d1e 0%, #2a1028 50%, #1a0d1e 100%);
+    }
+
+    .hdm-ann__text--maes {
+      color: #C29B57;
+      font-size: 0.875rem;
+      letter-spacing: 0.12em;
+    }
+
+    .hdm-ann__text--maes strong {
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    /* Slide Truss — fundo bege */
+    .hdm-ann__slide:has(.hdm-ann__text em) {
+      background: #b8ac9a;
+    }
+
+    .hdm-ann__slide:has(.hdm-ann__text em) .hdm-ann__text {
+      color: #111;
+      letter-spacing: 0.1em;
+    }
+
+    /* Slide Frete Grátis — fundo preto */
+    .hdm-ann__slide:last-child {
+      background: #0d0d0d;
+    }
+
+    .hdm-ann__slide:last-child .hdm-ann__text {
+      color: #ffffff;
+    }
+
+    .hdm-ann__slide:last-child .hdm-ann__slide-inner {
+      color: #ffffff;
+    }
+
+    /* ── Pill de cupom ── */
+    .hdm-ann__pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--ann-pill-bg);
+      color: var(--ann-pill-color);
+      font-family: var(--font-body--family, sans-serif);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 12px;
+      border-radius: 50px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .hdm-ann__pill strong {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Separador + ── */
+    .hdm-ann__sep {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ann-color);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* ── Dots ── */
+    .hdm-ann__dots {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 2;
+    }
+
+    .hdm-ann__dot {
+      width: var(--ann-dot-size);
+      height: var(--ann-dot-size);
+      border-radius: 50%;
+      border: none;
+      background: var(--ann-dot-idle);
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .hdm-ann__dot--active {
+      background: var(--ann-dot-active);
+      transform: scale(1.3);
+    }
+
+    /* ── Slide Presentes (foto 1) — fundo vinho com textura sutil ── */
+  .hdm-ann__slide--presentes {
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,255,255,0.015) 10px,
+        rgba(255,255,255,0.015) 20px
+      ),
+      linear-gradient(90deg, #1a0a1e 0%, #2e1230 50%, #1a0a1e 100%);
+  }
+
+  .hdm-ann__text--presentes {
+    color: #e8e0f0;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+  }
+
+  .hdm-ann__underline {
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    color: #ffffff;
+  }
+
+  /* ── Slide Urgência (foto 2) — fundo vermelho ── */
+  .hdm-ann__slide--urgencia {
+    background: #e8001e;
+  }
+
+  .hdm-ann__text--urgencia {
+    color: #ffffff;
+    font-size: 0.9375rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hdm-ann__text--urgencia strong {
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+    /* ── Responsividade ── */
+    @media screen and (max-width: 749px) {
+      .hdm-ann {
+        --ann-height:    40px;
+        --ann-font-size: 0.6875rem; /* 11px */
+      }
+
+      /* Oculta separador e segunda promoção no mobile */
+      .hdm-ann__sep,
+      .hdm-ann__slide-inner > .hdm-ann__text:nth-child(3),
+      .hdm-ann__slide-inner > .hdm-ann__pill:nth-child(4) {
+        display: none;
+      }
+
+      .hdm-ann__dots { display: none; }
+    }
+
+    /* ── Pause on hover — cursor indica que é interativo ── */
+    .hdm-ann__slide-inner:hover .hdm-ann__pill {
+      background: #333;
+    }
+{% endstylesheet %}

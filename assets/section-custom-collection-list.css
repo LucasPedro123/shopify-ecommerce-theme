@@ -1,0 +1,142 @@
+.mt-74px{
+ margin-top: 74px;
+}
+
+.custom-collection-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.custom-collection-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 10px 0;
+  color: #000;
+}
+
+.custom-collection-subtitle {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 29px 0;
+}
+
+.custom-secondary-btn {
+    display: inline-block;
+    padding: 13px 49.5px;
+    border: 2px solid #898989;
+    border-radius: 12px;
+    background: transparent;
+    color: #000;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    color: #000000;
+}
+
+.custom-secondary-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.custom-collection-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.custom-collection-item {
+  width: 100%;
+}
+
+.custom-collection-card {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 316px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.custom-collection-image-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-collection-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.custom-collection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  transition: background 0.3s ease;
+}
+
+.custom-collection-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+  width: 90%;
+}
+
+.custom-collection-card-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 5px 0;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.custom-collection-card-action {
+  color: #ffffff;
+  font-size: 14px;
+  text-decoration: underline;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+@media (hover: hover) {
+  .custom-collection-card:hover .custom-collection-img {
+    transform: scale(1.05);
+  }
+  .custom-collection-card:hover .custom-collection-overlay {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .custom-collection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .custom-collection-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px; /* Respiro maior no desktop */
+  }
+}

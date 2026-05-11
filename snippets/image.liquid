@@ -1,7 +1,8 @@
 {%- doc -%}
   Renders the <img> element using provided image object
 
-  @param {object} image - image object
+  @param {object} image - image object (Desktop)
+  @param {object} image_mobile - image object (Mobile - opcional)
   @param {number} [height] - custom image height
   @param {string} [class] - additional classes
   @param {string} [text_fallback] - text to display if image is blank
@@ -9,8 +10,9 @@
   @param {string} [style] - additional styles
 
   @example
-  {% render 'image', image: product.featured_image, height: 300, class: 'product-image' %}
+  {% render 'image', image: product.featured_image, image_mobile: product.metafields.custom.imagem_mobile, height: 300, class: 'product-image' %}
 {%- enddoc -%}
+
 {% if image != blank %}
   {% assign image_height = height | default: image.height %}
   {% assign image_height_2x = height | default: image_height | times: 2 %}
@@ -26,7 +28,29 @@
     {% assign style_value = style_value | append: 'object-position: inherit;' %}
   {% endif %}
 
-  {{ image | image_url: height: image_height | image_tag: class: class, srcset: image_srcset, style: style_value }}
+  {%- if image_mobile != blank -%}
+    {%- comment -%} LÓGICA DO MOBILE (Tag Picture) {%- endcomment -%}
+    {% assign mobile_height = height | default: image_mobile.height %}
+    {% assign mobile_height_2x = mobile_height | times: 2 %}
+    {% assign mobile_height_3x = mobile_height | times: 3 %}
+
+    {% capture mobile_srcset -%}
+      {{ image_mobile | image_url: height: mobile_height }} 1x, {{ image_mobile | image_url: height: mobile_height_2x }} 2x, {{ image_mobile | image_url: height: mobile_height_3x }} 3x
+    {%- endcapture %}
+
+    <picture>
+      <source media="(max-width: 768px)" srcset="{{ mobile_srcset }}">
+      
+      <source media="(min-width: 769px)" srcset="{{ image_srcset }}">
+      
+      {{ image | image_url: height: image_height | image_tag: class: class, style: style_value }}
+    </picture>
+
+  {%- else -%}
+    {%- comment -%} LÓGICA PADRÃO (Apenas Desktop/Única Imagem) {%- endcomment -%}
+    {{ image | image_url: height: image_height | image_tag: class: class, srcset: image_srcset, style: style_value }}
+  {%- endif -%}
+
 {% elsif text_fallback %}
   {{ text_fallback }}
 {% endif %}

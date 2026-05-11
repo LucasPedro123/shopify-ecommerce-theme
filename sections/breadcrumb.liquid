@@ -1,0 +1,330 @@
+{% schema %}
+{
+  "name": "Trilha de Navegação (HDM)",
+  "tag": "section",
+  "class": "section-breadcrumb",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aparência"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Cor do Texto",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Cor ao passar o mouse",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de Fundo",
+      "default": "transparent"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Largura Total",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alinhamento",
+      "options": [
+        { "value": "flex-start", "label": "Esquerda" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Margem Superior",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Margem Inferior",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Breadcrumbs (HDM)"
+    }
+  ]
+}
+{% endschema %}
+
+{% style %}
+  .hdm-section-breadcrumb-wrapper {
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    width: 100%;
+  }
+
+  .hdm-breadcrumb-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: {{ section.settings.alignment }};
+    font-size: 13px;
+    line-height: 1.5;
+    color: {{ section.settings.text_color }};
+  }
+
+  .hdm-breadcrumb-nav a {
+    text-decoration: none;
+    color: {{ section.settings.text_color }};
+    transition: color 0.2s ease;
+    text-transform: capitalize;
+  }
+
+  .hdm-breadcrumb-nav a:hover {
+    color: {{ section.settings.link_hover_color }};
+    text-decoration: underline;
+  }
+
+  .hdm-breadcrumb-divider {
+    margin: 0 8px;
+    font-size: 11px;
+    opacity: 0.6;
+  }
+
+  .hdm-breadcrumb-current {
+    font-weight: 600;
+    opacity: 0.9;
+    color: {{ section.settings.link_hover_color }};
+  }
+
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .hdm-breadcrumb-nav {
+      font-size: 11px;
+      white-space: nowrap;
+      overflow-x: auto; /* Scroll horizontal se for muito longo */
+      flex-wrap: nowrap;
+      padding-bottom: 5px; /* Espaço para a barra de scroll se aparecer */
+    }
+    
+    /* Esconde barra de rolagem feia */
+    .hdm-breadcrumb-nav::-webkit-scrollbar {
+      height: 0px;
+      background: transparent;
+    }
+  }
+{% endstyle %}
+
+{% liquid
+  assign t = template | split: '.' | first
+  assign current_col = collection
+  
+  # Se estiver em produto e a URL não tiver collection, tenta pegar a primeira associada
+  if t == 'product' and current_col == blank
+    assign current_col = product.collections.first
+  endif
+%}
+
+<section class="hdm-section-breadcrumb-wrapper shopify-section section">
+  <div class="{% unless section.settings.full_width %}page-width{% endunless %}">
+    
+    <nav class="hdm-breadcrumb-nav" aria-label="breadcrumbs">
+      <a href="https://hdmbeauty.com.br/" title="Home">Home</a>
+      <span class="hdm-breadcrumb-divider">›</span>
+
+      {% comment %} ===== PRODUTOS E COLEÇÕES ===== {% endcomment %}
+      {% if t == 'collection' or t == 'product' %}
+        {% if current_col %}
+          
+          {% assign parts = current_col.title | split: ']' %}
+          {% assign parts_size = parts.size %}
+          {% assign cumulative_handle = "" %}
+
+          {% for part in parts %}
+            {% assign clean_part = part | remove: '[' | strip %}
+            
+            {% if clean_part != blank %}
+              
+              {% assign current_handle_part = clean_part | handleize %}
+
+              {% if cumulative_handle == blank %}
+                {% assign cumulative_handle = current_handle_part %}
+              {% else %}
+                {% assign cumulative_handle = cumulative_handle | append: '-' | append: current_handle_part %}
+              {% endif %}
+
+              {% assign is_last_collection_part = false %}
+              {% if forloop.index == parts_size %}
+                 {% assign is_last_collection_part = true %}
+              {% endif %}
+
+              {% if is_last_collection_part %}
+                <a href="{{ current_col.url }}" title="{{ current_col.title }}">
+                  {{ clean_part }}
+                </a>
+              {% else %}
+                <a href="https://hdmbeauty.com.br/collections/{{ cumulative_handle }}" title="{{ clean_part }}">
+                  {{ clean_part }}
+                </a>
+              {% endif %}
+
+              {% unless forloop.last and t == 'collection' %}
+                 <span class="hdm-breadcrumb-divider">›</span>
+              {% endunless %}
+              
+            {% endif %}
+          {% endfor %}
+
+          {% if t == 'product' %}
+            <span class="hdm-breadcrumb-current">{{ product.title | truncate: 40 }}</span>
+          {% endif %}
+
+        {% else %}
+          <a href="collections/all">Produtos</a>
+          {% if t == 'product' %}
+            <span class="hdm-breadcrumb-divider">›</span>
+            <span class="hdm-breadcrumb-current">{{ product.title }}</span>
+          {% endif %}
+        {% endif %}
+
+      {% comment %} ===== BLOG E ARTIGOS ===== {% endcomment %}
+      {% elsif t == 'blog' %}
+        <span class="hdm-breadcrumb-current">{{ blog.title }}</span>
+
+      {% elsif t == 'article' %}
+        <a href="{{ blog.url }}" title="{{ blog.title }}">{{ blog.title }}</a>
+        <span class="hdm-breadcrumb-divider">›</span>
+        <span class="hdm-breadcrumb-current">{{ article.title | truncate: 40 }}</span>
+
+      {% comment %} ===== PÁGINAS PADRÃO (Opcional, mas recomendado) ===== {% endcomment %}
+      {% elsif t == 'page' %}
+        <span class="hdm-breadcrumb-current">{{ page.title }}</span>
+        
+      {% endif %}
+    </nav>
+  </div>
+</section>
+
+{% comment %} ===== JSON-LD PARA SEO AVANÇADO ===== {% endcomment %}
+{% if t == 'collection' or t == 'product' %}
+  {% if current_col %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ shop.url }}"
+        }
+        {% assign parts = current_col.title | split: ']' %}
+        {% assign cumulative_handle_seo = "" %}
+        {% assign position_counter = 2 %}
+        
+        {% for part in parts %}
+          {% assign clean_part_seo = part | remove: '[' | strip %}
+          
+          {% if clean_part_seo != blank %}
+            {% assign current_handle_seo = clean_part_seo | handleize %}
+            
+            {% if cumulative_handle_seo == blank %}
+              {% assign cumulative_handle_seo = current_handle_seo %}
+            {% else %}
+              {% assign cumulative_handle_seo = cumulative_handle_seo | append: '-' | append: current_handle_seo %}
+            {% endif %}
+            
+            ,{
+              "@type": "ListItem",
+              "position": {{ position_counter }},
+              "name": "{{ clean_part_seo }}",
+              "item": "{{ shop.url }}/collections/{{ cumulative_handle_seo }}"
+            }
+            {% assign position_counter = position_counter | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+        
+        {% if t == 'product' %}
+        ,{
+          "@type": "ListItem",
+          "position": {{ position_counter }},
+          "name": "{{ product.title | strip_html | escape }}",
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+        {% endif %}
+      ]
+    }
+    </script>
+  {% endif %}
+
+{% elsif t == 'blog' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ blog.title | strip_html | escape }}",
+        "item": "{{ shop.url }}{{ blog.url }}"
+      }
+    ]
+  }
+  </script>
+
+{% elsif t == 'article' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ blog.title | strip_html | escape }}",
+        "item": "{{ shop.url }}{{ blog.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ article.title | strip_html | escape }}",
+        "item": "{{ shop.url }}{{ article.url }}"
+      }
+    ]
+  }
+  </script>
+{% endif %}

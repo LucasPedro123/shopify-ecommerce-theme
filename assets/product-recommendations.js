@@ -1,4 +1,6 @@
-class ProductRecommendations extends HTMLElement {
+import { Component } from '@theme/component';
+
+class ProductRecommendations extends Component {
   /**
    * The observer for the product recommendations
    * @type {IntersectionObserver}
@@ -21,6 +23,12 @@ class ProductRecommendations extends HTMLElement {
     for (const mutation of mutations) {
       // Only attribute changes are interesting
       if (mutation.target !== this || mutation.type !== 'attributes') continue;
+
+      // Ignore error attribute changes
+      if (mutation.attributeName === 'data-error') continue;
+
+      // Ignore addition of hidden class because it means there's an error with the display
+      if (mutation.attributeName === 'class' && this.classList.contains('hidden')) continue;
 
       // Ignore when the data-recommendations-performed attribute has been set to 'true'
       if (
@@ -48,8 +56,15 @@ class ProductRecommendations extends HTMLElement {
   #activeFetch = null;
 
   connectedCallback() {
+    super.connectedCallback();
     this.#intersectionObserver.observe(this);
     this.#mutationObserver.observe(this, { attributes: true });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.#intersectionObserver.disconnect();
+    this.#mutationObserver.disconnect();
   }
 
   /**
@@ -133,7 +148,7 @@ class ProductRecommendations extends HTMLElement {
    * @param {Error} error
    */
   #handleError(error) {
-    console.error('Product recommendations error:', error);
+    console.error('Product recommendations error:', error.message);
     this.classList.add('hidden');
     this.dataset.error = 'Error loading product recommendations';
   }

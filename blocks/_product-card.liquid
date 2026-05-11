@@ -1,14 +1,85 @@
-
+{{ 'section-custom-product-slider.css' | asset_url | stylesheet_tag }}
 
 {% liquid
-  assign product = closest.product
+  assign product = closest.product | default: product
+
+  assign onboarding = false
+  if product.id == empty or product == blank
+    assign onboarding = true
+  endif
 -%}
 
-{% capture children %}
-  {% content_for 'blocks', closest.product: product %}
-{% endcapture %}
+<article
+  class="custom-product-card"
+  style="padding-top: {{ block.settings.padding-block-start }}px; padding-bottom: {{ block.settings.padding-block-end }}px; padding-left: {{ block.settings.padding-inline-start }}px; padding-right: {{ block.settings.padding-inline-end }}px;"
+>
+  <div class="custom-pc-badges">
+    {%- if product.tags contains 'Cabelo' -%}
+      <span class="custom-pc-badge">CABELO</span>
+    {%- endif -%}
 
-{% render 'product-card', children: children, product: product %}
+    {%- if product.compare_at_price > product.price -%}
+      {% render 'pc-badge-sale', product: product %}
+    {%- endif -%}
+
+    {% render 'wishlist-button', product: product %}
+  </div>
+
+  <a href="{{ product.url }}" class="custom-pc-image-link" aria-label="Ver detalhes de {{ product.title }}">
+    {%- unless onboarding -%}
+      {%- if product.featured_image -%}
+        {{
+          product.featured_image
+          | image_url: width: 400
+          | image_tag: loading: 'lazy', class: 'custom-pc-img', alt: product.title
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg custom-pc-img' }}
+      {%- endif -%}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg custom-pc-img' }}
+    {%- endunless -%}
+  </a>
+
+  <div class="custom-pc-info center">
+    <div class="custom-pc-text-area">
+      <h3 class="custom-pc-title">
+        <a href="{{ product.url }}">{{ product.title | default: 'Título do Produto' }}</a>
+      </h3>
+      <p class="custom-pc-vendor">
+        by
+        <span
+          ><a href="https://hdmbeauty.com.br/collections/{{ product.vendor | handleize }}">
+            {{- product.vendor | default: 'Sua Marca' -}}
+          </a></span
+        >
+      </p>
+
+      {% if product.description %}
+        <p class="custom-pc-description">
+          {{ product.description | strip_html | truncatewords: 15 }}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="custom-pc-action-area">
+      <div class="custom-pc-price">
+        {%- if product.compare_at_price > product.price -%}
+          <span class="custom-pc-price-compare"
+            >de <del>{{ product.compare_at_price | money }}</del></span
+          >
+        {%- endif -%}
+
+        <div class="custom-pc-price-current">
+          <span class="custom-pc-price-prefix">por</span>
+          <span class="custom-pc-price-amount">{{ product.price | money | default: 'R$ 99,90' }}</span>
+        </div>
+      </div>
+
+      {% content_for 'blocks', closest.product: product %}
+    </div>
+  </div>
+</article>
 
 {% schema %}
 {
@@ -31,6 +102,9 @@
     },
     {
       "type": "review"
+    },
+    {
+      "type": "sku"
     },
     {
       "type": "swatches"

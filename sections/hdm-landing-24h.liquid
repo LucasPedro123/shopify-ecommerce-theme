@@ -1,0 +1,644 @@
+{%- comment -%}
+  HDM Beauty - Landing Page SEO (Entrega 24h)
+  Layout inspirado em grandes players, otimizado para conversão e indexação.
+{%- endcomment -%}
+
+<section class="hdm-delivery-24h">
+  
+  <header class="hdm-delivery-hero" style="background-color: {{ section.settings.hero_bg_color }};">
+    <div class="page-width hdm-hero-container">
+      <div class="hdm-hero-content">
+        <span class="hdm-hero-badge">Exclusivo HDM Beauty</span>
+        <h1 class="hdm-hero-title">
+          Compre no site e receba em <strong>até 24h*</strong>
+        </h1>
+        <p class="hdm-hero-subtitle">
+          Você sabia que agora a HDM Beauty entrega seus cosméticos favoritos, produtos para skincare e cabelos sem você sair de casa e, o melhor, com uma rapidez incrível?
+        </p>
+        <div class="hdm-hero-rules">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>*Válido para pedidos aprovados até às <strong>12h (meio-dia)</strong>, de segunda a sexta-feira. Sujeito à disponibilidade por CEP.</span>
+        </div>
+        <a href="#hdm-passo-a-passo" class="hdm-hero-btn">Veja como funciona</a>
+      </div>
+      <div class="hdm-hero-image-wrapper">
+        {%- if section.settings.hero_image != blank -%}
+          <img src="{{ section.settings.hero_image | image_url: width: 800 }}" alt="Entrega Rápida 24h HDM Beauty" class="hdm-hero-image" width="800" height="auto" loading="eager">
+        {%- else -%}
+          <div class="hdm-placeholder-box" style="height: 400px; background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #7c79e7;">Adicione a Imagem de Topo no Painel</div>
+        {%- endif -%}
+      </div>
+    </div>
+  </header>
+
+  <article id="hdm-passo-a-passo" class="hdm-delivery-steps-section page-width">
+    <h2 class="hdm-steps-main-title">Confira o passo a passo de como comprar <br>com entrega em 24h!</h2>
+    
+    <div class="hdm-steps-slider-wrapper">
+      
+      <button class="hdm-step-nav hdm-step-prev" aria-label="Passo Anterior">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+
+      <div class="hdm-steps-track" id="hdm-steps-track">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+            <section class="hdm-step-slide" {{ block.shopify_attributes }}>
+              
+              <div class="hdm-step-text-col">
+                <div class="hdm-step-number">{{ forloop.index }}</div>
+                <h3 class="hdm-step-title">{{ block.settings.step_title }}</h3>
+                <p class="hdm-step-desc">{{ block.settings.step_text }}</p>
+              </div>
+              
+              <div class="hdm-step-image-col">
+                {%- if block.settings.step_image != blank -%}
+                  <img src="{{ block.settings.step_image | image_url: width: 800 }}" alt="Passo {{ forloop.index }} - {{ block.settings.step_title | escape }}" class="hdm-step-img" loading="lazy">
+                {%- else -%}
+                  <div class="hdm-placeholder-box">Adicione o mockup do celular {{ forloop.index }}</div>
+                {%- endif -%}
+              </div>
+
+            </section>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <button class="hdm-step-nav hdm-step-next" aria-label="Próximo Passo">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+
+    </div>
+
+    <div class="hdm-steps-dots">
+      {%- assign step_count = 0 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'step' -%}
+          <button class="hdm-step-dot {% if step_count == 0 %}is-active{% endif %}" data-index="{{ step_count }}" aria-label="Ir para o passo {{ step_count | plus: 1 }}"></button>
+          {%- assign step_count = step_count | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </article>
+
+  <article class="hdm-coverage-section">
+    <div class="page-width hdm-coverage-container">
+      
+      <div class="hdm-coverage-content">
+        <span class="hdm-coverage-subtitle">Regiões Atendidas</span>
+        <h2 class="hdm-coverage-title">{{ section.settings.coverage_title }}</h2>
+        <p class="hdm-coverage-desc">{{ section.settings.coverage_text }}</p>
+        
+        <ul class="hdm-coverage-list list-unstyled">
+          <li>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            São Paulo (Capital) e Centro
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Guarulhos, Osasco e ABC Paulista
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Regiões Metropolitanas de Média Distância
+          </li>
+        </ul>
+      </div>
+
+      <div class="hdm-coverage-map-wrapper">
+        {%- if section.settings.coverage_iframe != blank -%}
+          {{ section.settings.coverage_iframe }}
+        {%- elsif section.settings.coverage_image != blank -%}
+          <img src="{{ section.settings.coverage_image | image_url: width: 800 }}" alt="Mapa de Cobertura HDM Beauty" loading="lazy" class="hdm-coverage-image">
+        {%- else -%}
+          <div class="hdm-placeholder-box" style="height: 100%; border: none; background: #e5e7eb;">
+            <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1_nIZdRfQEGDZFjNtnEJUzU3PipKMGNo&ehbc=2E312F" width="640" height="480"></iframe>
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </article>
+
+  <footer class="hdm-delivery-footer page-width">
+    <h2>Pronta para receber seus produtos amanhã?</h2>
+    <a href="https://hdmbeauty.com.br" class="button add-to-cart-button button-secondary" style="background-color: #111; color: #fff; padding: 18px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; text-transform: uppercase;">Explorar Loja Agora</a>
+  </footer>
+
+</section>
+
+{% stylesheet %}
+  /* ========================================================================
+     CSS SEO E LAYOUT - LANDING PAGE 24H HDM BEAUTY
+     ======================================================================== */
+  
+  .hdm-delivery-24h {
+    font-family: var(--font-body-family, sans-serif);
+    color: #111;
+    overflow: hidden;
+  }
+
+  /* --- 1. HERO SECTION --- */
+  .hdm-delivery-hero {
+    padding: 80px 0;
+    position: relative;
+    border-bottom: 5px solid #f4f4f4;
+  }
+
+  .hdm-hero-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0px 1.5rem;
+  }
+
+  .hdm-hero-badge {
+    display: inline-block;
+    background: #111;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .hdm-hero-title {
+    font-size: 42px;
+    line-height: 1.1;
+    font-weight: 400;
+    color: #fff;
+    margin: 0 0 20px 0;
+    font-family: var(--font-heading-family, serif);
+  }
+
+  .hdm-hero-title strong {
+    font-weight: 800;
+    display: block;
+    font-size: 56px;
+  }
+
+  .hdm-hero-subtitle {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 30px;
+  }
+
+  .hdm-hero-rules {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .hdm-hero-rules svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .hdm-hero-btn {
+    display: inline-block;
+    background: #fff;
+    color: #7c79e7;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 18px 40px;
+    border-radius: 6px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .hdm-hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+
+  .hdm-hero-image {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+
+  .hdm-placeholder-box {
+    background: #f9f9f9;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    width: 100%;
+    min-height: 300px;
+  }
+
+  /* --- 2. PASSO A PASSO --- */
+  .hdm-delivery-steps-section {
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .hdm-steps-main-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 60px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+  }
+
+  .hdm-steps-slider-wrapper {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fdfbf7; 
+    border-radius: 20px;
+    padding: 40px 60px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  }
+
+  .hdm-steps-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hdm-steps-track::-webkit-scrollbar { display: none; }
+
+  .hdm-step-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    scroll-snap-align: center;
+    display: grid;
+    grid-template-columns: 4fr 6fr;
+    gap: 40px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .hdm-step-number {
+    background: #ff6b6b;
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .hdm-step-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+  }
+
+  .hdm-step-desc {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .hdm-step-img {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+  }
+
+  .hdm-step-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #333;
+    z-index: 2;
+    transition: all 0.2s;
+  }
+  .hdm-step-nav:hover { background: #111; color: #fff; }
+  .hdm-step-prev { left: -24px; }
+  .hdm-step-next { right: -24px; }
+
+  .hdm-steps-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  .hdm-step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s;
+  }
+  .hdm-step-dot.is-active {
+    background: #7c79e7;
+    transform: scale(1.3);
+  }
+
+  /* --- 3. ÁREA DE COBERTURA (MAPA) --- */
+  .hdm-coverage-section {
+    background-color: #f9f9fc;
+    padding: 80px 0;
+    margin-top: 40px;
+  }
+
+  .hdm-coverage-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .hdm-coverage-subtitle {
+    color: #7c79e7;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .hdm-coverage-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+  }
+
+  .hdm-coverage-desc {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .hdm-coverage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hdm-coverage-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .hdm-coverage-map-wrapper {
+    width: 100%;
+    height: 450px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    position: relative;
+    background: #fff;
+  }
+
+  /* Faz o iframe do Google Maps ou a imagem preencher 100% do container */
+  .hdm-coverage-map-wrapper iframe,
+  .hdm-coverage-map-wrapper .hdm-coverage-image {
+    width: 100%;
+    height: 616px;
+    padding-bottom: 84px;
+    border: none;
+    object-fit: cover;
+
+  }
+  
+  @media screen and (max-width: 768px){
+    .hdm-placeholder-box iframe{
+      padding-bottom: 130px;
+    }
+  }
+  /* --- 4. FOOTER CTA --- */
+  .hdm-delivery-footer {
+    text-align: center;
+    padding: 80px 0 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hdm-delivery-footer h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-weight: 700;
+  }
+
+  /* --- RESPONSIVIDADE --- */
+  @media screen and (max-width: 990px) {
+    .hdm-hero-container, .hdm-coverage-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 40px;
+    }
+    .hdm-hero-title, .hdm-coverage-title { font-size: 32px; }
+    .hdm-hero-title strong { font-size: 42px; }
+    .hdm-hero-rules { text-align: left; }
+    
+    .hdm-coverage-list { align-items: center; } /* Centraliza a lista no mobile */
+    .hdm-coverage-map-wrapper { height: 350px; }
+
+    .hdm-step-slide {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 30px;
+    }
+    .hdm-step-number { margin: 0 auto 20px; }
+    .hdm-step-nav { display: none; }
+    .hdm-steps-slider-wrapper { padding: 20px; }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function() {
+    const track = document.getElementById('hdm-steps-track');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.hdm-step-slide');
+    const dots = document.querySelectorAll('.hdm-step-dot');
+    const prevBtn = document.querySelector('.hdm-step-prev');
+    const nextBtn = document.querySelector('.hdm-step-next');
+    
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateUI() {
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('is-active', idx === currentIndex);
+      });
+    }
+
+    function goToSlide(index) {
+      currentIndex = index;
+      const slideWidth = track.offsetWidth;
+      track.scrollTo({ left: slideWidth * index, behavior: 'smooth' });
+      updateUI();
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      goToSlide(currentIndex);
+    });
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      goToSlide(currentIndex);
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => goToSlide(index));
+    });
+
+    track.addEventListener('scroll', () => {
+      clearTimeout(track.scrollTimeout);
+      track.scrollTimeout = setTimeout(() => {
+        const slideWidth = track.offsetWidth;
+        const newIndex = Math.round(track.scrollLeft / slideWidth);
+        if(newIndex !== currentIndex) {
+          currentIndex = newIndex;
+          updateUI();
+        }
+      }, 50);
+    });
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Landing Page - Entrega",
+  "settings": [
+    {
+      "type": "color",
+      "id": "hero_bg_color",
+      "label": "Cor de Fundo do Topo",
+      "default": "#7c79e7"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Imagem de Topo (Ao lado do texto)"
+    },
+    {
+      "type": "header",
+      "content": "Mapa de Cobertura"
+    },
+    {
+      "type": "text",
+      "id": "coverage_title",
+      "label": "Título da Cobertura",
+      "default": "Entregamos na sua porta em tempo recorde."
+    },
+    {
+      "type": "textarea",
+      "id": "coverage_text",
+      "label": "Texto da Cobertura",
+      "default": "A Entrega Local HDM Beauty cobre grande parte de São Paulo Capital e Regiões Metropolitanas. Consulte o seu CEP no carrinho para confirmar a disponibilidade."
+    },
+    {
+      "type": "html",
+      "id": "coverage_iframe",
+      "label": "Código do Mapa (Iframe do Google My Maps)",
+      "info": "Cole aqui o <iframe> gerado pelo Google My Maps. Se preenchido, ele substituirá a imagem abaixo."
+    },
+    {
+      "type": "image_picker",
+      "id": "coverage_image",
+      "label": "Imagem do Mapa (Fallback)",
+      "info": "Use este campo se não quiser usar o código <iframe> acima. Suba um print do mapa de áreas de entrega."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Passo a Passo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "step_title",
+          "label": "Título do Passo",
+          "default": "Calcule o frete na sacola de compras"
+        },
+        {
+          "type": "textarea",
+          "id": "step_text",
+          "label": "Descrição do Passo",
+          "default": "Adicione seus produtos favoritos à sacola. Em seguida, digite o seu CEP no campo de cálculo de frete e clique em 'Ok' para visualizar a opção de Entrega Local Mais Rápida."
+        },
+        {
+          "type": "image_picker",
+          "id": "step_image",
+          "label": "Imagem do Celular/Mockup"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Landing Page - Entrega 24h",
+      "blocks": [
+        { 
+          "type": "step",
+          "settings": {
+            "step_title": "Calcule o frete na sacola de compras",
+            "step_text": "Adicione seus produtos favoritos à sacola. Em seguida, digite o seu CEP no campo de cálculo de frete e clique em 'Ok' para visualizar a opção de Entrega Local Mais Rápida."
+          }
+        },
+        { 
+          "type": "step",
+          "settings": {
+            "step_title": "Selecione a Entrega 24h no Checkout",
+            "step_text": "Clique em 'Finalizar Compra'. Na tela de pagamento, confirme seu endereço e certifique-se de selecionar a opção 'Entrega local (Entrega em 24h Motoboy Express)' antes de concluir o pedido."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

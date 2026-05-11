@@ -1,4 +1,3 @@
-
 {%- doc -%}
   Renders the facet filtering component
 
@@ -9,6 +8,12 @@
 
 <script
   src="{{ 'facets.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+<script
+  src="{{ 'scrolling.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>
@@ -64,11 +69,6 @@
   if block_settings.enable_filtering == false and block_settings.enable_sorting
     assign should_use_select_on_mobile = false
   endif
-
-  assign should_show_vertical_clear_all = true
-  if block_settings.filter_style == 'vertical'
-    assign should_show_vertical_clear_all = false
-  endif
 -%}
 
 {% if block_settings.enable_filtering or block_settings.enable_sorting or block_settings.enable_grid_density %}
@@ -82,9 +82,16 @@
         <h4 class="facets--filters-title">{{ 'content.filters' | t }}</h4>
       {% endif %}
 
-      <div class="products-count-wrapper">
+      <div
+        class="products-count-wrapper"
+        data-testid="products-count"
+      >
         <span title="{{ 'content.product_count' | t }}">
-          {{- 'content.item_count' | t: count: products_count -}}
+          {% if products_count > 25000 %}
+            {{- 'content.item_count_cutoff' | t: count: 25000 -}}
+          {% else %}
+            {{- 'content.item_count' | t: count: products_count -}}
+          {% endif %}
         </span>
       </div>
 
@@ -205,24 +212,43 @@
                     class: 'facets__overflow-list',
                     children: rendered_filters,
                     more-attributes: more_attributes,
-                    minimum-items: 2
+                    minimum-items: 2,
+                    data-testid: 'horizontal-filters-overflow-list'
                   %}
                 {% else %}
                   {{ rendered_filters }}
                 {% endif %}
               </div>
 
-              {% render 'facets-actions',
-                results_url: results_url,
-                is_active: is_active,
-                products_count: products_count,
-                should_show_clear_all: should_show_vertical_clear_all
-              %}
+              {% if block_settings.filter_style == 'horizontal' %}
+                <facet-remove-component
+                  class="facets-horizontal-remove {% if is_active %}facets-horizontal-remove--active{% endif %}"
+                  active-class="facets__clear-all-link--active"
+                  data-url="{{ results_url }}"
+                >
+                  <button
+                    type="button"
+                    class="button-unstyled facets__clear-all-link facets__clear-all-link--horizontal {% if is_active %}facets__clear-all-link--active{% endif %}"
+                    ref="clearButton"
+                    on:click="/removeFilter?form="
+                    on:keydown="/removeFilter?form="
+                  >
+                    {{- 'actions.clear_all' | t -}}
+                  </button>
+                </facet-remove-component>
+              {% endif %}
             {% endif %}
             {% if block_settings.filter_style == 'horizontal' %}
-              <div class="products-count-wrapper">
+              <div
+                class="products-count-wrapper"
+                data-testid="products-count"
+              >
                 <span title="{{ 'content.product_count' | t }}">
-                  {{- 'content.item_count' | t: count: products_count -}}
+                  {% if products_count > 25000 %}
+                    {{- 'content.item_count_cutoff' | t: count: 25000 -}}
+                  {% else %}
+                    {{- 'content.item_count' | t: count: products_count -}}
+                  {% endif %}
                 </span>
               </div>
 
@@ -289,7 +315,17 @@
       </div>
     {% endif %}
 
-    <div class="facets-mobile-wrapper facets-controls-wrapper">
+    {% liquid
+      assign child_count = 0
+      if block_settings.enable_filtering == false and block_settings.enable_sorting
+        assign child_count = child_count | plus: 1
+      endif
+      if block_settings.enable_grid_density
+        assign child_count = child_count | plus: 1
+      endif
+    %}
+
+    <div class="facets-mobile-wrapper facets-controls-wrapper{% if child_count > 1 %} facets-mobile-wrapper--multiple-controls{% endif %}">
       {% if block_settings.enable_filtering == false and block_settings.enable_sorting %}
         <facets-form-component
           section-id="{{ section.id }}"
@@ -323,18 +359,18 @@
 {% if block_settings.enable_filtering %}
   <dialog-component
     id="filters-drawer"
-    class="facets-block-wrapper facets-block-wrapper--vertical facets-block-wrapper--drawer color-{{ settings.drawer_color_scheme }}"
+    class="facets-block-wrapper facets-block-wrapper--vertical color-{{ settings.drawer_color_scheme }}"
   >
     <dialog
       ref="dialog"
       class="facets facets--drawer dialog-modal drawer dialog-drawer dialog-drawer--right spacing-style"
       style="{% render 'spacing-style', settings: block_settings %}"
       scroll-lock
+      aria-labelledby="filters-drawer-heading"
     >
       {% assign form_component = 'FacetFiltersFormComponent--' | append: section.id | append: '-overflow' %}
-
       <facets-form-component
-        class="facets__form-wrapper"
+        class="facets__form-wrapper facets-drawer__form-wrapper"
         section-id="{{ section.id }}"
         id="{{ form_component }}"
       >
@@ -348,7 +384,10 @@
             class="facets__title-wrapper"
             style="--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));"
           >
-            <h2 class="facets-drawer__title h3">
+            <h2
+              id="filters-drawer-heading"
+              class="facets-drawer__title h3"
+            >
               {{ 'blocks.filter' | t }}
 
               {% if total_active_values > 0 %}
@@ -377,85 +416,94 @@
             </button>
           </div>
 
-          {% if block_settings.enable_filtering %}
-            {% render 'filter-remove-buttons',
-              filters: filters,
-              results_url: results_url,
-              show_filter_label: block_settings.show_filter_label,
-              should_show_clear_all: false
-            %}
+          <scroll-hint
+            class="facets-drawer__filters"
+          >
+            {% if block_settings.enable_filtering %}
+              {% render 'filter-remove-buttons',
+                filters: filters,
+                results_url: results_url,
+                show_filter_label: block_settings.show_filter_label,
+                should_show_clear_all: false
+              %}
 
-            <div class="facets__filters-wrapper">
-              {% assign total_active_values = 0 %}
-              {% assign is_active = false %}
+              <div class="facets__filters-wrapper">
+                {% assign total_active_values = 0 %}
+                {% assign is_active = false %}
 
-              {%- for filter in filters -%}
-                {%- liquid
-                  assign should_autofocus = false
-                  if forloop.first and total_active_values == 0
-                    assign should_autofocus = true
-                  endif
-                %}
-                {% case filter.type %}
-                  {% when 'price_range' %}
-                    {%- liquid
-                      if filter.min_value.value != null or filter.max_value.value != null
-                        assign total_active_values = total_active_values | plus: 1
-                        assign is_active = true
-                      endif
+                {%- for filter in filters -%}
+                  {% case filter.type %}
+                    {% when 'price_range' %}
+                      {%- liquid
+                        if filter.min_value.value != null or filter.max_value.value != null
+                          assign total_active_values = total_active_values | plus: 1
+                          assign is_active = true
+                        endif
 
-                      render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, autofocus: should_autofocus
-                    -%}
-                  {% else %}
-                    {% liquid
-                      if filter.active_values.size > 0
-                        assign is_active = true
-                      endif
+                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false
+                      -%}
+                    {% else %}
+                      {% liquid
+                        if filter.active_values.size > 0
+                          assign is_active = true
+                        endif
 
-                      assign active_value_count = filter.active_values | size
-                      assign total_active_values = total_active_values | plus: active_value_count
-                      render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, autofocus: should_autofocus, in_drawer: true, sectionId: section.id
-                    %}
-                {% endcase %}
-              {%- endfor -%}
-            </div>
-          {% endif %}
+                        assign active_value_count = filter.active_values | size
+                        assign total_active_values = total_active_values | plus: active_value_count
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id
+                      %}
+                  {% endcase %}
+                {%- endfor -%}
+              </div>
+            {% endif %}
 
-          {% if block_settings.enable_sorting %}
-            {% render 'sorting',
-              results: results,
-              sort_by: sort_by,
-              filter_style: block_settings.filter_style,
-              suffix: 'overflow',
-              should_use_select_on_mobile: should_use_select_on_mobile,
-              section_id: section.id
-            %}
-          {% endif %}
+            {% if block_settings.enable_sorting %}
+              {% render 'sorting',
+                results: results,
+                sort_by: sort_by,
+                filter_style: block_settings.filter_style,
+                suffix: 'overflow',
+                should_use_select_on_mobile: should_use_select_on_mobile,
+                section_id: section.id
+              %}
+            {% endif %}
+          </scroll-hint>
         </form>
       </facets-form-component>
 
-      {% render 'facets-actions',
-        results_url: results_url,
-        is_active: is_active,
-        products_count: products_count,
-        form_component: form_component,
-        should_show_clear_all: true
-      %}
+      <div
+        class="facets__drawer-actions"
+      >
+        <facet-remove-component
+          data-url="{{ results_url }}"
+          active-class="facets__clear-all--active"
+        >
+          <button
+            type="button"
+            class="button-secondary facets__clear-all{% if is_active %} facets__clear-all--active{% endif %}"
+            ref="clearButton"
+            on:click="/removeFilter?form={{ form_component }}"
+            on:keydown="/removeFilter?form={{ form_component }}"
+          >
+            {{- 'actions.clear_all' | t -}}
+          </button>
+        </facet-remove-component>
+
+        {% if products_count > 0 %}
+          <button
+            class="button facets__see-results"
+            type="button"
+            on:click="dialog-component/closeDialog"
+          >
+            {{- 'actions.see_items' | t: count: products_count -}}
+          </button>
+        {% endif %}
+      </div>
     </dialog>
   </dialog-component>
 {% endif %}
 
 {% stylesheet %}
-  .collection-wrapper {
-    @media screen and (min-width: 750px) {
-      --facets-vertical-col-width: 6;
-    }
-
-    @media screen and (min-width: 990px) {
-      --facets-vertical-col-width: 5;
-    }
-  }
-
   .facets-block-wrapper {
     @media screen and (min-width: 750px) {
       margin: var(--facets-margin);
@@ -466,6 +514,85 @@
   .facets-block-wrapper--vertical {
     @media screen and (min-width: 750px) {
       grid-column: var(--grid-column--desktop);
+    }
+  }
+
+  .facets-toggle {
+    --icon-offset: -3px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--minimum-touch-target);
+    margin: var(--facets-margin);
+    padding-block: var(--facets-inner-padding-block);
+    padding-inline: var(--facets-inner-padding-inline);
+
+    @media screen and (min-width: 750px) {
+      display: none;
+    }
+  }
+
+  .facets-toggle__wrapper {
+    margin-left: var(--icon-offset);
+  }
+
+  .facets-toggle__button {
+    box-shadow: none;
+
+    @media screen and (min-width: 750px) {
+      display: none;
+    }
+  }
+
+  .filter-count-bubble {
+    position: relative;
+    width: 20px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    line-height: normal;
+    place-content: center;
+    color: var(--color-foreground);
+    border: var(--icon-stroke-width) solid var(--color-background);
+  }
+
+  .facets-mobile__title-wrapper .h3 {
+    margin-block-end: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-xs);
+  }
+
+  .facets-mobile__title-wrapper .filter-count-bubble {
+    width: 22px;
+    height: 22px;
+  }
+
+  .facets-mobile__title-wrapper .filter-count-bubble__text {
+    font-size: var(--font-size--xs);
+  }
+
+  .filter-count-bubble__background {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+    border-radius: var(--style-border-radius-50);
+  }
+
+  .filter-count-bubble__text {
+    font-size: 11px;
+    font-weight: var(--font-paragraph--weight);
+    aspect-ratio: 1 / 1;
+  }
+
+  .facets-toggle--no-filters {
+    @media screen and (max-width: 749px) {
+      justify-content: unset !important;
+
+      & > .facets-mobile-wrapper {
+        width: 100%;
+      }
     }
   }
 
@@ -482,24 +609,16 @@
     justify-content: flex-end;
   }
 
-  .facets-mobile-wrapper:has(> :nth-child(2)) {
+  .facets-mobile-wrapper--multiple-controls {
     justify-content: space-between;
   }
 
-  dialog-component.facets-block-wrapper:not(:has(.facets--drawer[open])) {
-    @media screen and (min-width: 750px) {
-      display: none;
+  @media screen and (min-width: 750px) {
+    dialog-component.facets-block-wrapper {
+      position: absolute;
+      width: 0;
+      height: 0;
     }
-  }
-
-  .variant-option__swatch-wrapper {
-    position: relative;
-    overflow: visible;
-    border-radius: var(--options-border-radius);
-  }
-
-  .variant-option--swatches-disabled .variant-option__swatch-wrapper {
-    overflow: hidden;
   }
 
   .facets {
@@ -573,12 +692,6 @@
     }
   }
 
-  .collection-wrapper:has(.collection-wrapper--full-width) .facets--vertical:not(.facets--drawer) {
-    @media screen and (min-width: 750px) {
-      padding-inline-start: max(var(--padding-sm), var(--padding-inline-start));
-    }
-  }
-
   .facets--drawer {
     border-radius: 0;
     border-right: var(--style-border-drawer);
@@ -589,7 +702,38 @@
   .facets--drawer[open] {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .facets-drawer__form-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .facets-drawer__form-wrapper .facets__form {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .facets-drawer__filters {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .facets-drawer__filters .facets__filters-wrapper,
+  .facets-drawer__filters .filter-remove-buttons,
+  .facets-drawer__filters .sorting-filter-component {
+    overflow: visible;
   }
 
   .facets.facets-controls-wrapper {
@@ -598,12 +742,6 @@
       color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
       gap: 0 var(--facets-form-horizontal-gap);
       padding-bottom: var(--padding-xs);
-    }
-  }
-
-  .collection-wrapper:has(.product-grid-mobile--large) .facets-mobile-wrapper.facets-controls-wrapper {
-    @media screen and (max-width: 749px) {
-      display: none;
     }
   }
 
@@ -674,7 +812,7 @@
       --variant-picker-swatch-height: 26px;
     }
 
-    font-size: var(--font-h4--size);
+    font-size: var(--font-h5--size);
     display: flex;
     justify-content: space-between;
 
@@ -874,8 +1012,7 @@
     --facets-panel-height: 300px;
   }
 
-  .facets--horizontal .facets__panel-content,
-  .sorting-filter__options {
+  .facets--horizontal .facets__panel-content {
     @media screen and (min-width: 750px) {
       border-radius: var(--style-border-radius-popover);
       position: absolute;
@@ -922,12 +1059,38 @@
 
   /* Facets - Text */
   .facets__label,
-  .facets__clear-all,
+  .facets__clear-all-link,
   .clear-filter {
     text-decoration-color: transparent;
     text-decoration-thickness: 0.075em;
     text-underline-offset: 0.125em;
     transition: text-decoration-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .facets__clear-all-link {
+    display: none;
+    cursor: pointer;
+    padding: var(--padding-xs);
+    color: var(--button-color);
+    transition: text-decoration-color var(--animation-speed) var(--animation-easing),
+      color var(--animation-speed) var(--animation-easing);
+  }
+
+  .facets__clear-all-link:hover {
+    --button-color: var(--color-primary-hover);
+
+    text-decoration: underline;
+    text-decoration-color: var(--button-color);
+  }
+
+  .facets__clear-all-link--horizontal {
+    height: var(--minimum-touch-target);
+    padding-inline: var(--facets-form-horizontal-gap);
+    min-width: var(--facets-clear-all-min-width);
+  }
+
+  .facets__clear-all-link--active {
+    display: block;
   }
 
   .facets__label,
@@ -941,10 +1104,35 @@
     padding: 0;
   }
 
+  .clear-filter:hover {
+    text-decoration: underline;
+  }
+
+  /* Clear button */
+  .facets__clear {
+    display: none;
+  }
+
+  .facets--horizontal .facets__clear {
+    @media screen and (min-width: 750px) {
+      width: 100%;
+      justify-content: flex-end;
+      padding: 0 var(--facets-clear-padding) var(--facets-clear-padding) 0;
+      cursor: pointer;
+    }
+  }
+
+  .facets__clear--active {
+    @media screen and (min-width: 750px) {
+      display: flex;
+    }
+  }
+
   /* Facets - Label */
   .facets__label {
     color: var(--color-foreground);
     cursor: pointer;
+    white-space: nowrap;
 
     @media screen and (min-width: 750px) {
       margin-inline-end: var(--margin-2xs);
@@ -1048,10 +1236,213 @@
     }
   }
 
-  .collection-wrapper:has(> .facets--horizontal) .facets__panel[open] {
-    @media screen and (min-width: 750px) {
-      z-index: var(--facets-open-z-index);
+  /* Facets - Actions */
+  .facets__drawer-actions {
+    --to-top-gradient-background: linear-gradient(
+      to top,
+      rgb(var(--color-background-rgb) / var(--opacity-90)),
+      rgb(var(--color-background-rgb) / var(--opacity-80)),
+      rgb(var(--color-background-rgb) / var(--opacity-40)),
+      transparent
+    );
+
+    position: sticky;
+    bottom: 0;
+    z-index: var(--facets-sticky-z-index);
+    order: 1;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: var(--gap-sm);
+    padding-block-start: var(--padding-xs);
+    padding-block-end: var(--padding-md);
+    padding-inline: var(--padding-lg);
+    margin-top: auto;
+    background-image: var(--to-top-gradient-background);
+    background-color: var(--color-background);
+  }
+
+  /* Clear all button */
+  .facets__clear-all {
+    display: none;
+    cursor: pointer;
+    min-width: var(--facets-clear-all-min-width);
+    flex-grow: 1;
+    padding-block: var(--padding-lg);
+    color: var(--button-color, inherit);
+  }
+
+  .facets__clear-all--active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: transform var(--animation-values), opacity var(--animation-values);
+  }
+
+  @starting-style {
+    .facets__clear-all--active {
+      opacity: 0;
+      transform: translateY(100%);
     }
+  }
+
+  .facets__see-results {
+    min-width: var(--facets-see-results-min-width);
+    flex-grow: 1;
+    padding-block: var(--padding-lg);
+  }
+
+  .facets-horizontal-remove {
+    display: flex;
+    align-items: center;
+  }
+
+  .facets-horizontal-remove--active::before {
+    content: '';
+    border-inline-start: var(--style-border-width) solid var(--color-border);
+    height: var(--font-paragraph--size);
+    position: absolute;
+  }
+
+
+  /* ========================================================================
+     ✨ OVERRIDES DE DESIGN PREMIUM HDM BEAUTY ✨
+     Estas regras transformam a UI nativa da Shopify em uma interface 
+     de alto padrão sem quebrar o JavaScript original.
+     ======================================================================== */
+
+  /* 1. ESTILIZAÇÃO DO TÍTULO DE FILTROS (Desktop) */
+  .facets--filters-title {
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.5px !important;
+    color: #111 !important;
+    font-size: 14px !important;
+    margin-right: 15px !important;
+  }
+
+  /* 2. BOTÕES HORIZONTAIS DE FILTRO (Aparência de 'Pílulas') */
+  .facets--horizontal .facets__summary {
+    padding: 10px 18px !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 8px !important; /* Bordas mais suaves */
+    background-color: #fff !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
+    color: #444 !important;
+  }
+
+  .facets--horizontal .facets__summary:hover {
+    border-color: #662483 !important; /* Roxo HDM */
+    color: #662483 !important;
+    box-shadow: 0 4px 12px rgba(102, 36, 131, 0.08) !important;
+  }
+
+  .facets--horizontal .facets__summary .icon-caret {
+    transition: transform 0.3s ease !important;
+  }
+
+  .facets--horizontal details[open] .facets__summary .icon-caret {
+    transform: rotate(180deg) !important;
+  }
+
+  /* 3. LISTA VERTICAL DE FILTROS (Sidebar) */
+  .facets--vertical .facets__summary {
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    color: #222 !important;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+  }
+
+  /* Limpa bordas pesadas e usa linhas finas */
+  :is(.facets--drawer, .facets--vertical) :is(.facets__item, .sorting-filter)::before {
+    border-top: 1px solid #f0f0f0 !important;
+  }
+
+  /* 4. BOLHAS DE CONTAGEM DE FILTROS ATIVOS (Notification Badge) */
+  .filter-count-bubble__background {
+    background-color: #f3e8ff !important; /* Fundo Roxo Claro */
+    border: none !important;
+  }
+
+  .filter-count-bubble__text {
+    color: #662483 !important; /* Roxo Forte */
+    font-weight: 700 !important;
+  }
+
+  .facets__bubble {
+    background-color: #f3e8ff !important;
+    color: #662483 !important;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+
+  /* 5. BOTÃO "LIMPAR TUDO" E "REMOVER" */
+  .facets__clear-all-link, 
+  .facets__clear-all {
+    color: #662483 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .facets__clear-all-link:hover, 
+  .facets__clear-all:hover {
+    text-decoration: underline !important;
+    color: #4a1860 !important;
+  }
+
+  /* 6. EXPERIÊNCIA MOBILE (O Botão de Filtro Flutuante e o Drawer) */
+  .facets-toggle__button {
+    background-color: #fff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 30px !important; /* Formato Pílula no celular */
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+  }
+
+  .facets-drawer__title {
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+  }
+
+  /* Botão "Ver Resultados" no Mobile */
+  .facets__see-results {
+    background-color: #662483 !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+  }
+
+  .facets__see-results:hover {
+    background-color: #4a1860 !important;
+  }
+
+  /* Personalização elegante da barra de rolagem (Scrollbar) dos Filtros */
+  .facets__panel-content::-webkit-scrollbar,
+  .facets-drawer__filters::-webkit-scrollbar {
+    width: 6px;
+  }
+  .facets__panel-content::-webkit-scrollbar-thumb,
+  .facets-drawer__filters::-webkit-scrollbar-thumb {
+    background-color: #dcdcdc;
+    border-radius: 10px;
+  }
+  .facets__panel-content::-webkit-scrollbar-track,
+  .facets-drawer__filters::-webkit-scrollbar-track {
+    background: transparent;
   }
 {% endstylesheet %}
 

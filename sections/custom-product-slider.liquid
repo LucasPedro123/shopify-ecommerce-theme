@@ -1,0 +1,151 @@
+{{ 'section-custom-product-slider.css' | asset_url | stylesheet_tag }}
+
+<div class="custom-ps-wrapper page-width">
+  <div class="custom-ps-header center">
+    <h2 class="custom-ps-title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="custom-ps-slider-container">
+    <ul class="custom-ps-slider" id="ProductSlider-{{ section.id }}">
+      {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
+        <li class="custom-ps-slide">
+          <article class="custom-product-card">
+            <div class="custom-pc-badges">
+              {%- if product.tags contains 'OUTLET' -%}
+                <span class="custom-pc-badge">OUTLET</span>
+              {%- endif -%}
+
+              {%- if product.compare_at_price > product.price -%}
+                {% render 'pc-badge-sale', product: product %}
+              {%- endif -%}
+
+              {% render 'wishlist-button', product: product %}
+            </div>
+
+            <a href="{{ product.url }}" class="custom-pc-image-link" aria-label="Ver detalhes de {{ product.title }}">
+              {%- if product.featured_image -%}
+                {{
+                  product.featured_image
+                  | image_url: width: 400
+                  | image_tag: loading: 'lazy', class: 'custom-pc-img', alt: product.title
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg custom-pc-img' }}
+              {%- endif -%}
+            </a>
+
+            <div class="custom-pc-info center">
+              <h3 class="custom-pc-title">
+                <a href="{{ product.url }}">{{ product.title }}</a>
+              </h3>
+              <p class="custom-pc-vendor">
+                by
+                <span
+                  ><a href="https://hdmbeauty.com.br/collections/{{ product.vendor | handleize }}">
+                    {{- product.vendor -}}
+                  </a></span
+                >
+              </p>
+
+              {% if product.description %}
+                <p class="custom-pc-description">
+                  {{ product.description | strip_html | truncatewords: 10 }}
+                </p>
+              {% endif %}
+
+              <div class="custom-pc-price">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="custom-pc-price-compare"
+                    >de <del>{{ product.compare_at_price | money }}</del></span
+                  >
+                {%- endif -%}
+
+                <div class="custom-pc-price-current">
+                  <span class="custom-pc-price-prefix">por</span>
+                  <span class="custom-pc-price-amount">{{ product.price | money | default: 'R$ 99,90' }}</span>
+                </div>
+              </div>
+
+              {% content_for 'blocks', closest.product: product %}
+            </div>
+          </article>
+        </li>
+      {%- else -%}
+        {%- for i in (1..4) -%}
+          <li class="custom-ps-slide">
+            <div class="custom-product-card center" style="padding: 20px; border: 1px solid #eee;">
+              Selecione uma coleção nas configurações
+            </div>
+          </li>
+        {%- endfor -%}
+      {%- endfor -%}
+    </ul>
+    {%- if section.settings.collection.products.size > 4 -%}
+      <div class="custom-ps-dots"></div>
+      <button class="custom-hero-arrow custom-hero-arrow--left" aria-label="Produtos anteriores">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="custom-hero-arrow custom-hero-arrow--right" aria-label="Próximos produtos">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_view_all -%}
+    <div class="custom-ps-footer center">
+      <a href="{{ section.settings.collection.url }}" class="custom-secondary-btn"> VER TUDO </a>
+    </div>
+  {%- endif -%}
+</div>
+
+<script src="{{ 'custom-product-slider.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Slider de Produtos",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "buy-buttons"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título da Seção",
+      "default": "RECOMENDADO PARA VOCÊ"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Coleção a ser exibida"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Máximo de produtos a exibir",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Mostrar botão 'Ver Tudo'",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slider de Produtos"
+    }
+  ]
+}
+{% endschema %}

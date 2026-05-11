@@ -1,0 +1,34 @@
+{% doc %}
+  @param {product} product
+{% enddoc %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+  assign price_product = current_variant.price
+  assign compare_price_product = current_variant.compare_at_price
+
+  if compare_price_product and compare_price_product > price_product
+    assign different_price = compare_price_product | minus: price_product
+    
+    comment
+      O pulo do gato: multiplicar por 100.0 (com ponto flutuante) ANTES de dividir!
+    endcomment
+    assign discount_product = different_price | times: 100.0 | divided_by: compare_price_product | round
+  else
+    assign discount_product = 0
+  endif
+%}
+
+{%- if discount_product > 0 -%}
+  <span class="custom-pc-badge custom-pc-badge--sale">-{{ discount_product }}%</span>
+{%- endif -%}
+
+{% stylesheet %}
+  /* Sugestão de estilo para ficar alinhado ao padrão HDM Beauty (Amarelo ou Roxo) */
+  .custom-pc-badge--sale {
+    background-color: #FFD700 !important; /* Amarelo tipo Beleza na Web */
+    color: #000 !important;
+    font-weight: 600 !important;
+  }
+{% endstylesheet %}

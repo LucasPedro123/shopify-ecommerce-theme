@@ -1,0 +1,777 @@
+.custom-pdp-wrapper {
+  padding-top: 40px;
+  padding-bottom: 60px !important;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0px 1.5rem;
+}
+
+.custom-pdp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  padding-bottom: 24px;
+}
+
+/* --- COLUNA DE MÍDIA --- */
+.custom-pdp-media {
+  display: flex;
+  gap: 13px;
+  width: 100%;
+}
+
+.custom-pdp-main-image {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-pdp-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.custom-pdp-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.custom-pdp-thumbnails::-webkit-scrollbar { display: none; }
+
+.custom-pdp-thumb-btn {
+  width: 100%;
+  height: 80px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.custom-pdp-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- COLUNA DE INFORMAÇÕES (BUY BOX) --- */
+.custom-pdp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.custom-pdp-block {
+  width: 100%;
+}
+
+.custom-pdp-vendor {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin: 0 0 5px 0;
+}
+
+.custom-pdp-vendor a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.custom-pdp-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0;
+  line-height: 1.2;
+  color: #000;
+}
+
+/* Preços */
+.custom-pdp-price-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-pdp-compare-price {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+}
+
+.custom-pdp-current-price {
+  font-size: 28px;
+  font-weight: 900;
+  color: #000;
+}
+
+.custom-pdp-pix-price {
+  font-size: 13px;
+  color: #2e7d32; /* Verde conversão */
+  margin: 5px 0 0 0;
+}
+
+/* Botões e Quantidade */
+.custom-pdp-quantity-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.custom-pdp-qty-selector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 50px;
+}
+
+.qty-btn {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 100%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.qty-input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  font-weight: bold;
+  pointer-events: none; /* Impede o usuário de digitar besteira */
+}
+
+.custom-pdp-btn-add {
+  flex-grow: 1;
+  background-color: #7C79E7; /* Roxo da sua marca */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.custom-pdp-btn-add:hover {
+  background-color: #6460da;
+}
+
+.custom-pdp-btn-add[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.custom-pdp-trust-badges {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.custom-pdp-trust-badges p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+}
+
+/* Descrição */
+.custom-pdp-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+/* DESKTOP (Split Screen) */
+@media screen and (min-width: 750px) {
+
+  .custom-pdp-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: start;
+  }
+  
+  .custom-pdp-title {
+    font-size: 32px;
+  }
+}
+
+.custom-pdp-thumb-btn {
+  opacity: 0.6;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+.custom-pdp-thumb-btn.is-active,
+.custom-pdp-thumb-btn:hover {
+  opacity: 1;
+  border-color: #000;
+}
+
+/* Esconde o radio button original, mas mantém acessível para leitores de tela */
+.visually-hidden {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+.custom-pdp-variants {
+  margin-bottom: 20px;
+}
+
+.custom-pdp-option-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.custom-pdp-option-name {
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.custom-pdp-option-name .selected-value {
+  font-weight: normal;
+  color: #666;
+  margin-left: 5px;
+}
+
+.custom-pdp-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* O Botão/Pílula da Variante (Base A1, 1, 2, Vermelho, etc) */
+.custom-pdp-swatch-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  height: 40px;
+  padding: 0 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px; /* Para ficar pílula redonda, mude para 20px */
+  background-color: #fff;
+  color: #333;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+/* O que acontece quando o usuário seleciona (Clica) */
+.custom-pdp-swatch-input:checked + .custom-pdp-swatch-label {
+  border-color: #000;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Hover (passar o mouse) */
+.custom-pdp-swatch-label:hover {
+  border-color: #000;
+}
+/* Container que abraça o swatch, o desconto e o tooltip */
+.custom-pdp-swatch-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* O texto de desconto estilo Beleza na Web */
+.custom-pdp-swatch-discount {
+  font-size: 10px;
+  font-weight: 900;
+  color: #8b628b; /* Roxo da HDM Beauty */
+  text-align: center;
+}
+
+.pt-12{
+  padding: 6px 0px 12px 12px;
+}
+
+.custom-pdp-swatch-tooltip {
+  position: absolute;
+  width: 191px;
+  height: auto;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background-color: #000;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #0003;
+  border-radius: 1px;
+  box-shadow: 0 5px 10px #0003;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  padding: 12px;
+  span{
+    padding:0;
+    margin: 0;
+  }
+}
+
+/* Setinha do tooltip */
+.custom-pdp-swatch-tooltip::after {
+  content: '';
+  position: absolute;
+  overflow: hidden;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: #000 transparent transparent transparent;
+  text-align: center;
+  span{
+    color: #000;
+    font-size: 12px;
+  }
+}
+
+.discount-badge-sticky-button {
+  position: absolute;
+  right: -3px;
+  align-items: center;
+  background-color: #eecf76;
+  border-radius: 2px;
+  color: #000 !important;
+  display: inline-flex;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  justify-content: center;
+  padding: 3px 14px !important;
+  transform: skew(-15deg);
+}
+
+/* Opcional: Desinclinar o texto para ele ficar reto dentro da etiqueta */
+.discount-badge-sticky-button span {
+  color: #7695ee !important;
+  display: inline-block;
+  transform: skewX(15deg); 
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+/* Exibe o Tooltip no Hover da pílula */
+.custom-pdp-swatch-wrapper:hover .custom-pdp-swatch-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Layout específico quando for um seletor de CORES */
+.custom-pdp-swatches--color {
+  gap: 15px; /* Mais espaço entre os quadrados de cor */
+}
+
+/* O Quadrado de Cor */
+.custom-pdp-swatch-color {
+  width: 45px;
+  height: 45px;
+  min-width: unset;
+  padding: 0;
+  border-radius: 8px; /* Quadrado com cantos suaves igual a Beleza na Web */
+  border: 2px solid #e5e5e5;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); /* Sombra interna suave */
+}
+
+/* Quando selecionado (Borda Azul/Roxa e destaque) */
+.custom-pdp-swatch-input:checked + .custom-pdp-swatch-color {
+  border-color: #5b6fb6;
+  background-color: transparent;
+  box-shadow: 0 0 0 1px #5b6fb6; 
+}
+
+.custom-pdp-swatch-color:hover {
+  border-color: #5b6fb6;
+}
+
+/* Ajuste no Tooltip para mostrar preço cortado (de/por) em 2 linhas */
+.custom-pdp-swatch-tooltip {
+  text-align: center;
+  padding-top: 5px;
+  line-height: 1.2;
+}
+
+/* Estilo do OFF igual da foto (cor de texto cinza e sem fundo berrante) */
+.custom-pdp-swatch-discount {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-top: 2px;
+}
+
+.custom-pdp-compare-price{
+  .discount-badge-sticky-button{
+    left: 69px;
+    width: 30px;
+    right: 0;
+    height: stretch;
+    font-size: .75rem !important;
+    justify-content: center;
+    padding: 2px 4px !important;
+  }
+}
+
+/* Container da Imagem Principal - Precisa ter overflow hidden para o zoom */
+.custom-pdp-main-image {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden; /* Importante para o zoom inline */
+}
+
+.custom-pdp-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.1s ease-out; /* Transição suave para o hover zoom */
+  cursor: zoom-in; /* Mostra a lupa */
+}
+
+/* DESKTOP HOVER ZOOM CLASSE (Ativada via JS) */
+.custom-pdp-main-image.is-zooming .custom-pdp-img {
+  transform: scale(2); /* Nível do zoom no hover */
+}
+
+/* --- NOVA ÁREA: DESCRIÇÃO FULL WIDTH --- */
+.custom-pdp-full-description {
+  margin: 60px auto 0  auto;
+  padding-top: 60px;
+
+}
+
+.pdp-full-desc-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* Estilização básica para o conteúdo HTML da descrição */
+.prose {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.pdp-content-anchor{
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 24px 1.5rem ;
+}
+
+.prose p { margin-bottom: 20px; }
+.prose img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+
+/* MODAL DE ZOOM MELHORADO */
+.custom-pdp-zoom-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.custom-pdp-zoom-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Viewport para permitir o panning (arrastar) */
+.custom-pdp-zoom-viewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* JS controlará o scroll/panning */
+  cursor: grab;
+}
+
+.custom-pdp-zoom-img {
+  max-width: 90vw; 
+  max-height: 90vh;
+  object-fit: contain;
+  transition: transform 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;
+}
+
+.custom-pdp-zoom-modal.is-zoomed-in .custom-pdp-zoom-viewport {
+  cursor: grabbing;
+}
+
+.custom-pdp-zoom-modal.is-zoomed-in .custom-pdp-zoom-img {
+  max-width: none;
+  max-height: none;
+  transform: scale(1);
+}
+
+/* SETAS DO CARROSSEL NO MODAL */
+.custom-pdp-zoom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 95px;
+  background-color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  color: #000;
+  cursor: pointer;
+  z-index: 100000;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.custom-pdp-zoom-arrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.custom-pdp-zoom-prev {
+  left: 20px;
+}
+
+.custom-pdp-zoom-next {
+  right: 20px;
+}
+
+/* Oculta as setas se a tela for muito pequena (opcional, mas boa prática) */
+@media screen and (max-width: 749px) {
+  .custom-pdp-media{
+    flex-direction: column;
+  }
+  .custom-pdp-thumbnails{
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .custom-pdp-zoom-arrow {
+    width: 40px;
+    height: 40px;
+  }
+  .custom-pdp-zoom-prev { left: 10px; }
+  .custom-pdp-zoom-next { right: 10px; }
+}
+
+.custom-pdp-zoom-close.js-pdp-zoom-close{
+  position: absolute;
+  left: 13px;
+  top: 13px;
+  border: none;
+  background-color: #000;
+  color: #000;
+  cursor: pointer;
+}
+
+.pfp-divider{
+  height: 2px;
+  border-top: 2px solid #e2e0ff;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0px 1.5rem ;
+}
+
+/* --- CARROSSEL MOBILE E DESKTOP --- */
+.custom-pdp-carousel-track {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* Aceleração de hardware no iOS */
+  scroll-behavior: smooth;
+}
+
+.custom-pdp-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-pdp-carousel-slide {
+  flex: 0 0 101%;
+  width: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  justify-content: center;
+  position: relative; /* Necessário para segurar o zoom */
+  overflow: hidden; /* A MÁGICA: Corta a imagem pra ela não invadir a vizinha no Zoom! */
+}
+
+.custom-pdp-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-bottom: 5px;
+}
+
+.custom-pdp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #e5e5e5;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-pdp-dot.is-active {
+  background-color: #7695ee; /* Substitua pelo seu Roxo/Cor principal */
+}
+
+.custom-pdp-carousel-track {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* Aceleração de hardware no iOS */
+  scroll-behavior: smooth;
+}
+
+.custom-pdp-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-pdp-carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: start; /* Para exatamente no início da foto */
+  display: flex;
+  justify-content: center;
+}
+
+.custom-pdp-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-bottom: 5px;
+}
+
+.custom-pdp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #e5e5e5;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-pdp-dot.is-active {
+  background-color: #7695ee;
+}
+
+
+
+@media screen and (min-width: 750px) {
+  .custom-pdp-thumbnails {
+    display: flex; /* Garante no desktop */
+  }
+
+  .custom-pdp-carousel-track {
+    overflow: hidden; /* Trava o swipe no PC, o usuário clica nas thumbs */
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .custom-pdp-thumbnails {
+    display: none !important; /* Esconde thumbs no mobile */
+  }
+}
+
+
+/* --- OVERLAY DE + FOTOS (DESKTOP) --- */
+.custom-pdp-thumb-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.custom-pdp-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px; /* Tamanho do +7 */
+  font-weight: 700; 
+  color: #5b6fb6; 
+  z-index: 2;
+  transition: background-color 0.3s ease;
+}
+
+.custom-pdp-thumb-btn:hover .custom-pdp-thumb-overlay {
+  background-color: rgba(255, 255, 255, 0.85); 
+  color: #000;
+}
+
+.cart_shipping_calc-wrapper{
+  .hdm-shipping-calc{
+    padding: 0px;
+    border: none;
+    
+    .hdm-shipping-calc__form{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

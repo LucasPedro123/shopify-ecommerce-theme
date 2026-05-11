@@ -4,49 +4,575 @@
   fetchpriority="low"
 ></script>
 
+{% capture cart_icon %}
+  <cart-icon
+    class="header-actions__cart-icon{% if display_style == 'text' %} header-actions__cart-icon--text{% endif %}{% unless cart == empty %} header-actions__cart-icon--has-cart{% endunless %}"
+    data-testid="cart-icon"
+  >
+    <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
+      {{ 'content.cart_title' | t }}
+    </span>
+
+    <div
+      class="svg-wrapper cart-wrapper {% if display_style != 'icon' %}desktop:hidden{% endif %}"
+      aria-hidden="true"
+    >
+      <img
+        class="cart-icon-img"
+        width="20"
+        height="20"
+        src="{{ 'cart-icon-hdm.svg' | asset_url }}"
+        alt="ícone do carrinho de compras"
+      >
+
+        <span
+          class="header-action_item-text"
+        >
+          Sacola
+        </span>
+      </div>
+
+    {% render 'cart-bubble', limit: 100, live_region: true %}
+  </cart-icon>
+{% endcapture %}
+
+{% capture account_icon %}
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="15"
+    height="17"
+    viewBox="0 0 15 17"
+    fill="none"
+    slot="signed-out-avatar"
+    class="account-button__icon"
+  >
+    <path
+      stroke="currentColor"
+      stroke-linejoin="round"
+      stroke-width="var(--icon-stroke-width)"
+      d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"
+    />
+  </svg>
+{% endcapture %}
+
 <header-actions
+  {% if display_style == 'text' %}
+    class="header-actions--text"
+  {% endif %}
   {{- block.shopify_attributes -}}
 >
   {% if shop.customer_accounts_enabled %}
-    {% render 'account-popover' %}
-    {% render 'account-drawer' %}
+    {% liquid
+      assign account_actions_style = ''
+      if display_style == 'text' and section
+        assign actions_font = section.settings.actions_font | default: 'body'
+        assign font_obj = settings.type_heading_font
+        case actions_font
+          when 'body'
+            assign font_obj = settings.type_body_font
+          when 'subheading'
+            assign font_obj = settings.type_subheading_font
+          when 'accent'
+            assign font_obj = settings.type_accent_font
+        endcase
+        assign font_family = font_obj.family | append: ', ' | append: font_obj.fallback_families
+        assign font_family_safe = font_family | replace: '"', "'"
+        assign account_actions_style = '--header-actions-font-family: ' | append: font_family_safe | append: '; --header-actions-font-weight: ' | append: font_obj.weight | append: ';'
+      endif
+    %}
+    <div
+      class="account-button header-actions__action{% if display_style == 'text' %} account-button--text{% endif %} color-{{ settings.popover_color_scheme }}"
+    >
+      <shopify-account
+        menu="{{ customer_account_menu }}"
+        {% if account_actions_style != blank %}
+          style="{{ account_actions_style }}"
+        {% endif %}
+      >
+        {% if customer %}
+          <div class="account-button__fallback"></div>
+        {% else %}
+          <span
+            slot="signed-out-avatar"
+            class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}"
+          >
+            {{ 'content.account_title' | t }}
+          </span>
+
+          <span
+            slot="signed-out-avatar"
+            class="{% if display_style != 'icon' %}desktop:hidden{% endif %}"
+            aria-hidden="true"
+          >
+            <img
+              width="20"
+              height="20"
+              src="{{ 'my-account-icon.svg' | asset_url }}"
+              alt="ícone de Minha Conta"
+            >
+          </span>
+        {% endif %}
+      </shopify-account>
+      <span
+        class="header-action_item-text"
+      >
+        Minha Conta
+      </span>
+    </div>
   {% endif %}
 
+  <div class="header-action_wish-list" id="wishlist-trigger" tabindex="0">
+  <div class="svg-wrapper" style="position: relative;">
+    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" class="wishlist-icon" aria-hidden="true" focusable="false">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+    <span class="wishlist-count-bubble hidden" id="wishlist-count">0</span>
+  </div>
+  <span class="header-action_item-text">Favoritos</span>
+
+  <div class="wishlist-dropdown" id="wishlist-dropdown">
+    <div class="wishlist-dropdown__header">
+      <h4 style="margin: 0; font-size: 14px; font-weight: 600;">Adicionados Recentemente</h4>
+    </div>
+    
+    <div class="wishlist-dropdown__content" id="wishlist-dropdown-content">
+      </div>
+    
+    <div class="wishlist-dropdown__footer hidden" id="wishlist-dropdown-footer">
+      <a href="/pages/favoritos?view=favoritos" class="button custom-checkout-btn" style="padding: 12px; font-size: 13px; width: 100%;">Ver todos os favoritos</a>
+    </div>
+  </div>
+</div>
+
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
-    {% render 'cart-drawer' %}
+    <script
+      src="{{ 'cart-drawer.js' | asset_url }}"
+      type="module"
+      fetchpriority="low"
+    ></script>
+
+    {% capture empty_cart_drawer_content %}
+      <div class="cart-drawer__header">
+        <button
+          ref="closeButton"
+          on:click="cart-drawer-component/close"
+          class="button close-button cart-drawer__close-button button-unstyled"
+          aria-label="{{ 'actions.close_dialog' | t }}"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+
+      <div
+        class="cart-drawer__content"
+        aria-label="{{ 'accessibility.cart' | t }}"
+      >
+        <h2
+          class="cart-drawer__heading h4 cart-drawer__heading--empty"
+          id="cart-drawer-heading-empty"
+        >
+          {{ 'content.your_cart_is_empty' | t }}
+        </h2>
+
+        <div class="cart-drawer__items">
+          {% render 'cart-products', force_empty: true %}
+        </div>
+      </div>
+    {% endcapture %}
+
+    <cart-drawer-component
+      class="cart-drawer{% if display_style == 'text' %} cart-drawer--text{% endif %}"
+      {{ block.shopify_attributes }}
+      {% if settings.auto_open_cart_drawer %}
+        auto-open
+      {% endif %}
+    >
+      <template id="empty-cart-template">
+        {{ empty_cart_drawer_content }}
+      </template>
+      <button
+        class="header-actions__action button-unstyled{% if display_style == 'text' %} header-actions__text-style{% endif %}"
+        on:click="/open"
+        aria-haspopup="dialog"
+        aria-label="{{ 'accessibility.cart' | t }}"
+        aria-describedby="cart-bubble-text"
+        style="overflow: visible;"
+        data-testid="cart-drawer-trigger"
+      >
+        {{ cart_icon }}
+      </button>
+
+      <dialog
+        ref="dialog"
+        class="cart-drawer__dialog dialog-modal dialog-drawer color-{{ settings.drawer_color_scheme }}{% if cart.empty? %} cart-drawer--empty{%endif%}"
+        data-testid="cart-drawer-dialog"
+        aria-labelledby="{% if cart.empty? %}cart-drawer-heading-empty{% else %}cart-drawer-heading{% endif %}"
+        scroll-lock
+        cart-summary-sticky="true"
+      >
+        <div
+          class="cart-drawer__inner"
+          data-hydration-key="cart-drawer-inner"
+        >
+          <cart-items-component
+            class="cart-items-component"
+            data-drawer
+            data-section-id="{{ section.id }}"
+          >
+            {%- if cart.empty? -%}
+              {{ empty_cart_drawer_content }}
+            {%- else -%}
+              <div class="cart-drawer__header" id="cart-drawer-header">
+                <div
+                  class="cart-drawer__header-title-wrap"
+                  style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+                >
+                  <h2 class="cart-drawer__heading h4" id="cart-drawer-heading">
+                    {{ 'content.cart_title' | t }}
+                    {% render 'cart-bubble' %}
+                  </h2>
+
+                  <button
+                    ref="closeButton"
+                    on:click="cart-drawer-component/close"
+                    class="button close-button cart-drawer__close-button button-unstyled"
+                    aria-label="{{ 'actions.close_dialog' | t }}"
+                  >
+                    <span class="svg-wrapper">
+                      {{- 'icon-close.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+                </div>
+
+                {% render 'cart-shipping-progress' %}
+              </div>
+
+              <scroll-hint
+                class="cart-drawer__content"
+                aria-label="{{ 'accessibility.cart' | t }}"
+                style="--header-height: 100px;"
+              >
+                <scroll-hint class="cart-drawer__items">
+                  {% render 'cart-products', drawer_context: 'drawer' %}
+                </scroll-hint>
+
+                <div
+                  class="cart-drawer__summary"
+                  style="padding: 0px; margin-inline: auto;  background: #fafafa; border-top: 1px solid #e1e1e1;"
+                >
+                  {% assign total_savings = 0 %}
+                  {% for item in cart.items %}
+                    {% if item.variant.compare_at_price > item.variant.price %}
+                      {% assign saving = item.variant.compare_at_price
+                        | minus: item.variant.price
+                        | times: item.quantity
+                      %}
+                      {% assign total_savings = total_savings | plus: saving %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if total_savings > 0 %}
+                    <div
+                      class="cart-drawer__savings"
+                      style="background-color: #e3f1df; color: #108043; padding: 10px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: 600; margin-bottom: 0px;"
+                    >
+                      🔥 Você está economizando {{ total_savings | money }} nesta compra!
+                    </div>
+                  {% endif %}
+
+                  <div 
+                    style="
+                      margin-bottom: 15px;
+                      padding-inline: 1.25rem;
+                      width: 100%;
+                    "
+                  >
+                    {% render 'cart-summary', section_id: section.id %}
+                  </div>
+
+                  {% comment %} {% assign pix_discount = cart.total_price | times: 0.05 %}
+                  {% assign price_with_pix = cart.total_price | minus: pix_discount %} {% endcomment %}
+                  {% comment %} <div
+                    class="cart-drawer__pix-offer"
+                    style="text-align: center; font-size: 14px; margin-top: -5px; margin-bottom: 15px;"
+                  >
+                    ou <strong>{{ price_with_pix | money }}</strong> no PIX (5% off)
+                  </div> {% endcomment %}
+                </div>
+              </scroll-hint>
+            {%- endif -%}
+          </cart-items-component>
+        </div>
+      </dialog>
+    </cart-drawer-component>
   {% else %}
     <a
       href="{{ routes.cart_url }}"
-      class="header-actions__action action__cart"
-      aria-label="{{ 'accessibility.cart' | t }} {{ 'accessibility.cart_count' | t }}: {{ cart.item_count }}"
+      class="header-actions__action action__cart{% if display_style == 'text' %} header-actions__text-style{% endif %}"
+      aria-label="{{ 'accessibility.cart' | t }}"
+      aria-describedby="cart-bubble-text"
     >
-      {% render 'cart-icon-component' %}
+      {{ cart_icon }}
     </a>
   {% endif %}
 </header-actions>
 
 {% stylesheet %}
+  .header {
+    --account-offset-top: calc(
+      var(--header-group-height) + (var(--header-height) * var(--transparent-header-offset-boolean))
+    );
+
+    &[data-sticky-state='active'] {
+      --account-offset-top: calc(var(--header-height) - 1px);
+    }
+  }
+/* Container Principal */
+.header-action_wish-list {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Ajuste conforme seu header */
+}
+
+/* Bolinha de Contagem */
+.wishlist-count-bubble {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: #000; /* Cor primária da sua marca */
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.wishlist-count-bubble.hidden {
+  display: none;
+}
+
+/* O Dropdown Premium */
+.wishlist-dropdown {
+  position: absolute;
+  top: 150%;
+  right: -20px; /* Alinha à direita do ícone */
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  padding: 16px;
+  z-index: 1000;
+  
+  /* Animação de entrada suave */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: default;
+}
+
+/* Quando estiver aberto */
+.header-action_wish-list.is-open .wishlist-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Setinha apontando pro Header (Opcional, dá um charme) */
+.wishlist-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 28px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-left: 1px solid #eaeaea;
+  border-top: 1px solid #eaeaea;
+  transform: rotate(45deg);
+}
+
+/* Layout dos Produtos dentro do Dropdown */
+.wishlist-item-mini {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f1f1;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.wishlist-item-mini:hover {
+  opacity: 0.7;
+}
+
+.wishlist-item-mini__image {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #f1f1f1;
+  flex-shrink: 0;
+}
+
+.wishlist-item-mini__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wishlist-item-mini__title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wishlist-item-mini__price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+}
+
+.wishlist-dropdown__footer {
+  margin-top: 12px;
+}
+.wishlist-dropdown__footer.hidden {
+  display: none;
+}
+.wishlist-empty-msg {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+  .header-action_item-text{
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: #000000;
+  }
+
+  .cart-wrapper{
+    width: 100% !important;
+    display: flex;
+    gap: 12px;
+  }
+
+  .cart-icon-img{
+    width: 20px;
+    height: 25px;
+  }
+
+  .cart-drawer{
+    .button-unstyled{
+      padding: 0;
+    }
+  }
+
+  .account-button {
+    /* Remove the background color from the color scheme, we want to inherit the color of the header */
+    display: flex;
+    align-items: center;
+    background: transparent;
+    min-width: 0 !important;
+  }
+
+  .account-button__icon,
+  .account-button__text {
+    color: var(--color-account-icon);
+    transition: color var(--header-content-transition-timing);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  shopify-account {
+    --shopify-account-font-heading: var(--font-heading--family);
+    --shopify-account-font-heading-weight: var(--font-heading--weight);
+    --shopify-account-font-body: var(--font-body--family);
+    --shopify-account-font-body-weight: var(--font-body--weight);
+    --shopify-account-radius-base: var(--style-border-radius-popover);
+    --shopify-account-radius-button: var(--style-border-radius-buttons-primary);
+    --shopify-account-radius-button-small: var(--style-border-radius-buttons-primary);
+    --shopify-account-radius-input: var(--style-border-radius-buttons-primary);
+    --shopify-account-color-background: var(--color-background);
+    --shopify-account-color-text: var(--color-foreground);
+    --shopify-account-color-accent: var(--color-primary-button-background);
+    --shopify-account-color-accent-text: var(--color-primary-button-text);
+    --shopify-account-dialog-position-top: var(--account-offset-top);
+
+    &:not(:defined) {
+      min-width: 44px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Match the line height of the other buttons */
+      line-height: normal;
+    }
+  }
+
+  .account-button__fallback {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--shopify-account-color-accent, #0a142f);
+  }
+
+  .account-button--text shopify-account {
+    color: inherit;
+  }
+
   .cart-drawer {
-    --cart-drawer-padding: var(--padding-lg) var(--padding-xl);
+    --cart-drawer-padding: var(--padding-xl) var(--padding-xl);
     --cart-drawer-padding-desktop: var(--padding-xl) var(--padding-2xl);
-    --cart-font-size--2xs: var(--font-size--2xs);
-    --cart-font-size--xs: var(--font-size--xs);
-    --cart-font-size--sm: var(--font-size--sm);
-    --cart-font-size--md: var(--font-size--md);
-    --cart-font-size--2xl: var(--font-size--2xl);
+
+    @media screen and (min-width: 750px) {
+      margin-inline-end: calc(var(--gap-xs) * -1);
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-drawer--text {
+      display: flex;
+      align-items: center;
+    }
   }
 
   .cart-drawer__dialog {
     position: fixed;
+    overflow: hidden;
     border-radius: 0;
-    width: var(--sidebar-width);
-    max-width: 95vw;
+    width: 100%;
     height: 100%;
     margin: 0 0 0 auto;
     padding: 0;
     border-left: var(--style-border-drawer);
     box-shadow: var(--shadow-drawer);
     background-color: var(--color-background);
+    border-radius: 12px;
+    right: 13px;
+
+    @media screen and (min-width: 750px) {
+      width: var(--sidebar-width);
+      max-width: 95vw;
+    }
   }
 
   /* Needed to ensure the drawer is full height */
@@ -57,13 +583,15 @@
 
   .cart-drawer__inner {
     height: 100%;
+    overflow: hidden;
   }
 
   .cart-drawer__content {
-    padding: 0;
-    background-color: var(--color-background);
+    height: calc(100% - var(--header-height));
     display: flex;
     flex-direction: column;
+    padding: 0;
+    background-color: var(--color-background);
     flex-grow: 1;
     overflow-y: auto;
   }
@@ -72,10 +600,17 @@
     display: flex;
     align-items: center;
     gap: var(--gap-xs);
+    margin-bottom: 0;
   }
 
   .cart-drawer__close-button {
     margin-right: calc(var(--padding-sm) * -1);
+    top: var(--margin-sm);
+    width: 100%;
+
+    @media screen and (max-width: 749px) {
+      top: var(--margin-2xs);
+    }
   }
 
   .cart-drawer--empty .cart-drawer__content {
@@ -104,11 +639,14 @@
 
   .cart-drawer__summary {
     --cart-drawer-summary-padding: var(--padding-lg);
-
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-2xl);
+    gap: var(--gap-xl);
     padding: var(--cart-drawer-summary-padding);
     margin-top: auto;
     background-color: var(--color-background);
@@ -120,7 +658,23 @@
     }
   }
 
-  .cart-drawer__summary .cart__summary-totals:not(:has(.cart__original-total-container:empty)) {
+  .cart-drawer__dialog[cart-summary-sticky='false'] .cart-drawer__summary {
+    position: static;
+    mask-image: none;
+  }
+
+  .cart-drawer__dialog[cart-summary-sticky='false'] .cart-drawer__items {
+    overflow: unset;
+  }
+
+  .cart-actions summary {
+    padding-inline: 0;
+    padding-block: var(--padding-sm);
+    line-height: 1.2;
+    min-height: var(--minimum-touch-target);
+  }
+
+  .cart-drawer__summary .cart__summary-totals:not(:has(.cart__subtotal-container:empty)) {
     border-block-start: var(--style-border-width) solid var(--color-border);
     padding-block-start: var(--padding-2xl);
   }
@@ -172,6 +726,24 @@
     justify-content: center;
   }
 
+  .cart-drawer__header {
+    background-color: var(--color-background);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+    padding: var(--cart-drawer-padding);
+    border-bottom: var(--style-border-width) solid none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    @media screen and (min-width: 750px) {
+      padding-inline: var(--cart-drawer-padding-desktop);
+    }
+  }
+
   .cart-drawer--empty .cart-drawer__header {
     justify-content: right;
     border-bottom: none;
@@ -182,50 +754,49 @@
     text-align: center;
   }
 
-  .cart-drawer:not(:has(.cart-form)) .cart-items__wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
   header-actions {
     display: flex;
+    gap: 1.8125rem;
+    width: max-content;
 
     @media screen and (max-width: 749px) {
       justify-self: flex-end;
     }
   }
 
+  @media screen and (min-width: 750px) {
+    .header-actions--text {
+      gap: var(--gap-xl);
+    }
+
+    .header-actions__text-style {
+      font-size: var(--header-actions-font-size);
+      font-family: var(--header-actions-font-family);
+      font-weight: var(--header-actions-font-weight);
+      text-transform: var(--header-actions-text-case);
+    }
+  }
+
+  #header-component[data-menu-style='drawer'] header-actions {
+    justify-self: flex-end;
+  }
+
   .header__column--right header-actions {
     margin-inline-start: calc(var(--gap-md) * -1);
-  }
-
-  .header-actions__action {
-    --button-color: var(--color-foreground);
-
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-  }
-
-  .header-actions__action .svg-wrapper {
-    height: var(--button-size);
-    width: var(--button-size);
-  }
-
-  .header-actions__action svg {
-    width: var(--icon-size-md);
-    height: var(--icon-size-md);
   }
 
   .header-actions__cart-icon {
     --cart-bubble-size: 20px;
     --cart-bubble-top: 4.5px;
-    --cart-bubble-right: 2.5px;
+    --cart-bubble-right: 42.5px;
 
     position: relative;
+  }
+
+  @media screen and (max-width: 750px) {
+    .header-actions__cart-icon {
+      --cart-bubble-right: -11px;
+    }
   }
 
   .header-actions__cart-icon .cart-bubble {
@@ -233,6 +804,25 @@
     width: var(--cart-bubble-size, 20px);
     top: var(--cart-bubble-top);
     right: var(--cart-bubble-right);
+  }
+
+  @media screen and (min-width: 750px) {
+    .header-actions__cart-icon--text.header-actions__cart-icon .cart-bubble {
+      position: relative;
+      top: 0;
+    }
+  }
+
+  .cart-drawer__heading .cart-bubble {
+    width: fit-content;
+    border-radius: var(--style-border-radius-buttons-primary);
+    aspect-ratio: auto;
+    padding: var(--cart-padding);
+  }
+
+  .cart-drawer__heading .cart-bubble[data-maintain-ratio] {
+    width: min(1lh, 22px);
+    height: min(1lh, 22px);
   }
 
   .header-actions__cart-icon .cart-bubble__text,
@@ -246,8 +836,8 @@
     mask: radial-gradient(
       calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
       transparent 45.45%,
-      white 45.45%,
-      white 100%
+      #fff 45.45%,
+      #fff 100%
     );
   }
 
@@ -257,7 +847,7 @@
 
   .cart-drawer__heading .cart-bubble__text {
     color: var(--color-foreground);
-    font-size: var(--font-size--xs);
+    font-size: clamp(var(--font-size--3xs), 0.75em, var(--font-size--xs));
   }
 
   .cart-bubble--animating .cart-bubble__background {
@@ -265,6 +855,237 @@
   }
 
   .cart-bubble--animating .cart-bubble__text {
-    animation: cartBubbleSlideIn var(--animation-speed) var(--animation-easing);
+    --start-y: -1em;
+    --start-opacity: 1;
+    /* Set initial transform state before animation starts */
+    transform: translate(0, var(--start-y, -1em));
+    opacity: var(--start-opacity, 1);
+    animation: move-and-fade var(--animation-speed) var(--animation-easing);
+  }
+
+  cart-icon:has(.cart-bubble__text-count:empty) {
+    --cart-bubble-size: 10px;
+    --cart-bubble-top: 9px;
+    --cart-bubble-right: 9px;
+
+    .svg-wrapper {
+      --cart-bubble-top: 4px;
+      --cart-bubble-right: 4px;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    cart-icon.header-actions__cart-icon--text:has(.cart-bubble__text-count:empty) {
+      --cart-bubble-right: 2.5px;
+    }
+  }
+
+  @media screen and (max-width: 750px){
+      header-actions{
+        gap: 0.8rem;
+        padding-inline-end: 23px;
+      }
+
+      .header-actions__cart-icon{
+        width: 20px;
+      }
+
+     .header-action_item-text{
+      display: none !important;
+    }
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    html:active-view-transition-type(empty-cart-drawer) {
+      .cart-drawer__close-button {
+        view-transition-name: cart-drawer-close-button;
+      }
+
+      .cart-items-component {
+        view-transition-name: cart-drawer-content;
+      }
+    }
+  }
+
+  :active-view-transition {
+    .cart-drawer__header,
+    .cart-drawer__content {
+      background: transparent;
+    }
+  }
+
+  ::view-transition-old(cart-drawer-content) {
+    transform-origin: 50% 33%;
+    animation: cart-contents-old var(--spring-d280-b0-duration) var(--spring-d280-b0-easing) forwards;
+  }
+
+  ::view-transition-new(cart-drawer-content) {
+    transform-origin: top center;
+    animation: cart-contents-new var(--spring-d280-b0-duration) var(--spring-d280-b0-easing) forwards;
+  }
+
+  @keyframes cart-contents-old {
+    to {
+      scale: 0.92;
+      opacity: 0;
+    }
+  }
+
+  @keyframes cart-contents-new {
+    from {
+      scale: 1.05;
+      translate: 0 128px;
+      filter: blur(1px);
+      opacity: 0;
+    }
+  }
+  .header-actions__text {
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .header-actions__cart-icon--text {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-xs);
+    }
+
+    .header__column--right .header-actions--text {
+      margin-inline-start: 0;
+    }
   }
 {% endstylesheet %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const trigger = document.getElementById('wishlist-trigger');
+  const dropdown = document.getElementById('wishlist-dropdown');
+  const content = document.getElementById('wishlist-dropdown-content');
+  const footer = document.getElementById('wishlist-dropdown-footer');
+  const countBubble = document.getElementById('wishlist-count');
+
+  // Formata o valor em centavos da Shopify para Real Brasileiro
+  const formatMoney = (cents) => {
+    if (!cents) return 'R$ 0,00';
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+  };
+
+  const renderWishlistDropdown = async () => {
+    let wishlist = [];
+    
+    // 1. BLINDAGEM DO LOCAL STORAGE (Evita o Crash do "Carregando...")
+    try {
+      const storedData = localStorage.getItem('hdm_wishlist');
+      if (storedData) {
+        wishlist = JSON.parse(storedData);
+        // Se houver duplo stringify (Ex: '"[...]"'), fazemos o parse de novo
+        if (typeof wishlist === 'string') {
+          wishlist = JSON.parse(wishlist);
+        }
+      }
+    } catch (error) {
+      console.warn('HDM: Erro ao ler a wishlist, resetando dados.', error);
+      wishlist = [];
+    }
+
+    // Garante que é um Array válido
+    if (!Array.isArray(wishlist)) {
+      wishlist = [];
+    }
+
+    // Se tiver objetos (caso você tenha salvo {handle: '...'} no passado), pegamos só as strings
+    const safeHandles = wishlist.map(item => {
+      if (typeof item === 'object' && item !== null) return item.handle || item.name;
+      return item;
+    }).filter(Boolean); // Remove nulos ou vazios
+
+    // 2. Atualiza a Bolinha
+    if (safeHandles.length > 0) {
+      countBubble.textContent = safeHandles.length;
+      countBubble.classList.remove('hidden');
+    } else {
+      countBubble.classList.add('hidden');
+    }
+
+    // Só carrega o HTML se o dropdown estiver aberto para não pesar o site
+    if (!trigger.classList.contains('is-open')) return;
+
+    // 3. Estado Vazio
+    if (safeHandles.length === 0) {
+      content.innerHTML = '<p class="wishlist-empty-msg">Sua lista de desejos está vazia.</p>';
+      footer.classList.add('hidden');
+      return;
+    }
+
+    content.innerHTML = '<p style="text-align: center; font-size: 13px; color: #888; padding: 10px 0;">Carregando produtos...</p>';
+    
+    // 4. Pega apenas os últimos 2 adicionados (agora seguro contra crashes)
+    const latestHandles = safeHandles.slice(-2).reverse(); 
+    let html = '';
+
+    // 5. O Fetch Dinâmico
+    for (const handle of latestHandles) {
+      try {
+        const response = await fetch(`/products/${handle}.js`);
+        if (!response.ok) throw new Error(`Erro API Shopify para o handle: ${handle}`);
+        const product = await response.json();
+        
+        // Proteção caso a loja não tenha imagem cadastrada
+        const imageUrl = product.featured_image || (product.images && product.images.length > 0 ? product.images[0] : '');
+
+        html += `
+          <a href="${product.url}" class="wishlist-item-mini">
+            <img src="${imageUrl}" alt="${product.title}" class="wishlist-item-mini__image" loading="lazy">
+            <div class="wishlist-item-mini__info">
+              <span class="wishlist-item-mini__title">${product.title}</span>
+              <span class="wishlist-item-mini__price">${formatMoney(product.price)}</span>
+            </div>
+          </a>
+        `;
+      } catch (error) {
+        console.error('HDM Wishlist Fetch Erro:', error);
+      }
+    }
+
+    // Se o HTML voltar vazio por algum bug de produto deletado na loja, avisamos o cliente.
+    if (html === '') {
+       html = '<p class="wishlist-empty-msg">Nenhum produto disponível no momento.</p>';
+    }
+
+    content.innerHTML = html;
+
+    // Detalhe de UX: Mostrar o botão do footer se houver produtos salvos
+    if (safeHandles.length > 0) {
+      footer.classList.remove('hidden');
+    } else {
+      footer.classList.add('hidden');
+    }
+  };
+
+  // Abre/Fecha o Dropdown ao clicar no ícone
+  trigger.addEventListener('click', (e) => {
+    // Evita fechar ao clicar nos produtos ou botão dentro do Dropdown
+    if(e.target.closest('.wishlist-dropdown')) return; 
+    
+    e.preventDefault();
+    trigger.classList.toggle('is-open');
+    if(trigger.classList.contains('is-open')) {
+      renderWishlistDropdown();
+    }
+  });
+
+  // Fecha o dropdown ao clicar em qualquer lugar fora dele
+  document.addEventListener('click', (e) => {
+    if (!trigger.contains(e.target)) {
+      trigger.classList.remove('is-open');
+    }
+  });
+
+  // Gatilho inicial
+  renderWishlistDropdown();
+
+  // Escuta ativa para quando clicar no botão de favoritar em outras partes do site
+  window.addEventListener('wishlistUpdated', renderWishlistDropdown);
+});
+</script>

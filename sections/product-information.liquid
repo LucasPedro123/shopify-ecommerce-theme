@@ -1,390 +1,333 @@
+{{ 'section-custom-pdp.css' | asset_url | stylesheet_tag }}
 
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign main_image = current_variant.featured_image | default: product.featured_image
 
-{% liquid
-  if section.settings.desktop_media_position == 'left'
-    assign render_order = 'media,product-details'
-  else
-    assign render_order = 'product-details,media'
+  assign current_discount = 0
+  if current_variant.compare_at_price > current_variant.price
+    assign current_discount = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round
   endif
+-%}
 
-  assign product_has_media = true
-  if closest.product.media.size == 0
-    assign product_has_media = false
-  endif
+<div class="custom-pdp-wrapper page-width">
+  <div class="custom-pdp-media">
+    {%- if product.media.size > 1 -%}
+      <div class="custom-pdp-thumbnails">
+        {%- assign total_media = product.media.size -%}
 
-  assign product_grid_class = 'product-information__grid'
+        {%- for media in product.media -%}
+          <button
+            class="custom-pdp-thumb-btn js-pdp-thumb-btn {% if forloop.first %}is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            data-zoom-url="{{ media | image_url: width: 2400 }}"
+            data-image-url="{{ media | image_url: width: 800 }}"
+            {% if forloop.index > 6 %}
+              style="display: none !important;"
+            {% endif %}
+          >
+            <div class="custom-pdp-thumb-wrapper" style="position: relative; width: 100%; height: 100%;">
+              <img
+                src="{{ media | image_url: width: 150 }}"
+                height="150"
+                width="150"
+                alt="{{ media.alt | escape }}"
+                loading="lazy"
+                style="width: 100%; height: 100%; object-fit: cover; display: block;"
+              >
 
-  if product_has_media == false
-    assign product_grid_class = product_grid_class | append: ' product-information--media-none'
-  elsif section.settings.desktop_media_position == 'right'
-    assign product_grid_class = product_grid_class | append: ' product-information--media-right'
-  else
-    assign product_grid_class = product_grid_class | append: ' product-information--media-left'
-  endif
-
-  if section.settings.equal_columns
-    assign product_grid_class = product_grid_class | append: ' product-information__grid--half'
-
-    if section.settings.limit_details_width
-      assign product_grid_class = product_grid_class | append: ' product-information__grid--limit-details'
-    endif
-  endif
-
-  case section.settings.content_width
-    when 'content-center-aligned'
-      assign content_width = 'page-width'
-    when 'content-full-width'
-      assign content_width = 'full-width'
-  endcase
-%}
-
-<script type="application/ld+json">
-  {{ closest.product | structured_data }}
-</script>
-
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="product-information section section--{{ content_width }} spacing-style color-{{ section.settings.color_scheme }} relative"
-  style="{% render 'spacing-style', settings: section.settings %} --gap: {{ section.settings.gap }}px;"
->
-  {% if section.settings.desktop_media_position == 'left' and product_has_media %}
-    {% assign product_href = '#ProductInformation-' | append: section.id %}
-    {% render 'skip-to-content-link', href: product_href, text: 'accessibility.skip_to_product_info' %}
-  {% endif %}
-  <div
-    class="{{ product_grid_class }}"
-    data-product-grid-content
-  >
-    {% assign render_order_array = render_order | split: ',' %}
-    {% capture media %}
-      <div
-        class="product-information__media"
-        data-testid="product-information-media"
-      >
-        {%- content_for 'block',
-          type: '_product-media-gallery',
-          id: 'media-gallery',
-          closest.product: closest.product
-        -%}
+              {%- if forloop.index == 6 and total_media > 6 -%}
+                <div class="custom-pdp-thumb-overlay">+{{ total_media | minus: 5 }}</div>
+              {%- endif -%}
+            </div>
+          </button>
+        {%- endfor -%}
       </div>
-    {% endcapture %}
+    {%- endif -%}
 
-    {% capture details %}
-      {% content_for 'block',
-        type: '_product-details',
-        id: 'product-details',
-        closest.product: closest.product
-      %}
-    {% endcapture %}
+    <div class="custom-pdp-main-image js-pdp-main-image">
+      <div class="custom-pdp-carousel-track js-pdp-carousel-track">
+        {%- for media in product.media -%}
+          <div class="custom-pdp-carousel-slide js-pdp-carousel-slide" data-index="{{ forloop.index0 }}">
+            <img
+              src="{{ media | image_url: width: 800 }}"
+              data-zoom-url="{{ media | image_url: width: 2400 }}"
+              alt="{{ media.alt | escape }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              class="custom-pdp-img js-zoom-trigger"
+              width="500"
+              height="500"
+            >
+          </div>
+        {%- endfor -%}
+      </div>
 
-    {% for block in render_order_array %}
-      {% if block == 'media' and product_has_media %}
-        {{ media }}
-      {% elsif block == 'product-details' %}
-        {{ details }}
-      {% endif %}
-    {% endfor %}
+      {%- if product.media.size > 1 -%}
+        <div class="custom-pdp-carousel-dots">
+          {%- for media in product.media -%}
+            <button
+              class="custom-pdp-dot js-pdp-dot {% if forloop.first %}is-active{% endif %}"
+              data-index="{{ forloop.index0 }}"
+              aria-label="Ir para foto {{ forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="custom-pdp-info">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            <div class="custom-pdp-block custom-pdp-app" {{ block.shopify_attributes }}>
+              {% render block %}
+            </div>
+
+          {%- when 'title' -%}
+            <div class="custom-pdp-block" {{ block.shopify_attributes }}>
+              <div class="custom-pdp-tags">
+                {%- if product.tags contains 'Cabelo' -%}
+                  <span class="custom-pc-badge">CABELO</span>
+                {%- endif -%}
+              </div>
+
+              <p class="custom-pdp-vendor">
+                <a href="https://hdmbeauty.com.br/collections/{{ product.vendor | handleize }}">{{ product.vendor }}</a>
+              </p>
+              <h1 class="custom-pdp-title">{{ product.title }}</h1>
+            </div>
+
+          {%- when 'price' -%}
+           
+
+            <div class="custom-pdp-block custom-pdp-price-block" {{ block.shopify_attributes }}>
+              {%- if current_variant.compare_at_price > current_variant.price -%}
+                <s class="custom-pdp-compare-price">
+                  {{ current_variant.compare_at_price | money }}
+                  <span class="custom-pdp-swatch-discount discount-badge-sticky-button">-{{ current_discount }}%</span>
+                </s>
+              {%- endif -%}
+              <span class="custom-pdp-current-price">{{ current_variant.price | money }}</span>
+
+              <p class="custom-pdp-pix-price">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.09946 0.59342C7.91139 0.405287 7.68811 0.256048 7.44236 0.154228C7.1966 0.052407 6.9332 0 6.66719 0C6.40118 0 6.13778 0.052407 5.89202 0.154228C5.64627 0.256048 5.42299 0.405287 5.23492 0.59342L2.70454 3.12592H3.09656C3.3538 3.12523 3.60863 3.17554 3.84631 3.27393C3.87529 3.28593 3.90395 3.29862 3.93226 3.31197C4.13612 3.40814 4.32194 3.53909 4.4813 3.69916L6.48829 5.70657C6.55805 5.77612 6.65254 5.81517 6.75104 5.81517C6.84955 5.81517 6.94404 5.77612 7.0138 5.70657L9.01361 3.70677C9.14627 3.57323 9.29737 3.45993 9.462 3.37018C9.5224 3.33724 9.58463 3.30748 9.64844 3.28105C9.88615 3.18257 10.141 3.13228 10.3983 3.1331H10.6391L8.09946 0.59342ZM8.73547 2.64364C8.58154 2.74847 8.43755 2.86792 8.30557 3.00058L8.30418 3.00199L6.75109 4.55507L5.19 2.99365L5.18915 2.9928C5.03119 2.83425 4.85607 2.6946 4.66737 2.57625L5.94233 1.30023C6.03749 1.20507 6.15046 1.12958 6.27479 1.07807C6.39919 1.02653 6.53253 1 6.66719 1C6.80185 1 6.93518 1.02653 7.05959 1.07807C7.18399 1.12961 7.29715 1.20529 7.39235 1.30053L8.73547 2.64364Z" fill="#2e7d32"></path> <path d="M9.4652 9.9649C9.29938 9.8752 9.14716 9.7617 9.01349 9.62774L7.01326 7.62624C6.94251 7.55859 6.8484 7.52083 6.75051 7.52083C6.65262 7.52083 6.5585 7.55859 6.48775 7.62624L4.48077 9.63323C4.32155 9.79314 4.13591 9.92398 3.93229 10.0201C3.90379 10.0336 3.87494 10.0463 3.84576 10.0584C3.60808 10.1568 3.35326 10.2071 3.09602 10.2065H2.70443L5.23904 12.7411C5.61918 13.1204 6.13427 13.3335 6.6713 13.3335C7.20833 13.3335 7.72343 13.1204 8.10357 12.7411L10.6432 10.201L10.3982 10.1993C10.1411 10.2002 9.88635 10.1502 9.64867 10.0521C9.58592 10.0262 9.52468 9.99708 9.4652 9.9649ZM8.30577 10.3342C8.43855 10.4673 8.58343 10.587 8.73827 10.6919L7.39721 12.0332C7.20457 12.2254 6.9434 12.3335 6.6713 12.3335C6.39924 12.3335 6.13829 12.2256 5.94565 12.0335L4.66772 10.7556C4.85607 10.6373 5.03089 10.4979 5.1886 10.3396L5.1894 10.3388L6.75037 8.77784L8.30577 10.3342Z" fill="#2e7d32"></path> <path d="M10.3984 9.61135C10.0352 9.61044 9.6871 9.46622 9.42971 9.21003L7.4299 7.21065C7.24869 7.02944 7 6.93883 6.75126 6.93881C6.50248 6.9388 6.25365 7.02941 6.0722 7.21065L4.06521 9.21764C3.80787 9.47393 3.45976 9.61831 3.09657 9.61937H2.23649C2.21283 9.61974 2.18955 9.61962 2.16677 9.61949L2.13341 9.61937L0.592372 8.09903C0.213039 7.71889 0 7.20379 0 6.66676C0 6.12974 0.213039 5.61464 0.592372 5.2345L2.13679 3.71373L2.17348 3.71355C2.19578 3.71337 2.2167 3.71321 2.23987 3.71373H3.09657C3.45977 3.71475 3.80789 3.85913 4.06521 4.11547L6.07262 6.12161C6.25272 6.30139 6.49679 6.40235 6.75126 6.40235C7.00573 6.40235 7.2498 6.30139 7.4299 6.12161L9.42971 4.12307C9.6871 3.86689 10.0352 3.72267 10.3984 3.72176H11.0962C11.1206 3.72152 11.1421 3.72159 11.1655 3.72167L11.2052 3.72176L12.7399 5.2345C12.928 5.42256 13.0773 5.64542 13.1791 5.89118C13.2809 6.13693 13.3333 6.40033 13.3333 6.66634C13.3333 6.93235 13.2809 7.19576 13.1791 7.44151C13.0773 7.68726 12.928 7.91055 12.7399 8.09861L11.2052 9.61135L11.1674 9.61141C11.1437 9.61146 11.1209 9.61152 11.0962 9.61135H10.3984ZM10.1352 8.50127C10.2055 8.571 10.3009 8.61087 10.4 8.61135H10.7952L12.035 7.38928C12.1293 7.29452 12.2041 7.18223 12.2553 7.05874C12.3068 6.93434 12.3333 6.801 12.3333 6.66634C12.3333 6.53169 12.3068 6.39835 12.2553 6.27394C12.2043 6.151 12.1297 6.03901 12.035 5.94383L10.7952 4.72176H10.4C10.3009 4.72223 10.2055 4.76208 10.1352 4.83184L8.29967 6.66616L10.1352 8.50127ZM3.35946 4.82393C3.28914 4.75406 3.19384 4.71427 3.09473 4.71373H2.54649L1.29766 5.94344C1.10701 6.13585 1 6.3958 1 6.66676C1 6.93786 1.10712 7.19793 1.29794 7.39037L2.54367 8.61937H3.09466C3.19377 8.61881 3.28919 8.57891 3.35954 8.50909L5.20266 6.66597L3.35946 4.82393Z" fill="#2e7d32"></path>
+                </svg>
+                ou <strong>{{ current_variant.price | times: 0.95 | money }}</strong> no Pix (5% OFF)
+              </p>
+            </div>
+
+          {%- when 'variant_picker' -%}
+            {%- unless product.has_only_default_variant -%}
+              <div class="custom-pdp-block custom-pdp-variants" {{ block.shopify_attributes }}>
+                {%- for option in product.options_with_values -%}
+                  {% assign is_color = false %}
+                  {% assign downcase_option = option.name | downcase %}
+                  {% if downcase_option contains 'cor'
+                    or downcase_option contains 'color'
+                    or downcase_option contains 'tom'
+                  %}
+                    {% assign is_color = true %}
+                  {% endif %}
+
+                  <fieldset class="custom-pdp-option-group">
+                    <legend class="custom-pdp-option-name">
+                      {{ option.name }}:
+                      <span class="selected-value" id="SelectedValue-{{ option.position }}">
+                        {{- option.selected_value -}}
+                      </span>
+                    </legend>
+
+                    <div class="custom-pdp-swatches {% if is_color %}custom-pdp-swatches--color{% endif %}">
+                      {%- for value in option.values -%}
+                        {% assign option_index = 'option' | append: option.position %}
+                        {% assign matching_variant = product.variants | where: option_index, value | first %}
+
+                        {% assign swatch_image = blank %}
+                        {% if matching_variant.metafields.custom.cor_visual != blank %}
+                          {% assign swatch_image = matching_variant.metafields.custom.cor_visual.value
+                            | image_url: width: 100
+                          %}
+                        {% endif %}
+
+                        <div class="custom-pdp-swatch-wrapper">
+                          <input
+                            type="radio"
+                            id="Option-{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                            name="{{ option.name }}"
+                            value="{{ value | escape }}"
+                            data-position="option{{ option.position }}"
+                            {% if option.selected_value == value %}
+                              checked
+                            {% endif %}
+                            class="custom-pdp-swatch-input visually-hidden"
+                          >
+
+                          <label
+                            for="Option-{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                            class="custom-pdp-swatch-label {% if is_color and swatch_image != blank %}custom-pdp-swatch-color{% endif %}"
+                            title="{{ value | escape }}"
+                            {% if is_color and swatch_image != blank %}
+                              style="background-image: url('{{ swatch_image }}');"
+                            {% endif %}
+                          >
+                            <span
+                              {% if is_color and swatch_image != blank %}
+                                class="visually-hidden"
+                              {% endif %}
+                            >
+                              {{- value -}}
+                            </span>
+                          </label>
+
+                          {%- if matching_variant and matching_variant.compare_at_price > matching_variant.price -%}
+                            {% assign variant_discount = matching_variant.compare_at_price
+                              | minus: matching_variant.price
+                              | times: 100.0
+                              | divided_by: matching_variant.compare_at_price
+                              | round
+                            %}
+                            <span class="custom-pdp-swatch-discount">-{{ variant_discount }}%</span>
+                          {%- endif -%}
+
+                          {%- if matching_variant -%}
+                            <div class="custom-pdp-swatch-tooltip">
+                              <div style="color: #000;display: flex;font-size: 12px;gap: 2px;">
+                                <span>{{ option.name }}:</span>
+                                <span>{{ value }}</span>
+                              </div>
+                              <div style="display: flex;justify-content: space-between;border-top: 1px solid #ccc;padding-top: 12px;font-size: 13px;color: #000;">
+                                <span style="font-size: 14px">
+                                  {%- if matching_variant.compare_at_price > matching_variant.price -%}
+                                    <s style="font-size: 14px; color: #999; display: block;text-decoration: line-through;">
+                                      {{- matching_variant.compare_at_price | money -}}
+                                    </s>
+                                  {%- endif -%}
+                                  {{ matching_variant.price | money }}
+                                </span>
+                                {%- if matching_variant.compare_at_price > matching_variant.price -%}
+                                  <span class="custom-pdp-swatch-discount discount-badge-sticky-button"
+                                    >-{{ variant_discount }}%</span
+                                  >
+                                {%- endif -%}
+                              </div>
+                            </div>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endfor -%}
+
+                <script type="application/json" id="ProductJSON-{{ section.id }}">
+                  {{ product.variants | json }}
+                </script>
+              </div>
+            {%- endunless -%}
+          {%- when 'cart_shipping_calc' -%}
+            <div class="cart_shipping_calc-wrapper">
+              {% render 'cart-shipping-calculator' %}
+            </div>
+
+          {%- when 'buy_buttons' -%}
+            <div class="custom-pdp-block" {{ block.shopify_attributes }}>
+              {%- form 'product', product, id: 'AddToCartForm', class: 'custom-pdp-form' -%}
+                <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+                <div class="custom-pdp-quantity-row">
+                  <div class="custom-pdp-qty-selector">
+                    <button type="button" class="qty-btn qty-minus">-</button>
+                    <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                    <button type="button" class="qty-btn qty-plus">+</button>
+                  </div>
+
+                  <button
+                    type="submit"
+                    name="add"
+                    class="custom-pdp-btn-add"
+                    {% unless current_variant.available %}
+                      disabled
+                    {% endunless %}
+                  >
+                    {%- if current_variant.available -%}Comprar{%- else -%}Esgotado{%- endif -%}
+                  </button>
+                  {% render 'wishlist-button', product: product %}
+                </div>
+              {%- endform -%}
+
+              <div class="custom-pdp-trust-badges">
+                <p>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  Compra 100% Segura
+                </p>
+              </div>
+            </div>
+
+          {%- when 'description' -%}
+            <div class="custom-pdp-block custom-pdp-description" {{ block.shopify_attributes }}>
+              {{ product.description | strip_html | truncatewords: 30 }}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
   </div>
-
-  {% content_for 'blocks' %}
 </div>
 
-{% stylesheet %}
-  .product-information {
-    gap: var(--gap) 0;
-  }
+<div class="pfp-divider"></div>
 
-  /* Base grid layout */
-  .product-information__grid {
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
-  }
+<div class="custom-pdp-full-description pdp-content-anchor">
+  <div class="prose">
+    <h2 class="pdp-full-desc-title">Detalhes do Produto</h2>
+    {{ product.description }}
+  </div>
+</div>
 
-  /* Default column positions */
-  .product-details {
-    order: 1;
-  }
+<div class="custom-pdp-zoom-modal js-pdp-zoom-modal">
+  <button class="custom-pdp-zoom-close js-pdp-zoom-close" aria-label="Fechar zoom">
+    <svg viewBox="0 0 24 24" width="32" height="32" stroke="#fff" stroke-width="2" fill="none">
+      <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
 
-  .product-information__media {
-    order: 0;
-    width: 0;
-    min-width: 100%;
-  }
+  <button class="custom-pdp-zoom-arrow custom-pdp-zoom-prev js-pdp-zoom-prev" aria-label="Imagem anterior">
+    <svg viewBox="0 0 24 24" width="32" height="32" stroke="#000" stroke-width="2" fill="none">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
 
-  /* Mobile styles */
-  @media screen and (max-width: 749px) {
-    .product-information__media {
-      grid-column: 1 / -1;
-    }
+  <button class="custom-pdp-zoom-arrow custom-pdp-zoom-next js-pdp-zoom-next" aria-label="Próxima imagem">
+    <svg viewBox="0 0 24 24" width="32" height="32" stroke="#000" stroke-width="2" fill="none">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
 
-    .product-details {
-      grid-column: 2 / 3;
-    }
-  }
+  <div class="custom-pdp-zoom-viewport js-pdp-zoom-viewport">
+    <img
+      width="100"
+      height="100"
+      src="{{ main_image | image_url: width: 2400 }}"
+      alt="Zoom Alta Resolução"
+      class="custom-pdp-zoom-img js-pdp-zoom-img-target"
+    >
+  </div>
+</div>
 
-  /* Desktop styles */
-  @media screen and (min-width: 750px) {
-    .product-information__grid {
-      grid-column: 2;
-    }
-
-    /* Position when there is no media */
-    .product-information__grid.product-information--media-none,
-    .product-information__grid:has(.product-information__media:empty) {
-      .product-details {
-        width: var(--narrow-content-width);
-        margin: 0 auto;
-      }
-    }
-
-    /* Position when there is media */
-    .product-information__grid:not(:has(.product-information__media:empty)) {
-      /* Media on the left side */
-      &.product-information--media-left {
-        grid-template-columns: 1fr min(50vw, var(--sidebar-width));
-
-        .product-information__media {
-          padding-right: calc(var(--gap, 0) / 2);
-        }
-
-        .product-details {
-          padding-left: calc(var(--gap, 0) / 2);
-        }
-
-        &:has(.media-gallery--extend) {
-          grid-column: 1 / 3;
-        }
-      }
-
-      /* Media on the right side */
-      &.product-information--media-right {
-        grid-template-columns: min(50vw, var(--sidebar-width)) 1fr;
-
-        .product-information__media {
-          padding-left: calc(var(--gap, 0) / 2);
-          order: 1;
-        }
-
-        .product-details {
-          padding-right: calc(var(--gap, 0) / 2);
-          order: 0;
-        }
-
-        &:has(.media-gallery--extend) {
-          grid-column: 2 / -1;
-        }
-      }
-
-      /* Equal width columns */
-      &.product-information__grid--half,
-      &.product-information__grid--half:has(.media-gallery--extend) {
-        grid-column: 1 / -1;
-        grid-template-columns:
-          var(--full-page-grid-margin) calc(var(--full-page-grid-central-column-width) / 2) calc(
-            var(--full-page-grid-central-column-width) / 2
-          )
-          var(--full-page-grid-margin);
-
-        &.product-information--media-left {
-          .product-information__media {
-            grid-column: 2 / 3;
-
-            &:has(.media-gallery--extend) {
-              grid-column: 1 / 3;
-            }
-          }
-
-          .product-details {
-            grid-column: 3 / 4;
-          }
-        }
-
-        &.product-information--media-right {
-          .product-information__media {
-            grid-column: 3 / 4;
-
-            &:has(.media-gallery--extend) {
-              grid-column: 3 / -1;
-            }
-          }
-
-          .product-details {
-            grid-column: 2 / 3;
-          }
-        }
-      }
-    }
-
-    /* Handle full width section */
-    .section--full-width {
-      .product-information__grid:not(:has(.product-information__media:empty)),
-      .product-information__grid:not(:has(.product-information__media:empty)) {
-        &.product-information--media-left,
-        &.product-information--media-right {
-          grid-column: 1 / -1;
-        }
-
-        &.product-information--media-left .product-details {
-          padding-inline-end: var(--padding-lg);
-        }
-
-        &.product-information--media-right .product-details {
-          padding-inline-start: var(--padding-lg);
-        }
-
-        &.product-information__grid--half.product-information--media-left {
-          .product-information__media {
-            grid-column: 1 / 3;
-          }
-
-          .product-details {
-            grid-column: 3 / -1;
-          }
-        }
-
-        &.product-information__grid--half.product-information--media-right {
-          .product-information__media {
-            grid-column: 3 / -1;
-          }
-
-          .product-details {
-            grid-column: 1 / 3;
-          }
-        }
-      }
-    }
-  }
-
-  /* Wider sidebar for large screens */
-  @media screen and (min-width: 1200px) {
-    .product-information__grid:not(
-        .product-information__grid--half,
-        :has(.product-information__media:empty)
-      ).product-information--media-left {
-      grid-template-columns: 2fr 1fr;
-    }
-
-    .product-information__grid:not(
-        .product-information__grid--half,
-        :has(.product-information__media:empty)
-      ).product-information--media-right {
-      grid-template-columns: 1fr 2fr;
-    }
-  }
-
-  .product-information__grid--limit-details .product-details > .group-block {
-    max-width: var(--sidebar-width);
-  }
-
-  /* If the header is sticky, make product details content stick underneath the header */
-  body:has(#header-group #header-component[data-sticky-state='active']) .product-details.sticky-content--desktop {
-    --sticky-header-offset: var(--header-height);
-  }
-{% endstylesheet %}
+<script src="{{ 'custom-pdp.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {
-  "name": "t:names.product_information",
+  "name": "Página de Produto Custom",
+  "tag": "section",
   "blocks": [
-    {
-      "type": "@app"
-    }
+    { "type": "@app" },
+    { "type": "title", "name": "Título e Marca", "limit": 1 },
+    { "type": "price", "name": "Preço e Pix", "limit": 1 },
+    { "type": "buy_buttons", "name": "Botão de Compra", "limit": 1 },
+    { "type": "description", "name": "Descrição Mini", "limit": 1 },
+    { "type": "cart_shipping_calc", "name": "Simulador de Frete", "limit": 1 },
+    { "type": "variant_picker", "name": "Seletor de Variantes", "limit": 1 }
   ],
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
-  "settings": [
-    {
-      "type": "header",
-      "content": "t:content.layout"
-    },
-    {
-      "type": "select",
-      "id": "content_width",
-      "label": "t:settings.width",
-      "options": [
-        {
-          "value": "content-center-aligned",
-          "label": "t:options.page"
-        },
-        {
-          "value": "content-full-width",
-          "label": "t:options.full"
-        }
-      ],
-      "default": "content-center-aligned"
-    },
-    {
-      "type": "select",
-      "id": "desktop_media_position",
-      "label": "t:settings.media_position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "left"
-    },
-    {
-      "type": "checkbox",
-      "id": "equal_columns",
-      "label": "t:settings.equal_columns",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "limit_details_width",
-      "label": "t:settings.limit_product_details_width",
-      "default": false,
-      "visible_if": "{{ section.settings.equal_columns }}"
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 48,
-      "step": 4,
-      "unit": "px",
-      "default": 16
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "t:settings.color_scheme",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding"
-    },
-    {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    }
-  ],
-  "presets": []
 }
 {% endschema %}

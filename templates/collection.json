@@ -6,8 +6,22 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "breadcrumb_xinyzX": {
+      "type": "breadcrumb",
+      "name": "Breadcrumbs (HDM)",
+      "settings": {
+        "text_color": "#666666",
+        "link_hover_color": "#000000",
+        "bg_color": "rgba(0,0,0,0)",
+        "full_width": false,
+        "alignment": "flex-start",
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    },
     "section": {
       "type": "section",
       "blocks": {
@@ -15,44 +29,18 @@
           "type": "text",
           "name": "Title",
           "settings": {
-            "text": "<p>{{ closest.collection.title }}</p>",
+            "text": "<h1>Produtos {{ closest.collection.title }}</h1>",
             "width": "fit-content",
-            "max_width": "normal",
+            "max_width": "narrow",
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-primary--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
+            "font_size": "2rem",
+            "line_height": "tight",
+            "letter_spacing": "tight",
             "case": "none",
             "wrap": "pretty",
-            "color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "text_twGGkJ": {
-          "type": "text",
-          "name": "Description",
-          "settings": {
-            "text": "{{ closest.collection.description }}",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-primary--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "",
+            "color": "var(--color-foreground-heading)",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -65,12 +53,11 @@
         }
       },
       "block_order": [
-        "text_tqQTNE",
-        "text_twGGkJ"
+        "text_tqQTNE"
       ],
       "name": "Collection heading",
       "settings": {
-        "content_direction": "column",
+        "content_direction": "row",
         "vertical_on_mobile": true,
         "horizontal_alignment": "flex-start",
         "vertical_alignment": "center",
@@ -93,8 +80,160 @@
         "overlay_color": "#00000026",
         "overlay_style": "solid",
         "gradient_direction": "to top",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-start": 0,
+        "padding-block-end": 32
+      }
+    },
+    "collection_navigation_kjtrfU": {
+      "type": "collection-navigation",
+      "blocks": {
+        "banner_image_rB4EYw": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_1.png",
+            "link_url": "shopify://collections/cabelo-com-frizz-dia-a-dia"
+          }
+        },
+        "banner_image_qJthwf": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_2.png",
+            "link_url": "shopify://collections/cabelo-lisos-dia-a-dia"
+          }
+        },
+        "banner_image_TDqyy9": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_4.png",
+            "link_url": "shopify://collections/cabelo-ondulados-dia-a-dia"
+          }
+        }
+      },
+      "block_order": [
+        "banner_image_rB4EYw",
+        "banner_image_qJthwf",
+        "banner_image_TDqyy9"
+      ],
+      "name": "Banner Cabelo",
+      "settings": {
+        "collection_banner": "cabelo",
+        "layout_type": "vertical"
+      }
+    },
+    "collection_navigation_Dw6WPW": {
+      "type": "collection-navigation",
+      "blocks": {
+        "banner_image_LzQTQP": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_5.png",
+            "link_url": "shopify://collections/corpo-cuidados-intimos"
+          }
+        },
+        "banner_image_YyaCmV": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_6.png",
+            "link_url": "shopify://collections/corpo-e-banho"
+          }
+        },
+        "banner_image_M4KaFq": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_8.png",
+            "link_url": "shopify://collections/corpo-sugestoes-da-hdm"
+          }
+        }
+      },
+      "block_order": [
+        "banner_image_LzQTQP",
+        "banner_image_YyaCmV",
+        "banner_image_M4KaFq"
+      ],
+      "name": "Banner Corpo",
+      "settings": {
+        "collection_banner": "corpo",
+        "layout_type": "vertical"
+      }
+    },
+    "collection_navigation_EbFQyL": {
+      "type": "collection-navigation",
+      "blocks": {
+        "banner_image_yqr38E": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_9.png",
+            "link_url": "shopify://collections/maquiagem-olhos"
+          }
+        },
+        "banner_image_8qLpBf": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_10.png",
+            "link_url": "shopify://collections/maquiagem-rosto"
+          }
+        },
+        "banner_image_tKFjdQ": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_11.png",
+            "link_url": "shopify://collections/maquiagem-boca-batom"
+          }
+        }
+      },
+      "block_order": [
+        "banner_image_yqr38E",
+        "banner_image_8qLpBf",
+        "banner_image_tKFjdQ"
+      ],
+      "name": "Banner Maquiagem",
+      "settings": {
+        "collection_banner": "maquiagem",
+        "layout_type": "vertical"
+      }
+    },
+    "collection_navigation_NnQ4pm": {
+      "type": "collection-navigation",
+      "blocks": {
+        "banner_image_DCqmw7": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_15.png",
+            "link_url": "shopify://collections/skin-care-produtos-para-pele-hidratante-para-o-rosto"
+          }
+        },
+        "banner_image_y6cw6U": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_12.png",
+            "link_url": "shopify://collections/skin-care-produtos-para-pele-limpeza-de-pele"
+          }
+        },
+        "banner_image_LXJTH3": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_13.png",
+            "link_url": "shopify://collections/corpo-corpo-e-banho-creme-para-celulite"
+          }
+        },
+        "banner_image_AgrWPx": {
+          "type": "banner_image",
+          "settings": {
+            "image": "shopify://shop_images/banner-collection-website-hdm_14.png",
+            "link_url": "shopify://collections/skin-care-produtos-para-pele-tratamento-para-estrias"
+          }
+        }
+      },
+      "block_order": [
+        "banner_image_DCqmw7",
+        "banner_image_y6cw6U",
+        "banner_image_LXJTH3",
+        "banner_image_AgrWPx"
+      ],
+      "name": "Banner Skin Care",
+      "settings": {
+        "collection_banner": "skin-care",
+        "layout_type": "vertical"
       }
     },
     "main": {
@@ -105,13 +244,13 @@
           "static": true,
           "settings": {
             "enable_filtering": true,
-            "filter_style": "horizontal",
+            "filter_style": "vertical",
             "filter_width": "centered",
             "text_label_case": "default",
             "show_swatch_label": false,
-            "show_filter_label": false,
+            "show_filter_label": true,
             "enable_sorting": true,
-            "enable_grid_density": true,
+            "enable_grid_density": false,
             "inherit_color_scheme": true,
             "color_scheme": "",
             "padding-block-start": 8,
@@ -127,7 +266,7 @@
           "type": "_product-card",
           "static": true,
           "settings": {
-            "product_card_gap": 4,
+            "product_card_gap": 8,
             "inherit_color_scheme": true,
             "color_scheme": "",
             "border": "none",
@@ -140,73 +279,47 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "card-gallery": {
-              "type": "_product-card-gallery",
+            "buy_buttons_AXPE9V": {
+              "type": "buy-buttons",
+              "name": "t:names.product_buy_buttons",
               "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
+                "stacking": false,
+                "show_pickup_availability": true,
+                "gift_card_form": true,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
-              "blocks": {}
-            },
-            "product_title_4nY4eT": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "disabled": true,
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "style_class": "button-secondary"
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "disabled": true,
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                }
               },
-              "blocks": {}
-            },
-            "price_EzJzMm": {
-              "type": "price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+              "block_order": []
             }
           },
           "block_order": [
-            "card-gallery",
-            "product_title_4nY4eT",
-            "price_EzJzMm"
+            "buy_buttons_AXPE9V"
           ]
         }
       },
@@ -214,20 +327,27 @@
         "layout_type": "grid",
         "product_card_size": "medium",
         "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
         "product_grid_width": "centered",
         "full_width_on_mobile": true,
         "columns_gap_horizontal": 16,
-        "columns_gap_vertical": 24,
+        "columns_gap_vertical": 16,
         "padding-inline-start": 0,
         "padding-inline-end": 0,
         "color_scheme": "scheme-1",
-        "padding-block-start": 0,
+        "padding-block-start": 32,
         "padding-block-end": 32
       }
     }
   },
   "order": [
+    "breadcrumb_xinyzX",
     "section",
+    "collection_navigation_kjtrfU",
+    "collection_navigation_Dw6WPW",
+    "collection_navigation_EbFQyL",
+    "collection_navigation_NnQ4pm",
     "main"
   ]
 }

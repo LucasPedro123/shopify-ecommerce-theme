@@ -1,0 +1,153 @@
+{{ 'section-main-sitemap.css' | asset_url | stylesheet_tag }}
+
+<section 
+    class="hdm-sitemap-section page-width section-{{ section.id }}-padding"
+    style="
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+    "
+>
+  <div class="hdm-sitemap-header center">
+    <h1 class="title h2">{{ page.title | default: 'Mapa do Site' }}</h1>
+    <p>Navegue por todas as categorias, páginas e serviços da HDM Beauty.</p>
+  </div>
+
+  <div class="hdm-sitemap-grid">
+    
+    {% comment %} ===== COLUNA 1 & 2: DEPARTAMENTOS (COLEÇÕES AGRUPADAS) ===== {% endcomment %}
+    <div class="hdm-sitemap-group hdm-sitemap-departments">
+      <h2 class="hdm-sitemap-group-title">Departamentos</h2>
+      
+      <div class="hdm-sitemap-masonry">
+        {% comment %} 
+          1. Pegamos todos os "Pais" únicos (O texto dentro dos colchetes) 
+        {% endcomment %}
+        {% assign parents_list = "" %}
+        
+        {% for col in collections %}
+          {% if col.title contains ']' %}
+            {% assign parent_name = col.title | split: ']' | first | remove: '[' | strip %}
+            {% unless parents_list contains parent_name %}
+              {% assign parents_list = parents_list | append: parent_name | append: "||" %}
+            {% endunless %}
+          {% else %}
+            {% assign parent_name = "Outros" %}
+            {% unless parents_list contains parent_name %}
+              {% assign parents_list = parents_list | append: parent_name | append: "||" %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+
+        {% assign parents_array = parents_list | split: "||" | sort %}
+
+        {% comment %} 
+          2. Iteramos sobre os Pais e buscamos os "Filhos" de cada um 
+        {% endcomment %}
+        {% for parent in parents_array %}
+          {% if parent != blank %}
+            <div class="hdm-sitemap-category">
+              <h3 class="hdm-sitemap-category-title">{{ parent }}</h3>
+              <ul class="hdm-sitemap-list" role="list">
+                
+                {% for col in collections %}
+                  {% assign current_parent = "Outros" %}
+                  {% assign child_name = col.title %}
+                  
+                  {% if col.title contains ']' %}
+                    {% assign current_parent = col.title | split: ']' | first | remove: '[' | strip %}
+                    {% assign child_name = col.title | split: ']' | last | strip %}
+                    {% if child_name == blank %}{% assign child_name = "Ver Tudo" %}{% endif %}
+                  {% endif %}
+
+                  {% if current_parent == parent %}
+                    <li><a href="{{ col.url }}">{{ child_name }}</a></li>
+                  {% endif %}
+                {% endfor %}
+                
+              </ul>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {% comment %} ===== COLUNA 3: INSTITUCIONAL, BLOG E CONTA ===== {% endcomment %}
+    <div class="hdm-sitemap-sidebar">
+      
+      <div class="hdm-sitemap-group">
+        <h2 class="hdm-sitemap-group-title">Institucional e Ajuda</h2>
+        <ul class="hdm-sitemap-list" role="list">
+          {% if section.settings.institutional_menu != blank %}
+            {% for link in section.settings.institutional_menu.links %}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          {% else %}
+            <li><p style="font-size: 12px; color: #999;">Selecione um menu no painel.</p></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="hdm-sitemap-group">
+        <h2 class="hdm-sitemap-group-title">Conteúdo</h2>
+        <ul class="hdm-sitemap-list" role="list">
+          {% for blog in blogs %}
+            <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+          {% else %}
+            <li><a href="/blogs/news">Blog HDM</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="hdm-sitemap-group">
+        <h2 class="hdm-sitemap-group-title">Minha Conta</h2>
+        <ul class="hdm-sitemap-list" role="list">
+          <li><a href="{{ routes.account_url }}">Acessar Painel</a></li>
+          <li><a href="{{ routes.account_login_url }}">Fazer Login</a></li>
+          <li><a href="{{ routes.account_register_url }}">Criar Cadastro</a></li>
+          <li><a href="pages/favoritos?view=favoritos">Meus Favoritos</a></li>
+          <li><a href="{{ routes.cart_url }}">Minha Sacola</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Mapa do Site (Sitemap)",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "institutional_menu",
+      "label": "Menu Institucional",
+      "info": "Selecione o menu que contém links como Sobre Nós, Contato, Políticas de Privacidade, etc."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Superior",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Inferior",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mapa do Site (Sitemap)"
+    }
+  ]
+}
+{% endschema %}

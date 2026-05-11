@@ -9,7 +9,8 @@
 
 {% liquid
   assign block_settings = block.settings
-  assign plain_text = block_settings.text | strip_newlines | strip_html | strip
+  assign plain_text = block_settings.text | strip_newlines | strip
+  assign visible_text = plain_text | strip_html
   assign text_width = width | default: block_settings.width
 
   if block_settings.font_size contains 'heading-lg' or block_settings.font_size contains 'heading-xl'
@@ -49,7 +50,7 @@
 %}
 
 {% capture attributes %}
-  class="{{ class }} spacing-style text-block text-block--{{ block.id }} {{ block_settings.type_preset }}
+  class="{{ class }} text-max-content spacing-style text-block text-block--{{ block.id }} {{ block_settings.type_preset }}
     {{ text_block_classes }}
   "
 
@@ -70,6 +71,7 @@
 
   {{ block.shopify_attributes }}
 {% endcapture %}
+
 {% liquid
   # {{ attributes }} must be on the immediate HTML parent of the text to preserve
   # the click-to-edit connection in the theme editor. Any break between the text,
@@ -81,20 +83,30 @@
   endif
 %}
 
-{% if fallback_text != blank and plain_text == blank %}
-  <div {{ attributes }}>
+{% if fallback_text != blank and visible_text == blank %}
+  <div {{ attributes | strip_newlines | strip }}>
     {{ fallback_text }}
   </div>
 {% elsif plain_text != blank %}
-  <{{ element }} {{ attributes }}>
-    {% comment %}
-      Not using block_settings.text here because live replacement in editor doesn't work as well.
-    {% endcomment %}
+  <{{ element }} {{ attributes | strip_newlines | strip }} {% if template.name == 'collection' %} style="font-size: 30px !important;" {% endif %}>
     {{ block.settings.text }}
   </{{ element }}>
+  
+  {% if template.name == 'collection' %}
+    <img
+      height="auto"
+      width="100%"
+      src="{{ 'title-decoration-hdm.svg' | asset_url }}"
+    >
+  {% endif %}
 {% endif %}
 
 {% stylesheet %}
+  .text-max-content h1{
+    width: max-content;
+    margin-right: 24px;
+  }
+
   :root {
     --text-align-default: left;
   }
@@ -129,7 +141,7 @@
 
   .text-block > * {
     width: var(--width);
-    max-width: var(--max-width, 100%);
+    max-inline-size: min(100%, var(--max-width, 100%));
     text-align: var(--text-align, var(--text-align-default));
     text-wrap: var(--text-wrap);
   }

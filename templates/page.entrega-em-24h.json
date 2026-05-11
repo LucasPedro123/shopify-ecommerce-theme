@@ -1,0 +1,97 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "disabled": true,
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "disabled": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "hdm_landing_24h_kKkRcc": {
+      "type": "hdm-landing-24h",
+      "blocks": {
+        "step_7fkkbQ": {
+          "type": "step",
+          "settings": {
+            "step_title": "Calcule o frete na sacola de compras",
+            "step_text": "Adicione seus produtos favoritos à sacola. Em seguida, digite o seu CEP no campo de cálculo de frete e clique em 'Ok' para visualizar a opção de Entrega Local Mais Rápida",
+            "step_image": "shopify://shop_images/Foto_editorial_de_uma_mulher_com_os_cabelos_soltos_esvoacantes_e_brilhantes_transmitindo_leveza_e_saude_capilar_1_d8180ee8-6a4f-4e13-9eb1-6116786bf030.png"
+          }
+        },
+        "step_CyKnDE": {
+          "type": "step",
+          "settings": {
+            "step_title": "Selecione a Entrega 24h no Checkout",
+            "step_text": "Clique em 'Finalizar Compra'. Na tela de pagamento, confirme seu endereço e certifique-se de selecionar a opção 'Entrega local (Entrega em 24h Motoboy Express)' antes de concluir o pedido",
+            "step_image": "shopify://shop_images/Foto_editorial_de_uma_mulher_com_os_cabelos_soltos_esvoacantes_e_brilhantes_transmitindo_leveza_e_saude_capilar_2.png"
+          }
+        }
+      },
+      "block_order": [
+        "step_7fkkbQ",
+        "step_CyKnDE"
+      ],
+      "name": "Landing Page - Entrega 24h",
+      "settings": {
+        "hero_bg_color": "#766cff",
+        "hero_image": "shopify://shop_images/f21514529f848afc725e85a0d4adaca5.jpg"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "hdm_landing_24h_kKkRcc"
+  ]
+}

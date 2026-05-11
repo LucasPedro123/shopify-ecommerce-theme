@@ -6,16 +6,90 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
-    "collection_list_Wfgh3m": {
+    "custom_collection_list_eN6Mxd": {
+      "type": "custom-collection-list",
+      "blocks": {
+        "collection_T84VtR": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/FOTO-ANUNCIOS_-_2026-03-02T185303.807.png",
+            "title": "SKIN CARE",
+            "action_text": "Explorar",
+            "link": "shopify://collections/skin-care"
+          }
+        },
+        "collection_j7JDB3": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/FOTO-ANUNCIOS_-_2026-03-02T184723.340.png",
+            "title": "CORPO",
+            "action_text": "Explorar",
+            "link": "shopify://collections/corpo"
+          }
+        },
+        "collection_XULDbQ": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/FOTO-ANUNCIOS_-_2026-03-02T184801.159.png",
+            "title": "CABELO",
+            "action_text": "Explorar",
+            "link": "shopify://collections/cabelo"
+          }
+        },
+        "collection_9PHqJ4": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/image-kit-corretivo-da-catharine-hill-hdm_7eb2e9e6-3988-450f-9142-ef9b9f23960a.png",
+            "title": "MAQUIAGEM",
+            "action_text": "Explorar",
+            "link": "shopify://collections/maquiagem"
+          }
+        },
+        "collection_fU9Hrg": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/FOTO-ANUNCIOS_-_2026-03-02T185834.928.png",
+            "title": "OUTLET",
+            "action_text": "Explorar",
+            "link": "shopify://collections/outlet"
+          }
+        },
+        "collection_n6zkhz": {
+          "type": "collection",
+          "settings": {
+            "image": "shopify://shop_images/FOTO-ANUNCIOS_-_2026-03-02T190522.517.png",
+            "title": "MODO VERÃO",
+            "action_text": "Explorar",
+            "link": "shopify://collections/verao"
+          }
+        }
+      },
+      "block_order": [
+        "collection_T84VtR",
+        "collection_j7JDB3",
+        "collection_XULDbQ",
+        "collection_9PHqJ4",
+        "collection_fU9Hrg",
+        "collection_n6zkhz"
+      ],
+      "name": "Lista de Coleções Custom",
+      "settings": {
+        "title": "CONFIRA NOSSA COLEÇÃO",
+        "subtitle": "Nossa Coleção Refrescante De Edição Limitada",
+        "button_label": "",
+        "button_link": "shopify://collections"
+      }
+    },
+    "collection_list_KreTXe": {
       "type": "main-collection-list",
       "blocks": {
-        "group_4FtiAg": {
+        "group_T9Emrg": {
           "type": "group",
           "name": "t:names.header",
           "settings": {
-            "open_in_new_tab": false,
             "content_direction": "column",
             "vertical_on_mobile": true,
             "horizontal_alignment": "flex-start",
@@ -43,22 +117,25 @@
             "overlay_color": "#00000026",
             "overlay_style": "solid",
             "gradient_direction": "to top",
+            "link": "",
+            "open_in_new_tab": false,
+            "placeholder": "",
             "padding-block-start": 0,
-            "padding-block-end": 48,
+            "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
           "blocks": {
-            "text_fRMQMR": {
+            "text_wgAEay": {
               "type": "text",
               "name": "t:names.text",
               "settings": {
-                "text": "<h3>Collections</h3>",
+                "text": "<h1>Collections</h1>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "h2",
-                "font": "var(--font-primary--family)",
+                "type_preset": "h3",
+                "font": "var(--font-body--family)",
                 "font_size": "",
                 "line_height": "normal",
                 "letter_spacing": "normal",
@@ -77,7 +154,7 @@
             }
           },
           "block_order": [
-            "text_fRMQMR"
+            "text_wgAEay"
           ]
         },
         "static-collection-card": {
@@ -85,26 +162,26 @@
           "name": "t:names.collection_card",
           "static": true,
           "settings": {
-            "placement": "below_image",
+            "placement": "on_image",
             "horizontal_alignment": "flex-start",
-            "vertical_alignment": "flex-start",
+            "vertical_alignment": "flex-end",
             "collection_card_gap": 8,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
+            "inherit_color_scheme": false,
+            "color_scheme": "scheme-942023e3-eb4a-4b40-ab69-dc5332cced64",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
             "border_radius": 0
           },
           "blocks": {
-            "collection_title_7YgBPU": {
+            "collection_title_Gz3fh4": {
               "type": "collection-title",
               "name": "t:names.collection_title",
               "settings": {
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "rte",
+                "type_preset": "h6",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
                 "line_height": "normal",
@@ -112,22 +189,21 @@
                 "case": "none",
                 "wrap": "pretty",
                 "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
+                "background": true,
+                "background_color": "#ffffff",
                 "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "padding-block-start": 4,
+                "padding-block-end": 4,
+                "padding-inline-start": 8,
+                "padding-inline-end": 8
               },
               "blocks": {}
             },
             "collection-card-image": {
               "type": "_collection-card-image",
-              "name": "t:names.collection_card_image",
               "static": true,
               "settings": {
-                "image_ratio": "adapt",
+                "image_ratio": "portrait",
                 "toggle_overlay": false,
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
@@ -141,13 +217,14 @@
             }
           },
           "block_order": [
-            "collection_title_7YgBPU"
+            "collection_title_Gz3fh4"
           ]
         }
       },
       "block_order": [
-        "group_4FtiAg"
+        "group_T9Emrg"
       ],
+      "disabled": true,
       "name": "Collection list",
       "settings": {
         "layout_type": "grid",
@@ -155,8 +232,8 @@
         "columns": 3,
         "mobile_columns": "2",
         "columns_gap": 12,
-        "bento_gap": 8,
-        "rows_gap": 24,
+        "bento_gap": 16,
+        "rows_gap": 12,
         "max_collections": 4,
         "icons_style": "arrow",
         "icons_shape": "none",
@@ -166,9 +243,24 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "breadcrumb_DPRgg6": {
+      "type": "breadcrumb",
+      "name": "Breadcrumbs (HDM)",
+      "settings": {
+        "text_color": "#666666",
+        "link_hover_color": "#000000",
+        "bg_color": "transparent",
+        "full_width": false,
+        "alignment": "flex-start",
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
     }
   },
   "order": [
-    "collection_list_Wfgh3m"
+    "custom_collection_list_eN6Mxd",
+    "collection_list_KreTXe",
+    "breadcrumb_DPRgg6"
   ]
 }

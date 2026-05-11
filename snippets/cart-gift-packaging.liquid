@@ -1,0 +1,187 @@
+{%- comment -%}
+  Snippet: cart-gift-packaging.liquid
+  Descrição: Renderiza a seção de "Adicionar embalagem de presente" na página de carrinho.
+  Recebe o objeto 'block' como parâmetro do section.blocks.
+{%- endcomment -%}
+
+<div class="cart-gift-block" {{ block.shopify_attributes }}>
+  <div class="cart-gift-header">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#662483" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="8" width="18" height="12" rx="2" ry="2"></rect>
+      <path d="M12 8v12"></path>
+      <path d="M11.5 8c0-2.5-3-3.5-5-2.5s-2 3.5 0 5l5.5-2.5z"></path>
+      <path d="M12.5 8c0-2.5 3-3.5 5-2.5s2 3.5 0 5l-5.5-2.5z"></path>
+    </svg>
+    <h3>{{ block.settings.title }}</h3>
+  </div>
+  
+  <div class="cart-gift-grid">
+    {%- if block.settings.gift_1 != blank -%}
+      {%- assign gift1 = all_products[block.settings.gift_1] -%}
+      <div class="cart-gift-card">
+        <div class="cart-gift-card__info">
+          {%- if block.settings.gift_1_badge != blank -%}
+            <span class="cart-gift-badge">{{ block.settings.gift_1_badge }}</span>
+          {%- endif -%}
+          <strong>{{ gift1.title | default: 'Caixa' }}</strong>
+          <p>{{ block.settings.gift_1_desc }}</p>
+        </div>
+        <button type="button" class="cart-gift-add" data-variant-id="{{ gift1.selected_or_first_available_variant.id }}" aria-label="Adicionar presente">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    {%- endif -%}
+
+    {%- if block.settings.gift_2 != blank -%}
+      {%- assign gift2 = all_products[block.settings.gift_2] -%}
+      <div class="cart-gift-card">
+        <div class="cart-gift-card__info">
+          {%- if block.settings.gift_2_badge != blank -%}
+            <span class="cart-gift-badge">{{ block.settings.gift_2_badge }}</span>
+          {%- endif -%}
+          <strong>{{ gift2.title | default: 'Sacola' }}</strong>
+          <p>{{ block.settings.gift_2_desc }}</p>
+        </div>
+        <button type="button" class="cart-gift-add" data-variant-id="{{ gift2.selected_or_first_available_variant.id }}" aria-label="Adicionar presente">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  // Só adiciona o event listener se ele ainda não existir na página para evitar duplicatas
+  if (!window.cartGiftScriptLoaded) {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.cart-gift-add').forEach(button => {
+        button.addEventListener('click', function() {
+          const variantId = this.getAttribute('data-variant-id');
+          if(!variantId) return;
+          
+          let formData = {
+            'items': [{ 'id': variantId, 'quantity': 1 }]
+          };
+          
+          // Feedback visual rápido
+          const originalHTML = this.innerHTML;
+          this.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          
+          fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(() => {
+            window.location.reload(); // Atualiza para o cliente ver o presente no carrinho
+          })
+          .catch(error => {
+            console.error('Erro ao adicionar presente:', error);
+            this.innerHTML = originalHTML; // Volta ao normal se der erro
+          });
+        });
+      });
+    });
+    window.cartGiftScriptLoaded = true;
+  }
+</script>
+
+<style>
+  /* Estilos específicos do Bloco de Presentes */
+  .cart-gift-block {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+    width: 100%;
+  }
+
+  .cart-gift-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cart-gift-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #111;
+  }
+
+  .cart-gift-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-gift-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cart-gift-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cart-gift-card:hover {
+    border-color: #662483;
+    box-shadow: 0 4px 12px rgba(102, 36, 131, 0.05);
+  }
+
+  .cart-gift-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 15px;
+  }
+
+  .cart-gift-badge {
+    background: #f3e8ff;
+    color: #662483;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 4px;
+  }
+
+  .cart-gift-card__info strong {
+    font-size: 14px;
+    color: #111;
+  }
+
+  .cart-gift-card__info p {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .cart-gift-add {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .cart-gift-card:hover .cart-gift-add {
+    transform: translateX(3px); /* Pequeno bounce pra indicar clicabilidade */
+  }
+</style>

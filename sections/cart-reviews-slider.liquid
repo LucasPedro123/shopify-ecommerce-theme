@@ -1,0 +1,500 @@
+{%- comment -%}
+  HDM Beauty - Slider de Avaliações (Prova Social para Carrinho)
+  Com Drag to Scroll e Swipe Nativo
+{%- endcomment -%}
+
+<div class="cart-reviews-section" style="background-color: {{ section.settings.bg_color }};">
+  <div class="page-width">
+    
+    <cart-testimonial-slider class="testimonial-slider-wrapper" data-autoplay="{% if section.settings.autoplay %}true{% else %}false{% endif %}" data-speed="{{ section.settings.autoplay_speed | times: 1000 }}">
+      
+      <button class="slider-nav slider-prev" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+
+      <div class="testimonial-slider-track">
+        {%- for block in section.blocks -%}
+          <div class="testimonial-slide" {{ block.shopify_attributes }}>
+            
+            <div class="testimonial-image-col">
+              <div class="testimonial-image-wrapper">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 400 }}" alt="Foto da avaliação" loading="lazy" width="200" height="200" class="testimonial-img">
+                {%- else -%}
+                  <div class="testimonial-img-placeholder">Sem Foto</div>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="testimonial-content-col">
+              <div class="testimonial-quote-icon">“</div>
+              
+              <div class="testimonial-stars">
+                {%- for i in (1..5) -%}
+                  {%- if i <= block.settings.stars -%}
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#F59E0B" stroke="#F59E0B" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  {%- else -%}
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#e5e7eb" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+
+              <p class="testimonial-text">{{ block.settings.review_text }}</p>
+              <p class="testimonial-author">- {{ block.settings.author_name | upcase }}</p>
+            </div>
+
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <button class="slider-nav slider-next" aria-label="Próximo">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+
+      <div class="testimonial-dots">
+        {%- for block in section.blocks -%}
+          <button class="testimonial-dot {% if forloop.first %}is-active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Ir para o slide {{ forloop.index }}"></button>
+        {%- endfor -%}
+      </div>
+
+    </cart-testimonial-slider>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  /* --- ESTILOS DO SLIDER DE AVALIAÇÕES --- */
+  .cart-reviews-section {
+    padding: 60px 0;
+    overflow: hidden;
+  }
+
+  .testimonial-slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Track e Slides */
+  .testimonial-slider-track {
+    display: flex;
+    width: 100%;
+    overflow-x: auto; /* Permite o Swipe Nativo no Celular */
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none; /* Esconde scrollbar IE/Edge */
+    scrollbar-width: none; /* Esconde scrollbar Firefox */
+    cursor: grab; /* Cursor indicando que é arrastável */
+  }
+
+  .testimonial-slider-track::-webkit-scrollbar {
+    display: none; /* Esconde scrollbar Chrome/Safari */
+  }
+
+  /* Classes adicionadas via JS durante o clique do mouse */
+  .testimonial-slider-track.is-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto; /* Remove o delay do smooth durante o arrasto manual */
+    scroll-snap-type: none; /* Evita que o slide "brigue" com o mouse */
+  }
+
+  .testimonial-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px 60px;
+    box-sizing: border-box;
+    opacity: 0.4;
+    transition: opacity 0.4s ease;
+    user-select: none; /* Evita selecionar o texto enquanto arrasta */
+  }
+
+  .testimonial-slide.is-active {
+    opacity: 1;
+  }
+
+  /* Imagem Circular */
+  .testimonial-image-col {
+    flex-shrink: 0;
+    pointer-events: none; /* Evita bugar a imagem ao arrastar */
+  }
+
+  .testimonial-image-wrapper {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fce7f3;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  }
+
+  .testimonial-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .testimonial-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 14px;
+  }
+
+  /* Conteúdo e Tipografia */
+  .testimonial-content-col {
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .testimonial-quote-icon {
+    font-family: serif;
+    font-size: 80px;
+    line-height: 1;
+    color: #1a1a1a;
+    margin-bottom: -30px;
+    margin-left: -5px;
+  }
+
+  .testimonial-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 15px;
+  }
+
+  .testimonial-text {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+    margin: 0 0 20px 0;
+    font-weight: 400;
+  }
+
+  .testimonial-author {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  /* Navegação (Setas) */
+  .slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 95px;
+    box-shadow: 0 2px 6px #00000026;
+    background: #fff;
+    border: none;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    z-index: 2;
+  }
+
+  .slider-nav:hover {
+    background: #d4d4d4;
+    color: #000;
+  }
+
+  .slider-prev { left: 0; }
+  .slider-next { right: 0; }
+
+  /* Paginação (Dots) */
+  .testimonial-dots {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .testimonial-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s, transform 0.3s;
+  }
+
+  .testimonial-dot:hover {
+    transform: scale(1.2);
+  }
+
+  .testimonial-dot.is-active {
+    background: #4a4a4a;
+    transform: scale(1.2);
+  }
+
+  /* Responsivo */
+  @media screen and (max-width: 850px) {
+    .testimonial-slide {
+      flex-direction: column;
+      text-align: center;
+      padding: 10px 40px;
+      gap: 20px;
+    }
+
+    .testimonial-image-wrapper {
+      width: 150px;
+      height: 150px;
+    }
+
+    .testimonial-quote-icon {
+      margin-left: 0;
+      text-align: center;
+    }
+
+    .testimonial-stars {
+      justify-content: center;
+    }
+
+    .testimonial-text {
+      font-size: 16px;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .slider-nav { display: none; }
+    .testimonial-slide { padding: 10px 20px; }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class CartTestimonialSlider extends HTMLElement {
+    constructor() {
+      super();
+      this.track = this.querySelector('.testimonial-slider-track');
+      this.slides = this.querySelectorAll('.testimonial-slide');
+      this.dots = this.querySelectorAll('.testimonial-dot');
+      this.prevBtn = this.querySelector('.slider-prev');
+      this.nextBtn = this.querySelector('.slider-next');
+      
+      this.currentIndex = 0;
+      this.totalSlides = this.slides.length;
+      this.autoplay = this.dataset.autoplay === 'true';
+      this.speed = parseInt(this.dataset.speed) || 5000;
+      this.interval = null;
+
+      // Variáveis para o Drag com Mouse
+      this.isDragging = false;
+      this.startX = 0;
+      this.scrollLeft = 0;
+
+      if (this.totalSlides <= 1) {
+        if(this.prevBtn) this.prevBtn.style.display = 'none';
+        if(this.nextBtn) this.nextBtn.style.display = 'none';
+        if(this.querySelector('.testimonial-dots')) this.querySelector('.testimonial-dots').style.display = 'none';
+        if (this.slides.length > 0) this.slides[0].classList.add('is-active');
+        return;
+      }
+
+      this.init();
+    }
+
+    init() {
+      this.updateUI();
+
+      // Controles de Botões e Pontos
+      if(this.prevBtn) this.prevBtn.addEventListener('click', () => this.navigate(-1));
+      if(this.nextBtn) this.nextBtn.addEventListener('click', () => this.navigate(1));
+      
+      this.dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => this.goToSlide(index));
+      });
+
+      // Atualiza a UI quando a rolagem natural/swipe termina
+      this.track.addEventListener('scroll', () => {
+        if (this.isDragging) return; // Se estiver arrastando com mouse, não atualiza índice até soltar
+        clearTimeout(this.scrollTimeout);
+        this.scrollTimeout = setTimeout(() => {
+          const scrollPos = this.track.scrollLeft;
+          const slideWidth = this.track.offsetWidth;
+          const newIndex = Math.round(scrollPos / slideWidth);
+          if(newIndex !== this.currentIndex) {
+            this.currentIndex = newIndex;
+            this.updateUI();
+          }
+        }, 50);
+      });
+
+      // Lógica de Mouse Drag
+      this.setupMouseDrag();
+
+      if (this.autoplay) {
+        this.startAutoplay();
+        this.addEventListener('mouseenter', () => this.stopAutoplay());
+        this.addEventListener('mouseleave', () => {
+          if (!this.isDragging) this.startAutoplay();
+        });
+      }
+    }
+
+    setupMouseDrag() {
+      // Quando clica e segura o mouse
+      this.track.addEventListener('mousedown', (e) => {
+        this.isDragging = true;
+        this.track.classList.add('is-dragging');
+        this.startX = e.pageX - this.track.offsetLeft;
+        this.scrollLeft = this.track.scrollLeft;
+        this.stopAutoplay();
+      });
+
+      // Quando o mouse sai da área ou solta o botão
+      const stopDrag = () => {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.track.classList.remove('is-dragging');
+        
+        // Ajusta para o slide mais próximo quando soltar
+        const slideWidth = this.track.offsetWidth;
+        this.currentIndex = Math.round(this.track.scrollLeft / slideWidth);
+        this.goToSlide(this.currentIndex);
+        
+        if (this.autoplay) this.startAutoplay();
+      };
+
+      this.track.addEventListener('mouseleave', stopDrag);
+      this.track.addEventListener('mouseup', stopDrag);
+
+      // Quando arrasta o mouse
+      this.track.addEventListener('mousemove', (e) => {
+        if (!this.isDragging) return;
+        e.preventDefault(); // Previne comportamentos padrão do navegador
+        const x = e.pageX - this.track.offsetLeft;
+        const walk = (x - this.startX) * 1.5; // Multiplicador de velocidade do arrasto
+        this.track.scrollLeft = this.scrollLeft - walk;
+      });
+    }
+
+    navigate(direction) {
+      this.currentIndex = (this.currentIndex + direction + this.totalSlides) % this.totalSlides;
+      this.goToSlide(this.currentIndex);
+    }
+
+    goToSlide(index) {
+      this.currentIndex = index;
+      const slideWidth = this.track.offsetWidth;
+      this.track.scrollTo({
+        left: slideWidth * index,
+        behavior: 'smooth'
+      });
+      this.updateUI();
+    }
+
+    updateUI() {
+      this.slides.forEach((slide, idx) => {
+        slide.classList.toggle('is-active', idx === this.currentIndex);
+      });
+      this.dots.forEach((dot, idx) => {
+        dot.classList.toggle('is-active', idx === this.currentIndex);
+      });
+    }
+
+    startAutoplay() {
+      this.stopAutoplay();
+      this.interval = setInterval(() => this.navigate(1), this.speed);
+    }
+
+    stopAutoplay() {
+      clearInterval(this.interval);
+    }
+  }
+
+  customElements.define('cart-testimonial-slider', CartTestimonialSlider);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Avaliações no Carrinho",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de Fundo",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Rotação Automática",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Tempo por avaliação (segundos)",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Avaliação",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto do Recebimento/Cliente"
+        },
+        {
+          "type": "range",
+          "id": "stars",
+          "label": "Quantidade de Estrelas",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "review_text",
+          "label": "Texto da Avaliação",
+          "default": "Eu procurei por esse produto por muito tempo e não achava com um preço bom até descobrir este site. É um dos meus favoritos e recebo elogios sempre que uso!!"
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Nome do Cliente",
+          "default": "Vera Wang"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Avaliações no Carrinho",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}

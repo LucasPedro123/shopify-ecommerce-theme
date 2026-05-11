@@ -1,173 +1,590 @@
-
+{%- comment -%}
+  HDM BEAUTY: Layout Editorial de Blog (Estilo Magazine / Beleza na Web)
+{%- endcomment -%}
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div class="section color-{{ section.settings.color_scheme }}">
-  <div
-    class="
-      spacing-style
-      layout-panel-flex
-      layout-panel-flex--column
-      section-content-wrapper
-      mobile-column
-    "
-    style="
-      {% render 'layout-panel-style', settings: section.settings %}
-      {% render 'spacing-style', settings: section.settings %}
-    "
-  >
-    <header>
-      {%- content_for 'block', id: 'blog-post-title', type: 'text' %}
-      {%- content_for 'block', id: 'blog-post-details', type: '_blog-post-info-text' %}
+
+<article
+  class="hdm-article section color-{{ section.settings.color_scheme }}"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  <div class="page-width">
+    {%- comment -%} CABEÇALHO DO ARTIGO {%- endcomment -%}
+    <header class="hdm-article__header">
+      <div class="hdm-article__meta">
+        {%- if section.settings.show_date -%}
+          <span class="hdm-article__date" itemprop="dateCreated pubdate datePublished">
+            {{- article.published_at | time_tag: format: 'date' -}}
+          </span>
+        {%- endif -%}
+        {%- if section.settings.show_author -%}
+          <span class="hdm-article__author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            Por <span itemprop="name">{{ article.author }}</span>
+          </span>
+        {%- endif -%}
+      </div>
+
+      <h1 class="hdm-article__title" itemprop="headline">{{ article.title | escape }}</h1>
+
+      {%- comment -%} BOTÕES DE COMPARTILHAMENTO (Nativos Shopify / Redes Sociais) {%- endcomment -%}
+      {%- if section.settings.show_share_buttons -%}
+        <div class="hdm-article__share">
+          <span class="hdm-article__share-label">Compartilhar:</span>
+          <a
+            href="//www.facebook.com/sharer.php?u={{ shop.url | append: article.url }}"
+            class="hdm-share-btn hdm-share-btn--facebook"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="presentation"
+              class="icon icon-facebook"
+              viewBox="0 0 18 18"
+            >
+              <path d="M16.42.062H1.58C.71.062.004.76.004 1.624v14.752c0 .864.705 1.562 1.576 1.562h7.973v-6.43H7.39v-2.51h2.163v-1.85c0-2.146 1.318-3.32 3.23-3.32.917 0 1.703.068 1.932.1v2.24l-1.326.001c-1.04 0-1.242.494-1.242 1.22v1.608h2.476l-.322 2.51h-2.154v6.43h4.275c.87 0 1.576-.698 1.576-1.562V1.624c0-.864-.706-1.562-1.576-1.562z"/>
+            </svg>
+          </a>
+          <a
+            href="//twitter.com/share?text={{ article.title | url_param_escape }}&amp;url={{ shop.url | append: article.url }}"
+            class="hdm-share-btn hdm-share-btn--twitter"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-twitter" viewBox="0 0 18 18">
+              <path d="M18 4.23a7.387 7.387 0 0 1-2.122.58 3.69 3.69 0 0 0 1.624-2.043 7.386 7.386 0 0 1-2.345.895 3.692 3.692 0 0 0-6.287 3.36A10.472 10.472 0 0 1 1.27 3.12a3.692 3.692 0 0 0 1.14 4.922 3.665 3.665 0 0 1-1.67-.46v.045a3.69 3.69 0 0 0 2.96 3.618 3.69 3.69 0 0 1-1.665.062 3.693 3.693 0 0 0 3.447 2.56 7.399 7.399 0 0 1-4.577 1.58A7.327 7.327 0 0 1 0 15.295 10.435 10.435 0 0 0 5.655 17c6.786 0 9.996-5.618 9.996-9.996 0-.16-.003-.32-.01-.478A7.142 7.142 0 0 0 18 4.23z"/>
+            </svg>
+          </a>
+          <a
+            href="https://api.whatsapp.com/send?text={{ article.title | url_param_escape }} - {{ shop.url | append: article.url }}"
+            class="hdm-share-btn hdm-share-btn--whatsapp"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon icon-whatsapp">
+              <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zM223.9 413.2c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 334.1l-4.4-7.1c-18.9-30.7-28.9-66-28.9-102 0-101.4 82.5-184.2 184.3-184.2 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.2 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+            </svg>
+          </a>
+        </div>
+      {%- endif -%}
     </header>
 
-    {%- if article.image -%}
-      {%- content_for 'block', id: 'blog-post-image', type: '_blog-post-featured-image', image: article.image %}
+    {%- comment -%} IMAGEM DESTACADA {%- endcomment -%}
+    {%- if article.image and section.settings.show_image -%}
+      <div class="hdm-article__image-wrapper" itemprop="image">
+        <img
+          src="{{ article.image | image_url: width: 1200 }}"
+          alt="{{ article.image.alt | escape }}"
+          width="{{ article.image.width }}"
+          height="{{ article.image.height }}"
+          loading="eager"
+        >
+      </div>
     {%- endif -%}
-    {%- content_for 'block', id: 'blog-post-content', type: '_blog-post-content' %}
 
+    {%- comment -%} GRID PRINCIPAL: CONTEÚDO vs SIDEBAR {%- endcomment -%}
+    <div class="hdm-article__grid">
+      {%- comment -%} COLUNA ESQUERDA (O Artigo) {%- endcomment -%}
+      <div class="hdm-article__content rte" itemprop="articleBody">
+        {{ article.content }}
+      </div>
+
+      {%- comment -%} COLUNA DIREITA (Sidebar Comercial) {%- endcomment -%}
+      <aside class="hdm-article__sidebar">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'product_highlight' -%}
+              <div
+                class="hdm-sidebar-widget hdm-sidebar-widget--product hdm-dynamic-widget-{{ block.id }}"
+                {{ block.shopify_attributes }}
+              >
+                {%- if block.settings.title != blank -%}
+                  <h3 class="hdm-sidebar-widget__title">{{ block.settings.title }}</h3>
+                {%- endif -%}
+
+                {%- assign fallback_product = all_products[block.settings.product] -%}
+
+                {%- comment -%}
+                  Este é o Container Vazio. O JS vai decidir se injeta o Produto Visto ou se injeta o Fallback aqui dentro.
+                {%- endcomment -%}
+                <div class="hdm-sidebar-product-card" id="hdm-sidebar-product-container-{{ block.id }}"></div>
+
+                {%- comment -%}
+                  Template Escondido: O Produto Fallback configurado no painel (caso não haja histórico).
+                {%- endcomment -%}
+                <template id="hdm-fallback-template-{{ block.id }}">
+                  {%- if fallback_product != blank -%}
+                    <a href="{{ fallback_product.url }}" class="hdm-sidebar-product-card__link">
+                      <img
+                        src="{{ fallback_product.featured_image | image_url: width: 400 }}"
+                        alt="{{ fallback_product.title | escape }}"
+                        width="100"
+                        height="100"
+                        loading="lazy"
+                      >
+                      <div class="hdm-sidebar-product-card__info">
+                        <span class="hdm-sidebar-product-card__title">{{ fallback_product.title }}</span>
+                        <span class="hdm-sidebar-product-card__price">{{ fallback_product.price | money }}</span>
+                      </div>
+                    </a>
+                    <form method="post" action="/cart/add">
+                      <input
+                        type="hidden"
+                        name="id"
+                        value="{{ fallback_product.selected_or_first_available_variant.id }}"
+                      >
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="hdm-sidebar-product-card__btn">Comprar</button>
+                    </form>
+                  {%- else -%}
+                    <p style="font-size:12px; color: #888;">Selecione um produto no painel.</p>
+                  {%- endif -%}
+                </template>
+              </div>
+
+              {%- comment -%} SCRIPT DINÂMICO PARA ESTE BLOCO {%- endcomment -%}
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const container = document.getElementById('hdm-sidebar-product-container-{{ block.id }}');
+                  const fallbackTemplate = document.getElementById('hdm-fallback-template-{{ block.id }}').innerHTML;
+
+                  let recentlyViewed = [];
+                  try {
+                    recentlyViewed = JSON.parse(localStorage.getItem('hdm_recently_viewed')) || [];
+                  } catch (e) {
+                    console.warn('Erro ao acessar histórico:', e);
+                  }
+
+                  if (recentlyViewed && recentlyViewed.length > 0) {
+                    const shuffledViewed = recentlyViewed.sort(() => 0.5 - Math.random());
+
+                    const randomProductHandle = shuffledViewed[0];
+
+                    fetch(`/products/${randomProductHandle}.js`)
+                      .then((response) => {
+                        if (!response.ok) throw new Error('Produto não encontrado');
+                        return response.json();
+                      })
+                      .then((product) => {
+                        const priceFormatted = new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(product.price / 100);
+
+                        const productHTML = `
+            <a href="${product.url}" class="hdm-sidebar-product-card__link">
+              <img src="${product.images && product.images[0] ? product.images[0] : ''}" alt="${
+                          product.title
+                        }" width="100" height="100" loading="lazy">
+              <div class="hdm-sidebar-product-card__info">
+                <span class="hdm-sidebar-product-card__title">${product.title}</span>
+                <span class="hdm-sidebar-product-card__price">${priceFormatted}</span>
+              </div>
+            </a>
+            <form method="post" action="/cart/add">
+              <input type="hidden" name="id" value="${product.variants[0].id}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="hdm-sidebar-product-card__btn">Comprar</button>
+            </form>
+          `;
+                        container.innerHTML = productHTML;
+                      })
+                      .catch((error) => {
+                        console.log('Erro ao buscar produto visto, usando fallback.', error);
+                        container.innerHTML = fallbackTemplate;
+                      });
+                  } else {
+                    container.innerHTML = fallbackTemplate;
+                  }
+                });
+              </script>
+
+            {%- when 'promo_banner' -%}
+              <div class="hdm-sidebar-widget hdm-sidebar-widget--banner" {{ block.shopify_attributes }}>
+                {%- if block.settings.image != blank -%}
+                  <a href="{{ block.settings.link | default: '#' }}">
+                    <img
+                      src="{{ block.settings.image | image_url: width: 600 }}"
+                      width="50"
+                      height=""
+                      alt="Banner Promocional"
+                      loading="lazy"
+                      style="width: 100%; height: auto; border-radius: 8px;"
+                    >
+                  </a>
+                {%- else -%}
+                  <div style="padding: 40px 20px; background: #f4f4f4; text-align: center; border-radius: 8px;">
+                    Adicione uma imagem de banner
+                  </div>
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </aside>
+    </div>
+    {% comment %} End Grid {% endcomment %}
+
+    {%- comment -%} SEÇÃO DE COMENTÁRIOS {%- endcomment -%}
     {% if blog.comments_enabled? %}
-      <div class="blog-post-comments-container">
-        <h2 class="h3">{{- 'blogs.article.comments_heading' | t: count: article.comments_count -}}</h2>
-
+      <div class="hdm-article__comments">
+        <h2 class="h3">{{ 'blogs.article.comments_heading' | t: count: article.comments_count }}</h2>
         <div class="blog-post-comments">
           {% paginate article.comments by 10 %}
             {% for comment in article.comments %}
               <div class="blog-post-comment">
-                {{ comment.content }}
+                <div class="blog-post-comment__content">{{ comment.content }}</div>
                 <div class="blog-post-comment__author">
-                  <span class="blog-post-comment__author-name">{{- comment.author -}}</span>
-                  <span>{{- 'blogs.article.comment_author_separator' | t -}}</span>
-                  <span class="blog-post-comment__date">
-                    {{- comment.created_at | time_tag: format: 'date' -}}
-                  </span>
+                  <strong>{{ comment.author }}</strong>
+                  <span class="blog-post-comment__date">{{ comment.created_at | time_tag: format: 'date' }}</span>
                 </div>
               </div>
             {% endfor %}
-
             <div class="blog-post-comments-pagination">
-              {{- paginate | default_pagination -}}
+              {{ paginate | default_pagination }}
             </div>
           {% endpaginate %}
         </div>
-
         {% render 'blog-comment-form', article: article, section_id: section.id %}
       </div>
     {% endif %}
   </div>
-</div>
+</article>
 
 <script type="application/ld+json">
   {{ article | structured_data }}
 </script>
 
 {% stylesheet %}
-  .blog-post-comments-container {
-    width: 100%;
-    max-width: var(--normal-content-width);
-    margin: 0 auto;
+  /* ========================================================================
+     HDM BEAUTY - EDITORIAL BLOG STYLES
+     ======================================================================== */
+
+  .hdm-article {
+    padding-top: 74px;
+    padding-bottom: 60px;
+    font-family: var(--font-body--family);
+    color: var(--color-foreground);
   }
 
-  .blog-post-comments {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-3xl);
+  .hdm-article__header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 30px;
   }
 
-  .blog-post-comment__author {
+  .hdm-article__meta {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 15px;
+  }
+
+  .hdm-article__meta span {
+    display: inline-block;
+    margin: 0 5px;
+  }
+
+  .hdm-article__title {
+    font-family: var(--font-heading--family);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  /* Compartilhamento Social */
+  .hdm-article__share {
     display: flex;
     align-items: center;
-    gap: var(--gap-2xs);
-    margin-top: var(--margin-md);
-    font-size: var(--font-size--body-sm);
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
-  }
-
-  .blog-post-comments-pagination {
-    display: flex;
     justify-content: center;
-    gap: var(--gap-2xs);
+    gap: 15px;
+    margin-top: 20px;
   }
 
-  .blog-post-comments-pagination,
-  .blog-post-comments-pagination a {
-    color: var(--color-foreground);
+  .hdm-article__share-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
   }
 
-  .blog-post-comments-pagination .current {
-    color: var(--color-foreground);
+  .hdm-share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f4f4f4;
+    color: #333;
+    transition: all 0.2s ease;
   }
 
-  .blog-post-comments-pagination .current,
-  .blog-post-comments-pagination a {
+  .hdm-share-btn svg { width: 18px; height: 18px; fill: currentColor; }
+  .hdm-share-btn--facebook:hover { background: #1877f2; color: white; }
+  .hdm-share-btn--twitter:hover { background: #1da1f2; color: white; }
+  .hdm-share-btn--whatsapp:hover { background: #25d366; color: white; }
+
+  /* Imagem Principal */
+  .hdm-article__image-wrapper {
+    margin-bottom: 50px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  }
+
+  .hdm-article__image-wrapper img {
+    width: 100%;
+    height: auto;
     display: block;
-    padding: var(--padding-2xs) var(--padding-xs);
+    object-fit: cover;
+    max-height: 500px;
   }
 
-  .blog-post-comments-pagination .current,
-  .blog-post-comments-pagination a:hover {
-    border-bottom: 1px solid var(--color-foreground);
+  /* O Grid Editorial (Conteúdo Esquerda / Produtos Direita) */
+  .hdm-article__grid {
+    display: grid;
+    grid-template-columns: 1fr 320px; /* 320px fixos para a sidebar */
+    gap: 50px;
+    align-items: start;
+  }
+
+  /* Conteúdo do Texto (RTE) */
+  .hdm-article__content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #222;
+  }
+
+  .hdm-article__content h2, .hdm-article__content h3 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-family: var(--font-heading--family);
+  }
+
+  .hdm-article__content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .hdm-article__content a {
+    color: #766CFF; /* Roxo HDM / Beleza na Web */
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  /* Sidebar (Widgets) */
+  .hdm-article__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    position: sticky;
+    top: 100px; /* Faz a sidebar acompanhar o scroll */
+  }
+
+  .hdm-sidebar-widget {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .hdm-sidebar-widget--banner {
+    padding: 0;
+    border: none;
+  }
+
+  .hdm-sidebar-widget__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #000;
+    border-bottom: 2px solid #9400D3;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+
+  /* Card de Produto na Sidebar */
+  .hdm-sidebar-product-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hdm-sidebar-product-card__link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .hdm-sidebar-product-card__link img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+
+  .hdm-sidebar-product-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .hdm-sidebar-product-card__title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hdm-sidebar-product-card__price {
+    font-weight: 700;
+    color: #9400D3;
+    font-size: 16px;
+  }
+
+  .hdm-sidebar-product-card__btn {
+    width: 100%;
+    padding: 12px;
+    background: #766CFF;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .hdm-sidebar-product-card__btn:hover {
+    background: #7a00b3;
+  }
+
+  /* Comentários Restilizados */
+  .hdm-article__comments {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid #eaeaea;
+    max-width: 800px;
+  }
+
+  .blog-post-comment {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .blog-post-comment__content { font-size: 15px; margin-bottom: 10px; }
+  .blog-post-comment__author { font-size: 13px; color: #666; }
+  .blog-post-comment__date { margin-left: 10px; font-style: italic; }
+
+  /* Responsividade Mobile */
+  @media screen and (max-width: 990px) {
+    .hdm-article__grid {
+      grid-template-columns: 1fr; /* Quebra para uma coluna */
+      gap: 40px;
+    }
+
+    .hdm-article__sidebar {
+      position: static; /* Remove o sticky no mobile */
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.blog_post",
+  "name": "Post de Blog (Editorial)",
   "class": "section-wrapper",
   "settings": [
     {
-      "type": "select",
-      "id": "content_direction",
-      "label": "t:settings.direction",
-      "options": [
-        {
-          "value": "column",
-          "label": "t:options.vertical"
-        }
-      ],
-      "default": "column",
-      "visible_if": "{{ section.settings.gap < 0 }}"
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 12
-    },
-    {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "t:settings.color_scheme",
+      "label": "Esquema de Cores",
       "default": "scheme-1"
     },
     {
       "type": "header",
-      "content": "t:content.padding"
+      "content": "Cabeçalho do Artigo"
     },
     {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Mostrar imagem de destaque",
+      "default": true
     },
     {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Mostrar data",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Mostrar autor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Mostrar botões de compartilhamento",
+      "default": true
     }
   ],
-  "presets": []
+  "blocks": [
+    {
+      "type": "product_highlight",
+      "name": "Produto na Sidebar",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título do Widget",
+          "default": "Recomendado para você"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Selecione o Produto"
+        }
+      ]
+    },
+    {
+      "type": "promo_banner",
+      "name": "Banner na Sidebar",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem do Banner"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link do Banner"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Post de Blog (Editorial)",
+      "blocks": [{ "type": "product_highlight" }, { "type": "promo_banner" }]
+    }
+  ]
 }
 {% endschema %}

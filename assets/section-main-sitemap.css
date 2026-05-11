@@ -1,0 +1,87 @@
+  .hdm-sitemap-section {
+    max-width: var(--page-width);
+    padding: 0 1.5rem;
+    margin-inline: auto;
+  }
+
+  .hdm-sitemap-header {
+    margin-bottom: 48px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 24px;
+  }
+
+  /* Grid Principal: 2/3 para Departamentos, 1/3 para o resto */
+  .hdm-sitemap-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .hdm-sitemap-grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  .hdm-sitemap-group-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Masonry para as coleções não ficarem com buracos */
+  .hdm-sitemap-masonry {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px 24px;
+    align-items: start;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hdm-sitemap-masonry {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .hdm-sitemap-category-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #333;
+    border-left: 3px solid #000; /* Destaque visual */
+    padding-left: 8px;
+  }
+
+  .hdm-sitemap-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hdm-sitemap-list a {
+    text-decoration: none;
+    color: #666;
+    font-size: 14px;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+
+  .hdm-sitemap-list a:hover {
+    color: #000;
+    text-decoration: underline;
+    padding-left: 4px; /* Micro-interação premium */
+  }
+
+  .hdm-sitemap-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    background: #fafafa;
+    padding: 32px;
+    border-radius: 12px;
+  }

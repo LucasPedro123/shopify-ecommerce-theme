@@ -1,0 +1,444 @@
+{%- comment -%}
+  HDM Beauty - Carrinho de Produtos (Estilo Beleza na Web)
+  Borda no contêiner pai, linhas pontilhadas entre os itens e badge de desconto.
+{%- endcomment -%}
+
+{% liquid
+  assign block_settings = block.settings
+%}
+
+<script src="{{ 'component-cart-items.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'component-cart-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'volume-pricing-info.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+<div class="hdm-cart-wrapper" {{ block.shopify_attributes }}>
+  
+  {% if cart.empty? or force_empty %}
+    <div class="hdm-cart-empty">
+      {%- if shop.customer_accounts_enabled and customer == null -%}
+        <p>{{ 'actions.log_in_html' | t: link: routes.account_login_url }}</p>
+      {%- endif -%}
+      <a class="hdm-btn-primary" href="{{ settings.empty_cart_button_link | default: routes.all_products_collection_url }}">
+        {{ 'actions.continue_shopping' | t }}
+      </a>
+    </div>
+  
+  {%- else -%}
+    
+    <span class="visually-hidden" ref="cartItemCount" aria-hidden="true">{{ cart.item_count }}</span>
+    
+    <div class="hdm-cart-delivery-header">
+      <h3 class="hdm-cart-delivery-title">Entrega</h3>
+      <p class="hdm-cart-delivery-vendor">Vendido e entregue por <strong>HDM Beauty</strong></p>
+      <div class="hdm-cart-shipping-progress">
+        {% render 'cart-shipping-progress' %}
+      </div>
+    </div>
+
+    <form action="{{ routes.cart_url }}" class="cart-form" id="cart-form" method="post">
+      
+      <div class="hdm-cart-items-container">
+        
+        {% for item in cart.items %}
+          <div class="hdm-cart-item {% if item.parent_relationship.parent != null %} hdm-cart-item--nested{% endif %}" 
+               ref="cartItemRows[]" 
+               data-parent-key="{{ item.parent_relationship.parent.key }}" 
+               data-key="{{ item.key }}">
+            
+            <div class="hdm-cart-item__media">
+              {%- liquid
+                assign discount_percentage = 0
+                if item.variant.compare_at_price > item.original_price
+                  assign difference = item.variant.compare_at_price | minus: item.original_price
+                  assign discount_percentage = difference | times: 100.0 | divided_by: item.variant.compare_at_price | round
+                endif
+              -%}
+              
+              <a href="{{ item.url }}" class="hdm-cart-item__image-link">
+                {%- if discount_percentage > 0 -%}
+                  <span class="hdm-cart-item__badge">-{{ discount_percentage }}%</span>
+                {%- endif -%}
+                
+                {% if item.image %}
+                  {{ item.image | image_url: width: 250 | image_tag: class: 'hdm-cart-item__image', loading: 'lazy' }}
+                {% else %}
+                  <div class="hdm-cart-item__image-placeholder">Sem Imagem</div>
+                {% endif %}
+              </a>
+            </div>
+
+            <div class="hdm-cart-item__details">
+              <p class="hdm-cart-item__vendor">{{ item.product.vendor }}</p>
+              
+              <a href="{{ item.url }}" class="hdm-cart-item__title">{{ item.product.title }}</a>
+
+              {%- if item.variant.sku != blank -%}
+                 <p class="hdm-cart-item__sku">cód: {{ item.variant.sku }}</p>
+              {%- endif -%}
+
+              {%- if item.product.has_only_default_variant == false or item.properties.size != 0 -%}
+                <div class="hdm-cart-item__variants-box">
+                  {%- if item.product.has_only_default_variant == false and item.item_components.size == 0 -%}
+                    {%- for option in item.options_with_values -%}
+                      <p class="hdm-cart-item__variant-line">
+                        <strong>{{ option.name }}:</strong> {{ option.value }}
+                      </p>
+                    {%- endfor -%}
+                  {%- endif -%}
+
+                  {%- for property in item.properties -%}
+                    {%- assign property_first_char = property.first | slice: 0 -%}
+                    {%- if property.last != blank and property_first_char != '_' -%}
+                      <p class="hdm-cart-item__variant-line">
+                        <strong>{{ property.first }}:</strong> {{ property.last }}
+                      </p>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if item.line_level_discount_allocations.size > 0 -%}
+                <ul class="hdm-cart-item__discounts list-unstyled">
+                  {%- for discount in item.line_level_discount_allocations -%}
+                    <li style="display: flex;gap: 10px;align-items: center;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                      {{ discount.discount_application.title }}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+
+            <div class="hdm-cart-item__actions">
+              {% assign can_update_quantity = item.instructions.can_update_quantity | default: true, allow_false: true %}
+              
+              <div class="hdm-cart-item__qty-wrapper">
+                {% render 'quantity-selector',
+                  product: item.product,
+                  variant: item.variant,
+                  in_cart_quantity: item.quantity,
+                  line_index: item.index,
+                  class: 'hdm-qty-selector',
+                  can_update_quantity: can_update_quantity
+                %}
+              </div>
+
+              <button class="hdm-cart-item__remove button-unstyled" type="button" aria-label="Remover" on:click="/onLineItemRemove/{{ item.index | plus: 1 }}">
+                Remover
+              </button>
+            </div>
+
+            <div class="hdm-cart-item__price-col">
+              <div class="hdm-cart-item__price-group">
+                {%- liquid
+                  if settings.currency_code_enabled_cart_items
+                    assign price = item.final_line_price | money_with_currency
+                  else
+                    assign price = item.final_line_price | money
+                  endif
+                -%}
+
+                {% if item.original_price != item.final_price or item.variant.compare_at_price > item.original_price %}
+                  <s class="hdm-cart-item__price-old">
+                    {% if item.variant.compare_at_price > item.original_price %}
+                      {{ item.variant.compare_at_price | times: item.quantity | money }}
+                    {% else %}
+                      {{ item.original_line_price | money }}
+                    {% endif %}
+                  </s>
+                {% endif %}
+
+                <text-component class="hdm-cart-item__price-final" value="{{ price | strip_html }}">
+                  {{ price }}
+                </text-component>
+              </div>
+            </div>
+
+            <div class="hdm-cart-item__error hidden" role="cell" ref="cartItemErrorContainer-{{ item.index | plus: 1 }}">
+              <small class="hdm-cart-item__error-text" ref="cartItemError-{{ item.index | plus: 1 }}"></small>
+            </div>
+
+          </div>
+        {% endfor %}
+        
+      </div> </form>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  /* ========================================================================
+     UI HDM BEAUTY - NOVO DESIGN DO CARRINHO (CONTÊINER PAI + PONTILHADO)
+     ======================================================================== */
+  
+  .hdm-cart-wrapper {
+    width: 100%;
+  }
+
+  /* Cabeçalho de Entrega (Estilo BZNW) */
+  .hdm-cart-delivery-header {
+    margin-bottom: 12px;
+  }
+  .hdm-cart-delivery-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 4px 0;
+  }
+  .hdm-cart-delivery-vendor {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+  }
+  .hdm-cart-delivery-vendor strong {
+    color: #111;
+  }
+
+  /* O CONTÊINER PAI (Borda externa arredondada) */
+  .hdm-cart-items-container {
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 0px 24px 24px 24px; /* Padding apenas nas laterais, o vertical fica nos itens */
+  }
+
+  /* O Produto Individual (Sem borda lateral, apenas bottom pontilhado) */
+  .hdm-cart-item {
+    display: grid;
+    grid-template-columns: 110px 1fr auto auto;
+    grid-template-areas: 
+      "media details actions price"
+      "error error error error";
+    gap: 20px;
+    align-items: center;
+    padding: 24px 0; /* Padding vertical do item */
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.24) !important; /* Linha pontilhada estilo BZNW */
+    transition: opacity 0.3s, transform 0.2s;
+  }
+
+  .hdm-cart-item.removing {
+    opacity: 0;
+    transform: scale(0.98);
+    pointer-events: none;
+  }
+
+  /* 1. Mídia (Imagem e Badge) */
+  .hdm-cart-item__media {
+    grid-area: media;
+    position: relative;
+  }
+
+  .hdm-cart-item__image-link {
+    display: block;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    /* Fundo limpo sem borda pesada, pois a foto do cosmético já é destaque */
+  }
+
+  .hdm-cart-item__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* BADGE DE DESCONTO (Posicionado no topo esquerdo da foto) */
+  .hdm-cart-item__badge {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    background-color: #fde047; /* Amarelo Beleza na Web */
+    color: #111;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  /* 2. Detalhes */
+  .hdm-cart-item__details {
+    grid-area: details;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hdm-cart-item__vendor {
+    font-size: 13px;
+    color: #111;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+  }
+
+  .hdm-cart-item__title {
+    font-size: 15px;
+    font-weight: 400;
+    color: #444;
+    text-decoration: none;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    transition: color 0.2s;
+  }
+
+  .hdm-cart-item__title:hover {
+    color: #7c79e7;
+  }
+
+  .hdm-cart-item__sku {
+    font-size: 12px;
+    color: #888;
+    margin: 0 0 8px 0;
+  }
+
+  .hdm-cart-item__variants-box {
+    margin-top: 4px;
+  }
+
+  .hdm-cart-item__variant-line {
+    font-size: 12px;
+    color: #666;
+    margin: 2px 0;
+  }
+
+  .hdm-cart-item__discounts {
+    color: #166534;
+    font-size: 12px;
+    margin: 8px 0 0 0;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  /* 3. Ações (Quantidade e Remover) */
+  .hdm-cart-item__actions {
+    grid-area: actions;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hdm-qty-selector {
+    border: 1px solid #dcdcdc !important;
+    border-radius: 4px !important;
+    height: 38px !important;
+    width: 100px !important;
+    background: #fff;
+  }
+
+  .hdm-qty-selector button {
+    color: #7c79e7 !important;
+    width: 32px !important;
+    height: 100% !important;
+  }
+
+  .hdm-qty-selector input {
+    font-weight: 600 !important;
+    color: #111 !important;
+    font-size: 14px !important;
+  }
+
+  .hdm-cart-item__remove {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #3b82f6; /* Azul tipo link BZNW */
+    text-decoration: underline;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    transition: color 0.2s;
+  }
+
+  .hdm-cart-item__remove:hover {
+    color: #2563eb;
+  }
+
+  /* 4. Preço */
+  .hdm-cart-item__price-col {
+    grid-area: price;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 100px;
+  }
+
+  .hdm-cart-item__price-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .hdm-cart-item__price-old {
+    font-size: 13px;
+    color: #888;
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+
+  .hdm-cart-item__price-final {
+    font-size: 16px;
+    font-weight: 800;
+    color: #7c79e7; /* Preço final em roxo HDM */
+  }
+
+  .hdm-cart-item__error {
+    grid-area: error;
+    color: #dc2626;
+    font-size: 13px;
+    padding-top: 10px;
+  }
+  .hdm-cart-item__error.hidden {
+    display: none;
+  }
+
+  /* Remove a linha pontilhada do último item para não encostar na borda do container pai */
+  .hdm-cart-item:last-child {
+    border-bottom: none !important;
+  }
+
+  .hdm-cart-shipping-progress{
+    .cart-drawer__shipping-progress{
+      display: flex;
+      flex-direction: column-reverse;
+
+      p{
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-top: 15px;
+      }
+    }
+  }
+
+  /* Responsivo Mobile */
+  @media screen and (max-width: 768px) {
+    .hdm-cart-items-container {
+      padding: 0px 16px 16px 16px; /* Reduz o padding lateral no mobile */
+    }
+
+    .hdm-cart-item {
+      grid-template-columns: 80px 1fr;
+      grid-template-areas: 
+        "media details"
+        "actions price"
+        "error error";
+      gap: 15px;
+      padding: 16px 0;
+    }
+
+    .hdm-cart-item__image-link {
+      width: 80px;
+      height: 80px;
+    }
+
+    .hdm-cart-item__actions {
+      align-items: flex-start;
+    }
+
+    .hdm-cart-item__price-group {
+      align-items: flex-end;
+    }
+  }
+{% endstylesheet %}

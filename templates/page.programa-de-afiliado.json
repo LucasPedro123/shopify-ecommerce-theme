@@ -1,0 +1,190 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "hdm_page_affiliates_mhDPUy": {
+      "type": "hdm-page-affiliates",
+      "blocks": {
+        "benefit_q3U7zm": {
+          "type": "benefit",
+          "settings": {
+            "title": "Aumentar sua renda",
+            "text": "Com comissões sobre vendas e potencializar seus ganhos."
+          }
+        },
+        "benefit_xwxgR7": {
+          "type": "benefit",
+          "settings": {
+            "title": "Cupom nominal",
+            "text": "Com seu nome exclusivo para seus seguidores"
+          }
+        },
+        "benefit_yG7W4G": {
+          "type": "benefit",
+          "settings": {
+            "title": "espaço personalizado",
+            "text": "Página no site personalizada para divulgar promoções"
+          }
+        },
+        "step_fVMKRW": {
+          "type": "step",
+          "settings": {
+            "text": "Preencha o formulário do programa"
+          }
+        },
+        "step_TVzbDq": {
+          "type": "step",
+          "settings": {
+            "text": "Avaliação de pré-requisito pelo time"
+          }
+        },
+        "step_Yh8XBA": {
+          "type": "step",
+          "settings": {
+            "text": "Retorno da aprovação e apresentação"
+          }
+        },
+        "step_bpBwih": {
+          "type": "step",
+          "settings": {
+            "text": "comece a vender com a gente"
+          }
+        },
+        "prerequisite_XYKc43": {
+          "type": "prerequisite",
+          "settings": {
+            "text": "SER MAIOR DE 18 ANOS"
+          }
+        },
+        "prerequisite_eLG7rY": {
+          "type": "prerequisite",
+          "settings": {
+            "text": "SER ENTUSIASTA DE COSMÉTICOS"
+          }
+        },
+        "prerequisite_K9U9Bg": {
+          "type": "prerequisite",
+          "settings": {
+            "text": "TER O INSTAGRAM ABERTO"
+          }
+        },
+        "prerequisite_K3BtMT": {
+          "type": "prerequisite",
+          "settings": {
+            "text": "TER CONTA BANCÁRIA DE PESSOA JURÍDICA LIGADA AO CNPJ"
+          }
+        },
+        "faq_4V7Gh9": {
+          "type": "faq",
+          "settings": {
+            "question": "Como funciona o pagamento?",
+            "answer": "<p>O período de apuração do ciclo mensal vai do primeiro ao último dia útil do mês. O pagamento ocorre via depósito em conta em até 20 dias úteis após a emissão e envio da Nota Fiscal por parte do afiliado, em conta previamente cadastrada e atrelada ao CNPJ. Para ser elegível ao pagamento mensal, o afiliado deverá acumular no mínimo R$250,00 em comissão.</p>"
+          }
+        },
+        "faq_8N4e7h": {
+          "type": "faq",
+          "settings": {
+            "question": "Existe algum termo de exclusividade?",
+            "answer": "<p>Não. Hoje não há nenhuma exclusividade com a nossa marca, podendo o afiliado estar inscrito em outros programas de afiliação de outras marcas. O que está previsto é a questão de confidencialidade, em que o afiliado se compromete a não divulgar nenhuma informação a respeito do funcionamento ou sobre os benefícios oferecidos pelo programa.</p>"
+          }
+        },
+        "faq_wWQCxG": {
+          "type": "faq",
+          "settings": {
+            "question": "Como ser afiliado?",
+            "answer": "<p>Confira o passo a passo para se tornar um afiliado e começar a vender em HDM Beauty</p><p><strong>1 -</strong> Preencha o formulário</p><p><strong>2 - </strong>Avaliação de pré-requisitos pelo time</p><p><strong>3 -</strong> Retorno da aprovação e agenda de apresentação sobre o programa</p><p><strong>4 -</strong> Confirmação de interesse e finalização do cadastro</p><p><strong>5 - </strong>Acesso à sua loja personalizada e iniciar as vendas com a gente</p>"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_q3U7zm",
+        "benefit_xwxgR7",
+        "benefit_yG7W4G",
+        "step_fVMKRW",
+        "step_TVzbDq",
+        "step_Yh8XBA",
+        "step_bpBwih",
+        "prerequisite_XYKc43",
+        "prerequisite_eLG7rY",
+        "prerequisite_K9U9Bg",
+        "prerequisite_K3BtMT",
+        "faq_4V7Gh9",
+        "faq_8N4e7h",
+        "faq_wWQCxG"
+      ],
+      "name": "Landing Page - Afiliados HDM",
+      "settings": {
+        "primary_color": "#6460da",
+        "primary_light_color": "#e2e0ff",
+        "text_color": "#333333",
+        "bg_color": "#fafafa",
+        "hero_image": "shopify://shop_images/741814245fa209a2691c45fb3dc98c05.jpg",
+        "hero_logo": "shopify://shop_images/favicon-hdmbeauty.svg",
+        "hero_title": "Transforme sua influência em um negócio rentável.",
+        "cta_text": "Inscreva-se",
+        "cta_link": "",
+        "reqs_image": "shopify://shop_images/Analyzing_Source_Image_I_m_currently_analyzing_the_source_image_focusing_on_the_subject_s_features._Specifically_I_am_noting_the_woman_s_blue_eyes_and_honey-blonde_hair._I_m_aiming_to.png",
+        "steps_image": "shopify://shop_images/c40e58b4b194635f572500a2cedfef31.jpg"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "hdm_page_affiliates_mhDPUy"
+  ]
+}

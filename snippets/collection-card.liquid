@@ -18,6 +18,14 @@
   %}
 {%- enddoc -%}
 
+{% style %}
+  {% if request.visual_preview_mode %}
+    .collection-card {
+      min-width: 250px;
+    }
+  {% endif %}
+{% endstyle %}
+
 {% liquid
   assign onboarding = false
   assign block_settings = block.settings
@@ -37,12 +45,15 @@
     {% if block_settings.inherit_color_scheme == false %} color-{{ block_settings.color_scheme }}{% endif %}
   "
   data-block-id="{{ block.id }}"
+  {% if onboarding %}
+    data-placeholder="true"
+  {% endif %}
   style="
     {% render 'border-override', settings: block_settings %}
     --horizontal-alignment: {{ block_settings.horizontal_alignment }};
     --vertical-alignment: {{ block_settings.vertical_alignment }};
     --background-overlay-color: {{ block_settings.overlay_color }};
-    --collection-card-gap: {{ block_settings.collection_card_gap }}px;
+    --gap: {{ block_settings.collection_card_gap }}px;
   "
   {{- block.shopify_attributes -}}
 >
@@ -66,8 +77,7 @@
   .collection-card {
     --fixed-card-height: var(--height-small);
 
-    width: 100%;
-    position: relative;
+    flex: 1 1 var(--card-width-small);
   }
 
   .collection-card > svg {
@@ -76,23 +86,12 @@
     aspect-ratio: var(--ratio);
   }
 
-  .collection-card__inner {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    gap: var(--collection-card-gap);
-    display: flex;
-    flex-direction: column;
-    border-radius: 32px;
-  }
-
   .collection-card--image-bg .collection-card__inner {
     height: 100%;
   }
 
   .collection-card__inner {
-    z-index: var(--layer-flat);
-    pointer-events: none;
+    gap: var(--gap);
 
     a,
     button {
@@ -107,34 +106,8 @@
   }
 
   .collection-card__content {
-    position: absolute;
-    bottom: -0.05px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    height: max-content;
-    width: 100%;
     max-width: 100%;
-    gap: var(--collection-card-gap);
-    flex-direction: column;
-    align-items: var(--horizontal-alignment);
-    justify-content: space-between;
-    padding: 10px 16px;
-    -webkit-backdrop-filter: blur(40px);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
-    background: radial-gradient(90.16% 143.01% at 15.32% 21.04%, rgba(165, 239, 255, .2) 0, rgba(110, 191, 244, .045) 77.08%, rgba(70, 144, 213, 0) 100%);
-    background-blend-mode: overlay, normal;
-    border-radius: 0 0 32px 32px;
-  }
-
-  .collection-card__link {
-    position: absolute;
-    inset: 0;
-
-    /* allows focus outline to have radius in supported browsers */
-    border-radius: var(--border-radius);
+    --flex-wrap: wrap;
   }
 
   /* Nested image block rules */
@@ -145,6 +118,10 @@
 
   .collection-card.collection-card--image-bg .collection-card__content {
     padding: var(--padding-lg);
+  }
+
+  .collection-card--image-height-fixed {
+    height: 100%;
   }
 
   /* Bento layout rules */
@@ -158,18 +135,11 @@
     aspect-ratio: unset;
   }
 
-  .collection-card__image  {
+  .collection-card__image .image-block__image {
     object-fit: cover;
     width: 100%;
-    height: 200px;
-    max-height: 200px;
+    height: 100%;
     max-width: 100%;
-
-    .img{
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-    }
   }
 
   .collection-card--image-bg .collection-card__image {
@@ -187,27 +157,6 @@
     &.collection-card.collection-card--image-bg,
     &.collection-card .placeholder-svg {
       aspect-ratio: 99;
-    }
-
-    .collection-card__image {
-      aspect-ratio: 99;
-      height: 100%;
-    }
-
-    .collection-card__inner {
-      overflow: hidden;
-      border-radius: 32px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .collection-card__content {
-      flex-shrink: 0;
-    }
-
-    &:not(.collection-card--image-bg) .collection-card__content {
-      height: auto;
     }
   }
 {% endstylesheet %}

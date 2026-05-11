@@ -1,4 +1,20 @@
 // Theme editor specific logic
+import { updateAllHeaderCustomProperties } from '@theme/utilities';
+
+/** @type {{ activeSlideIndex: number | null }} */
+const layeredSlideshowState = {
+  activeSlideIndex: null,
+};
+
+/** @type {{ activeSlideIndex: number | null }} */
+const carouselState = {
+  activeSlideIndex: null,
+};
+
+/** @type {{ activeSlideIndex: number | null }} */
+const slideshowState = {
+  activeSlideIndex: null,
+};
 
 /**
  * @param {Event} event
@@ -29,6 +45,7 @@ document.addEventListener('shopify:block:select', function (event) {
       }
     }
 
+    // Keep track of the selected slide for the slideshow
     const slide = event.target.closest('slideshow-slide');
 
     if (slide) {
@@ -38,12 +55,60 @@ document.addEventListener('shopify:block:select', function (event) {
       if (slideshow) {
         const index = Array.from(slide.parentElement?.children ?? []).indexOf(slide);
 
-        if (index !== -1) {
-          // Pause autoplay
-          slideshow.pause();
-          slideshow.select(index);
+        if (index === -1) return;
+
+        // Compare before updating to detect if same slide is selected again
+        const isAlreadyActive = index === slideshowState.activeSlideIndex;
+        slideshowState.activeSlideIndex = index;
+        // Pause autoplay
+        slideshow.pause();
+        slideshow.select(index, undefined, { animate: isAlreadyActive ? false : true });
+      }
+    }
+
+    // Keep track of the selected slide for the carousel
+    const carouselCard = event.target.closest('[data-carousel-card]');
+
+    if (carouselCard) {
+      /** @type {import('./slideshow').Slideshow | null} */
+      const slideshow = carouselCard.closest('slideshow-component');
+
+      if (slideshow) {
+        const cards = Array.from(carouselCard.parentElement?.children ?? []);
+        if (!cards) return;
+
+        const index = cards.indexOf(carouselCard);
+
+        if (index === -1) return;
+
+        // Compare before updating to detect if same slide is selected again
+        const isAlreadyActive = index === carouselState.activeSlideIndex;
+        carouselState.activeSlideIndex = index;
+        const targetCard = cards[index];
+
+        if (targetCard instanceof HTMLElement) {
+          targetCard.scrollIntoView({ behavior: isAlreadyActive ? 'instant' : 'smooth', inline: 'center' });
         }
       }
+    }
+
+    // Keep track of the selected slide for the layered slideshow
+    const layeredSlideshowPanel = event.target.closest('layered-slideshow-component [role="tabpanel"]');
+
+    if (layeredSlideshowPanel) {
+      /** @type {import('./layered-slideshow').LayeredSlideshowComponent | null} */
+      const layeredSlideshow = layeredSlideshowPanel.closest('layered-slideshow-component');
+      if (!layeredSlideshow) return;
+
+      const index = Array.from(layeredSlideshow.querySelectorAll('[role="tabpanel"]')).indexOf(layeredSlideshowPanel);
+      if (index === -1) return;
+
+      // Compare before updating to detect if same slide is selected again
+      const isAlreadyActive = index === layeredSlideshowState.activeSlideIndex;
+      layeredSlideshowState.activeSlideIndex = index;
+
+      // Use instant transition if the same slide is selected again
+      layeredSlideshow.select(index, { instant: isAlreadyActive });
     }
   }
 });
@@ -65,6 +130,20 @@ document.addEventListener('shopify:block:deselect', function (event) {
   }
 });
 
+document.addEventListener('shopify:section:load', function (event) {
+  if (event.target instanceof HTMLElement && event.target.classList.contains('shopify-section-group-header-group')) {
+    updateAllHeaderCustomProperties();
+  }
+});
+
+document.addEventListener('shopify:section:unload', function (event) {
+  if (event.target instanceof HTMLElement && event.target.classList.contains('shopify-section-group-header-group')) {
+    setTimeout(() => {
+      updateAllHeaderCustomProperties();
+    }, 500);
+  }
+});
+
 /**
  * When in the theme editor, it can be frustrating to be tweaking the design of features that are implemented as a dialog
  * or any sort of overlay, because the theme editor will refresh the page and close the dialog.
@@ -75,7 +154,7 @@ document.addEventListener('shopify:block:deselect', function (event) {
 // Detect when page is about to unload
 // This helps distinguish between theme editor refreshes (which don't trigger beforeunload)
 // and actual navigation (which does trigger beforeunload)
-window.addEventListener('beforeunload', function (event) {
+window.addEventListener('beforeunload', function (_event) {
   // Set a flag to indicate that an actual unload is happening (not just a refresh)
   sessionStorage.setItem('editor-page-unloading', 'true');
 });

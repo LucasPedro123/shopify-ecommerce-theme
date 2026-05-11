@@ -1,0 +1,461 @@
+{{ 'section-custom-footer.css' | asset_url | stylesheet_tag }}
+
+<footer class="custom-footer">
+  <div class="cf-benefits-bar">
+    <div class="page-width cf-benefits-grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'benefit' -%}
+          <div class="cf-benefit-item" {{ block.shopify_attributes }}>
+            {% if block.settings.benefit_image %}
+              {{
+                block.settings.benefit_image
+                | image_url: width: 40
+                | image_tag:
+                  alt: block.settings.title,
+                  loading: 'lazy',
+                  widths: '20,40,60',
+                  sizes: '(max-width: 768px) 20px, 40px'
+              }}
+            {% endif %}
+            <span>{{ block.settings.title }}</span>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+  <div class="cf-top-area">
+    <div class="page-width cf-top-grid">
+      <div class="cf-newsletter-box">
+        <h3 class="cf-title pt-49">{{ section.settings.newsletter_title }}</h3>
+        {%- assign form_id = 'NewsletterFooter-' | append: section.id -%}
+        {% form 'customer', id: form_id, class: 'cf-form' %}
+          {%- unless form.posted_successfully? -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="cf-form-fields">
+              <div class="cf-input-container">
+                <input
+                  type="email"
+                  name="contact[email]"
+                  id="NewsletterEmail-{{ section.id }}"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  placeholder="Seu email"
+                  required
+                  class="cf-input"
+                  {% if form.errors %}
+                    aria-invalid="true"
+                  {% endif %}
+                >
+              </div>
+              <div class="cf-input-container">
+                <input
+                  type="tel"
+                  name="contact[phone]"
+                  placeholder="Seu telefone"
+                  class="cf-input"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="tel-local-prefix"
+                >
+              </div>
+              <button
+                type="submit"
+                class="custom-secondary-btn"
+                name="commit"
+                aria-label="{{ 'actions.sign_up' | t }}"
+              >
+                INSCREVER-SE
+              </button>
+            </div>
+          {%- endunless -%}
+          {%- if form.posted_successfully? -%}
+            <p class="cf-success" tabindex="-1" autofocus>Obrigado por se inscrever!</p>
+          {%- elsif form.errors -%}
+            <p class="cf-error" tabindex="-1" autofocus>
+              Erro ao se inscrever: {{ form.errors.translated_fields.email | capitalize }}
+              {{ form.errors.messages.email }}
+            </p>
+          {%- endif -%}
+        {% endform %}
+        <p class="cf-disclaimer">{{ section.settings.newsletter_disclaimer }}</p>
+      </div>
+
+      <div class="cf-info-box">
+        <div class="cf-info-item">
+          <h3 class="cf-title pt-49">PRECISA DE AJUDA?</h3>
+          <p class="pb-49">
+            <a href="mailto:{{ section.settings.email_suporte }}">{{ section.settings.email_suporte }}</a>
+          </p>
+        </div>
+        <div class="cf-info-item">
+          <h3 class="cf-title">LOJA</h3>
+          <p class="pb-49">{{ section.settings.endereco_loja | newline_to_br }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-middle-area">
+    <div class="page-width cf-middle-grid">
+      <div class="cf-menus-grid">
+        {%- for block in section.blocks -%}
+          {%- assign total_links = block.settings.menu.links.size -%}
+          {%- if block.type == 'menu' -%}
+            <details class="cf-accordion js-footer-accordion">
+              <summary class="cf-accordion-title">
+                {{ block.settings.title }}
+                <svg
+                  class="cf-icon-arrow"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </summary>
+              <ul class="cf-menu-list total-links-{{ total_links }}">
+                {%- for link in block.settings.menu.links -%}
+                  <li>
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="cf-badges-column">
+        <div class="cf-socials">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'social_media' -%}
+              {%- if block.settings.url_facebook != blank -%}
+                <a
+                  href="{{ block.settings.url_facebook }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Acessar nosso Facebook"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.url_instagram != blank -%}
+                <a
+                  href="{{ block.settings.url_instagram }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Acessar nosso Instagram"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.url_tiktok != blank -%}
+                <a
+                  href="{{ block.settings.url_tiktok }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Acessar nosso TikTok"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    class="bi bi-tiktok"
+                  >
+                    <path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.url_linkedin != blank -%}
+                <a
+                  href="{{ block.settings.url_linkedin }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Acessar nosso LinkedIn"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.url_whatsapp != blank -%}
+                <a
+                  href="{{ block.settings.url_whatsapp }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Falar conosco no WhatsApp"
+                >
+                  <svg
+                    xmlns="http://www.w3.org"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                  </svg>
+                </a>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <div class="cf-signature-box"><span class="cf-sig-logo">Hdm Beauty</span> CLUBE DE ASSINATURA</div>
+
+        <div class="cf-trust-badges">
+          {% comment %}
+            <div id="ra-verified-seal">
+                <div id="ra-verified-seal">
+                  <script
+                    async
+                    type="text/javascript"
+                    id="ra-embed-verified-seal"
+                    src="https://s3.amazonaws.com/raichu-beta/ra-verified/bundle.js"
+                    data-id="VUViaDI1MkE0WmlQUGhXZTpoZG0tYWxsLXBhcnRzLWNvbWVyY2lvLWRlLXBlY2FzLWx0ZGE="
+                    data-target="ra-verified-seal"
+                    data-model="horizontal_1"
+                  ></script>
+                </div>
+              </div>
+          {% endcomment %}
+          <a
+            style="width: 100%"
+            href="https://www.reclameaqui.com.br/empresa/hdm-all-parts-comercio-de-pecas-ltda/?utm_source=referral&utm_medium=embbed&utm_campaign=ra_verificada&utm_term=horizontal_1"
+          >
+            <img
+              src="https://blog.reclameaqui.com.br/wp-content/uploads/2019/10/CAPAS-JANEIRO-2024-41-300x87.png"
+              width="100"
+              height="50"
+              alt="RA1000 selo de verificada pelo Reclame AQUI"
+              loading="lazy"
+            >
+          </a>
+          <a
+            style="width: 100%"
+            href="https://transparencyreport.google.com/safe-browsing/search?url=hdmbeauty.com.br"
+          >
+            <img
+              src="{{ 'security-google-icon.svg' | asset_url }}"
+              width="100"
+              height="50"
+              alt="Imagem de Selo da Google"
+              loading="lazy"
+              class="cf-badge-img"
+            >
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-bottom-area">
+    <div class="footer-col-copyright page-width center">
+      <div class="cf-legal-links text-sm">
+        <div style="display: flex;">
+          <a href="{{ shop.privacy_policy.url | default: '#' }}">Política De Privacidade</a> |
+          <a href="{{ shop.terms_of_service.url | default: '#' }}">Aviso De Privacidade</a>
+        </div>
+        <p class="cf-copyright text-sm">{{ section.settings.texto_copyright }}</p>
+      </div>
+      <p class="cf-copyright">{{ section.settings.texto_copyright_bottom }}</p>
+      <p class="cf-disclaimer-bot">Todos Os Direitos Reservados.</p>
+
+      <div class="cf-payment-icons">
+        {%- for type in shop.enabled_payment_types -%}
+          {{ type | payment_type_svg_tag: class: 'icon-payment' }}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ 'custom-footer.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Footer By Dev Lucas",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Área 1: Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Título da Newsletter",
+      "default": "CADASTRE-SE PARA RECEBER OFERTAS E PROMOÇÕES ESPECIAIS."
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_disclaimer",
+      "label": "Texto de consentimento",
+      "default": "Ao inserir seu e-mail e clicar em inscrever-se..."
+    },
+    {
+      "type": "header",
+      "content": "Área 1: Contato e Loja"
+    },
+    {
+      "type": "text",
+      "id": "email_suporte",
+      "label": "E-mail de Suporte",
+      "default": "sac@hdmbeauty.com.br"
+    },
+    {
+      "type": "textarea",
+      "id": "endereco_loja",
+      "label": "Endereço da Loja",
+      "default": "HDM ALL PARTS LTDA\n252 RUA IGUATEMI.\nSÃO PAULO, SP"
+    },
+    {
+      "type": "header",
+      "content": "Área 3: Rodapé Final"
+    },
+    {
+      "type": "textarea",
+      "id": "texto_copyright",
+      "label": "Texto Legal / Direitos",
+      "default": "Todo O Conteúdo É Protegido Por Direitos Autorais..."
+    },
+    {
+      "type": "textarea",
+      "id": "texto_copyright_bottom",
+      "label": "Texto Legal / Direitos - Bottom",
+      "default": "Todo o conteúdo do site, todas as fotos, imagens, logotipos, marcas, dizeres, som, software..."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Coluna de Navegação",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título da Coluna",
+          "default": "DEPARTAMENTOS"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu de Links"
+        }
+      ]
+    },
+    {
+      "type": "social_media",
+      "name": "Redes Sociais",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "url_facebook",
+          "label": "Facebook"
+        },
+        {
+          "type": "text",
+          "id": "url_instagram",
+          "label": "Instagram"
+        },
+        {
+          "type": "text",
+          "id": "url_tiktok",
+          "label": "TikTok"
+        },
+        {
+          "type": "text",
+          "id": "url_linkedin",
+          "label": "LinkedIn"
+        },
+        {
+          "type": "text",
+          "id": "url_whatsapp",
+          "label": "WhatsApp"
+        }
+      ]
+    },
+    {
+      "type": "benefit",
+      "name": "Selo de Benefício (Topo)",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Texto do Benefício",
+          "default": "Free Delivery"
+        },
+        {
+          "type": "image_picker",
+          "id": "benefit_image",
+          "label": "Recomenda-se Imagem de 20px 20px"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer By Dev Lucas",
+      "blocks": [
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "menu" },
+        { "type": "menu" },
+        { "type": "menu" },
+        { "type": "social_media" }
+      ]
+    }
+  ]
+}
+{% endschema %}

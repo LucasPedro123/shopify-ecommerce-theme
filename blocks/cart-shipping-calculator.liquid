@@ -1,0 +1,309 @@
+{%- comment -%} HDM Beauty - Calculadora de Frete Premium {%- endcomment -%}
+
+<div class="hdm-shipping-calc" {{ block.shopify_attributes }}>
+  <div class="hdm-shipping-calc__header">
+    <h3>{{ block.settings.title | default: 'Consulte o frete e o prazo de entrega' }}</h3>
+  </div>
+
+  <div class="hdm-shipping-calc__form">
+    <div class="hdm-shipping-input-group">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#666"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="1" y="3" width="15" height="13"></rect>
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+      </svg>
+      <input type="text" id="hdm-cep-input" placeholder="Digite seu CEP aqui" maxlength="9" autocomplete="postal-code">
+    </div>
+
+    <button
+      type="button"
+      id="hdm-cep-submit"
+      class="cart-summary__continue-btn"
+      style="margin-top: 0px; width: max-content;"
+    >
+      Ok
+    </button>
+
+    <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" class="hdm-shipping-link"
+      >Não sei meu CEP</a
+    >
+  </div>
+
+  <div id="hdm-shipping-results" class="hdm-shipping-results hidden">
+    <div class="hdm-shipping-loader hidden" id="hdm-shipping-loader">Calculando...</div>
+    <ul id="hdm-shipping-list" class="hdm-shipping-list list-unstyled"></ul>
+  </div>
+</div>
+
+<script>
+  if (!window.cartShippingScriptLoaded) {
+    document.addEventListener('DOMContentLoaded', function () {
+      const cepInput = document.getElementById('hdm-cep-input');
+      const submitBtn = document.getElementById('hdm-cep-submit');
+      const resultsContainer = document.getElementById('hdm-shipping-results');
+      const resultsList = document.getElementById('hdm-shipping-list');
+      const loader = document.getElementById('hdm-shipping-loader');
+
+      if (!cepInput || !submitBtn) return;
+
+      // 1. Máscara de CEP (00000-000)
+      cepInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 5) value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+      });
+
+      // 2. Recuperar do LocalStorage
+      const savedCEP = localStorage.getItem('hdm_user_cep');
+      if (savedCEP) {
+        cepInput.value = savedCEP;
+        injectCepIntoCheckout(savedCEP);
+      }
+
+      // 3. Ação de Clique
+      submitBtn.addEventListener('click', function () {
+        const cepOnlyNumbers = cepInput.value.replace(/\D/g, '');
+        if (cepOnlyNumbers.length === 8) {
+          calculateShipping(cepOnlyNumbers);
+        } else {
+          alert('Por favor, digite um CEP válido com 8 dígitos.');
+        }
+      });
+
+      // Permitir Enter no input
+      cepInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitBtn.click();
+        }
+      });
+
+      // Injeta o CEP no form do carrinho para ir direto pro Checkout
+      function injectCepIntoCheckout(cepString) {
+        const cartForms = document.querySelectorAll('form[action="/cart"]');
+        cartForms.forEach(form => {
+          let hiddenZip = form.querySelector('input[name="checkout[shipping_address][zip]"]');
+          if (!hiddenZip) {
+            hiddenZip = document.createElement('input');
+            hiddenZip.type = 'hidden';
+            hiddenZip.name = 'checkout[shipping_address][zip]';
+            form.appendChild(hiddenZip);
+          }
+          hiddenZip.value = cepString;
+        });
+      }
+
+      // 4. Validação Prévia com ViaCEP
+      function calculateShipping(cepOnlyNumbers) {
+        resultsContainer.classList.remove('hidden');
+        loader.classList.remove('hidden');
+        resultsList.innerHTML = '';
+
+        localStorage.setItem('hdm_user_cep', cepInput.value);
+
+        fetch(`https://viacep.com.br/ws/${cepOnlyNumbers}/json/`)
+          .then((response) => response.json())
+          .then((viaCepData) => {
+            if (viaCepData.erro) {
+              throw new Error('CEP inválido ou não encontrado na base dos Correios.');
+            }
+
+            injectCepIntoCheckout(cepInput.value);
+
+            const formattedCep = encodeURIComponent(cepInput.value);
+            const province = encodeURIComponent(viaCepData.uf);
+            const city = encodeURIComponent(viaCepData.localidade);
+
+            const queryParams = `shipping_address[zip]=${formattedCep}&shipping_address[country]=BR&shipping_address[province]=${province}&shipping_address[city]=${city}`;
+
+            return fetch(`/cart/prepare_shipping_rates.json?${queryParams}`, { method: 'POST' }).then(
+              () => queryParams
+            );
+          })
+          .then((queryParams) => {
+            pollShippingRates(queryParams, 10);
+          })
+          .catch((error) => {
+            showError(error.message || 'Erro ao consultar o CEP. Verifique e tente novamente.');
+          });
+      }
+
+      function pollShippingRates(queryParams, retriesLeft) {
+        fetch(`/cart/async_shipping_rates.json?${queryParams}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error || data.errors || (data.message && data.message === 'Cart Error')) {
+              showError('Não foi possível calcular o frete. Verifique se o carrinho possui itens com peso cadastrado.');
+              return;
+            }
+
+            if (!data || !data.shipping_rates) {
+              if (retriesLeft > 0) {
+                setTimeout(() => pollShippingRates(queryParams, retriesLeft - 1), 1000);
+              } else {
+                showError('Tempo limite excedido. A transportadora demorou a responder.');
+              }
+              return;
+            }
+
+            renderRates(data.shipping_rates);
+          })
+          .catch((error) => {
+            if (retriesLeft > 0) {
+              setTimeout(() => pollShippingRates(queryParams, retriesLeft - 1), 1000);
+            } else {
+              showError('Erro ao buscar as opções de entrega.');
+            }
+          });
+      }
+
+      function renderRates(rates) {
+        loader.classList.add('hidden');
+
+        if (rates && rates.length > 0) {
+          
+          // Ordena as opções: Joga 'Express', '24h' ou 'Local' sempre pro topo
+          rates.sort((a, b) => {
+            const aIsExp = a.name.toLowerCase().includes('24h') || a.name.toLowerCase().includes('local') || a.name.toLowerCase().includes('express');
+            const bIsExp = b.name.toLowerCase().includes('24h') || b.name.toLowerCase().includes('local') || b.name.toLowerCase().includes('express');
+            if (aIsExp && !bIsExp) return -1;
+            if (!aIsExp && bIsExp) return 1;
+            return parseFloat(a.price) - parseFloat(b.price);
+          });
+
+          // Função inteligente que monta a linha e avalia prazos de entrega
+          const createRateHtml = (rate) => {
+            const price = parseFloat(rate.price) === 0 ? 'Grátis' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(rate.price);
+            const isExpress = rate.name.toLowerCase().includes('24h') || rate.name.toLowerCase().includes('local') || rate.name.toLowerCase().includes('express');
+            
+            // Lógica de Prazos
+            let deliveryText = '';
+            if (isExpress) {
+              deliveryText = 'Entrega em até 24h';
+            } else if (rate.delivery_days && rate.delivery_days.length > 0) {
+              const maxDays = Math.max(...rate.delivery_days);
+              deliveryText = `Em até ${maxDays} dia${maxDays > 1 ? 's' : ''} útei${maxDays > 1 ? 's' : 'l'}`;
+            } else if (rate.delivery_date) {
+              deliveryText = `Previsão: ${new Date(rate.delivery_date).toLocaleDateString('pt-BR')}`;
+            }
+
+            return `
+              <li class="hdm-shipping-rate ${isExpress ? 'hdm-shipping-rate--express' : ''}">
+                <div class="hdm-shipping-rate__info">
+                  <div class="hdm-shipping-rate__name-group">
+                    <span class="hdm-shipping-rate__name">${rate.name}</span>
+                    ${isExpress ? '<span class="hdm-shipping-rate__badge">Mais Rápido</span>' : ''}
+                  </div>
+                  ${deliveryText ? `<span class="hdm-shipping-rate__time">${deliveryText}</span>` : ''}
+                </div>
+                <strong class="hdm-shipping-rate__price">${price}</strong>
+              </li>
+            `;
+          };
+
+          // Renderiza o campeão (Posição 0) aberto
+          let html = createRateHtml(rates[0]);
+
+          // Renderiza os demais no Accordion "Ver outras opções"
+          if (rates.length > 1) {
+            html += `
+              <li class="hdm-shipping-accordion-wrapper">
+                <details class="hdm-shipping-accordion">
+                  <summary>
+                    Ver outras opções de Entrega
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </summary>
+                  <ul class="list-unstyled hdm-shipping-accordion-list">
+            `;
+            for (let i = 1; i < rates.length; i++) {
+              html += createRateHtml(rates[i]);
+            }
+            html += `
+                  </ul>
+                </details>
+              </li>
+            `;
+          }
+
+          resultsList.innerHTML = html;
+        } else {
+          showError('Nenhuma opção de entrega encontrada para este CEP.');
+        }
+      }
+
+      function showError(message) {
+        loader.classList.add('hidden');
+        resultsList.innerHTML = `<li class="hdm-shipping-rate__error">${message}</li>`;
+      }
+    });
+    window.cartShippingScriptLoaded = true;
+  }
+</script>
+
+<style>
+  .hdm-shipping-calc { background: #ffffff; border: 1px solid #eaeaea; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .hdm-shipping-calc__header h3 { font-size: 14px; font-weight: 700; color: #111; margin: 0 0 16px 0; }
+  .hdm-shipping-calc__form { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .hdm-shipping-input-group { display: flex; align-items: center; border: 1px solid #dcdcdc; border-radius: 4px; padding: 0 12px; flex: 1; max-width: 250px; background: #fff; transition: border-color 0.2s; height: 51px; }
+  .hdm-shipping-input-group:focus-within { border-color: #7c79e7; }
+  .hdm-shipping-input-group svg { margin-right: 8px; }
+  .hdm-shipping-input-group input { border: none; outline: none; height: 42px; width: 100%; font-size: 14px; color: #333; }
+  .hdm-shipping-link { font-size: 13px; color: #7c79e7; text-decoration: underline; margin-left: 8px; }
+  
+  .hdm-shipping-results { margin-top: 16px; padding-top: 16px; border-top: 1px dashed #eaeaea; }
+  .hdm-shipping-results.hidden { display: none; }
+  .hdm-shipping-loader { font-size: 13px; color: #666; }
+  
+  .hdm-shipping-rate { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
+  .hdm-shipping-rate:last-child { border-bottom: none; }
+  
+  .hdm-shipping-rate__info { display: flex; flex-direction: column; gap: 4px; }
+  .hdm-shipping-rate__name-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hdm-shipping-rate__name { font-size: 14px; color: #444; }
+  .hdm-shipping-rate__time { font-size: 12px; color: #666; font-weight: 500; }
+  .hdm-shipping-rate__price { font-size: 14px; color: #111; white-space: nowrap; }
+  
+  .hdm-shipping-rate--express { background-color: #f0fdf4; border-radius: 6px; border: 1px solid #bbf7d0; }
+  .hdm-shipping-rate--express .hdm-shipping-rate__name { color: #166534; font-weight: 600; }
+  .hdm-shipping-rate__badge { background: #22c55e; color: #fff; font-size: 10px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  .hdm-shipping-rate__error { color: #dc2626; font-size: 13px; }
+
+  /* Estilos do Accordion de Frete */
+  .hdm-shipping-accordion-wrapper { padding-top: 10px; }
+  .hdm-shipping-accordion summary { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #7c79e7; cursor: pointer; list-style: none; padding: 8px 10px; border-top: 1px solid #eaeaea; transition: background 0.2s; border-radius: 4px; }
+  .hdm-shipping-accordion summary:hover { background: #fdfafb; }
+  .hdm-shipping-accordion summary::-webkit-details-marker { display: none; }
+  .hdm-shipping-accordion[open] summary svg { transform: rotate(180deg); }
+  .hdm-shipping-accordion summary svg { transition: transform 0.3s ease; }
+  
+  .hdm-shipping-accordion-list { margin: 10px 0 0 0; padding: 0 0 0 10px; border-left: 2px solid #f4f4f4; }
+  .hdm-shipping-accordion-list .hdm-shipping-rate { padding: 8px 10px; }
+
+  @media screen and (max-width: 768px){
+      .hdm-shipping-input-group{ max-width: 100%; min-width: 200px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Calculadora de Frete",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título Principal",
+      "default": "Consulte o frete e o prazo de entrega"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,615 @@
+{% doc %}
+  @prompt
+    Um layout editorial no estilo de revista
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-editorial-layout-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px;
+  }
+
+  .ai-editorial-container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .ai-editorial-featured-{{ ai_gen_id }} {
+    grid-column: span 8;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-editorial-featured-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-editorial-featured-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 600px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-editorial-featured-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-editorial-featured-content-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: {{ block.settings.content_padding }}px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+    color: {{ block.settings.featured_text_color }};
+  }
+
+  .ai-editorial-featured-category-{{ ai_gen_id }} {
+    font-family: {{ block.settings.category_font }};
+    font-size: {{ block.settings.category_size }}px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: block;
+    color: {{ block.settings.category_color }};
+  }
+
+  .ai-editorial-featured-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.featured_title_size }}px;
+    line-height: 1.2;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+  }
+
+  .ai-editorial-featured-excerpt-{{ ai_gen_id }} {
+    font-size: {{ block.settings.excerpt_size }}px;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .ai-editorial-sidebar-{{ ai_gen_id }} {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.grid_gap }}px;
+  }
+
+  .ai-editorial-article-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+    background-color: {{ block.settings.article_bg_color }};
+    border: {{ block.settings.article_border_width }}px solid {{ block.settings.article_border_color }};
+  }
+
+  .ai-editorial-article-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-editorial-article-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 200px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-editorial-article-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 150px;
+    max-height: 150px;
+  }
+
+  .ai-editorial-article-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.article_padding }}px;
+  }
+
+  .ai-editorial-article-category-{{ ai_gen_id }} {
+    font-family: {{ block.settings.category_font }};
+    font-size: {{ block.settings.article_category_size }}px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    display: block;
+    color: {{ block.settings.category_color }};
+  }
+
+  .ai-editorial-article-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.article_title_size }}px;
+    line-height: 1.3;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: {{ block.settings.article_text_color }};
+  }
+
+  .ai-editorial-article-excerpt-{{ ai_gen_id }} {
+    font-size: {{ block.settings.article_excerpt_size }}px;
+    line-height: 1.5;
+    margin: 0;
+    color: {{ block.settings.article_text_color }};
+    opacity: 0.8;
+  }
+
+  .ai-editorial-divider-{{ ai_gen_id }} {
+    height: {{ block.settings.divider_height }}px;
+    background-color: {{ block.settings.divider_color }};
+    margin: {{ block.settings.divider_margin }}px 0;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-editorial-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-editorial-featured-{{ ai_gen_id }},
+    .ai-editorial-sidebar-{{ ai_gen_id }} {
+      grid-column: span 1;
+    }
+
+    .ai-editorial-featured-placeholder-{{ ai_gen_id }} {
+      height: 400px;
+    }
+
+    .ai-editorial-featured-title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.featured_title_size }}px * 0.7);
+    }
+
+    .ai-editorial-article-title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.article_title_size }}px * 0.9);
+    }
+  }
+{% endstyle %}
+
+<div class="ai-editorial-layout-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-editorial-container-{{ ai_gen_id }}">
+    <article class="ai-editorial-featured-{{ ai_gen_id }}">
+      {% if block.settings.featured_image %}
+        <img
+          src="{{ block.settings.featured_image | image_url: width: 1600 }}"
+          alt="{{ block.settings.featured_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.featured_image.width }}"
+          height="{{ block.settings.featured_image.height }}"
+          class="ai-editorial-featured-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-editorial-featured-placeholder-{{ ai_gen_id }}">
+          {{ 'hero-apparel-1' | placeholder_svg_tag }}
+        </div>
+      {% endif %}
+      
+      <div class="ai-editorial-featured-content-{{ ai_gen_id }}">
+        {% if block.settings.featured_category != blank %}
+          <span class="ai-editorial-featured-category-{{ ai_gen_id }}">{{ block.settings.featured_category }}</span>
+        {% endif %}
+        
+        {% if block.settings.featured_title != blank %}
+          <h2 class="ai-editorial-featured-title-{{ ai_gen_id }}">{{ block.settings.featured_title }}</h2>
+        {% endif %}
+        
+        {% if block.settings.featured_excerpt != blank %}
+          <p class="ai-editorial-featured-excerpt-{{ ai_gen_id }}">{{ block.settings.featured_excerpt }}</p>
+        {% endif %}
+      </div>
+    </article>
+
+    <aside class="ai-editorial-sidebar-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign image_key = 'article_' | append: i | append: '_image'
+          assign category_key = 'article_' | append: i | append: '_category'
+          assign title_key = 'article_' | append: i | append: '_title'
+          assign excerpt_key = 'article_' | append: i | append: '_excerpt'
+          
+          assign article_image = block.settings[image_key]
+          assign article_category = block.settings[category_key]
+          assign article_title = block.settings[title_key]
+          assign article_excerpt = block.settings[excerpt_key]
+        %}
+        
+        <article class="ai-editorial-article-{{ ai_gen_id }}">
+          {% if article_image %}
+            <img
+              src="{{ article_image | image_url: width: 600 }}"
+              alt="{{ article_image.alt | escape }}"
+              loading="lazy"
+              width="{{ article_image.width }}"
+              height="{{ article_image.height }}"
+              class="ai-editorial-article-image-{{ ai_gen_id }}"
+            >
+          {% else %}
+            <div class="ai-editorial-article-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+          
+          <div class="ai-editorial-article-content-{{ ai_gen_id }}">
+            {% if article_category != blank %}
+              <span class="ai-editorial-article-category-{{ ai_gen_id }}">{{ article_category }}</span>
+            {% endif %}
+            
+            {% if article_title != blank %}
+              <h3 class="ai-editorial-article-title-{{ ai_gen_id }}">{{ article_title }}</h3>
+            {% endif %}
+            
+            {% if article_excerpt != blank %}
+              <p class="ai-editorial-article-excerpt-{{ ai_gen_id }}">{{ article_excerpt }}</p>
+            {% endif %}
+          </div>
+        </article>
+        
+        {% if i < 3 and block.settings.show_dividers %}
+          <div class="ai-editorial-divider-{{ ai_gen_id }}"></div>
+        {% endif %}
+      {% endfor %}
+    </aside>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Layout editorial",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Artigo em destaque"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image",
+      "label": "Imagem"
+    },
+    {
+      "type": "text",
+      "id": "featured_category",
+      "label": "Categoria",
+      "default": "Destaque"
+    },
+    {
+      "type": "text",
+      "id": "featured_title",
+      "label": "Título",
+      "default": "A nova era da beleza sustentável"
+    },
+    {
+      "type": "textarea",
+      "id": "featured_excerpt",
+      "label": "Resumo",
+      "default": "Descubra como as marcas estão revolucionando o mercado com produtos eco-friendly e embalagens sustentáveis."
+    },
+    {
+      "type": "range",
+      "id": "featured_title_size",
+      "label": "Tamanho do título",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "featured_text_color",
+      "label": "Cor do texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Artigo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "article_1_image",
+      "label": "Imagem"
+    },
+    {
+      "type": "text",
+      "id": "article_1_category",
+      "label": "Categoria",
+      "default": "Tendências"
+    },
+    {
+      "type": "text",
+      "id": "article_1_title",
+      "label": "Título",
+      "default": "Skincare minimalista: menos é mais"
+    },
+    {
+      "type": "textarea",
+      "id": "article_1_excerpt",
+      "label": "Resumo",
+      "default": "A tendência que está conquistando os cuidados com a pele."
+    },
+    {
+      "type": "header",
+      "content": "Artigo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "article_2_image",
+      "label": "Imagem"
+    },
+    {
+      "type": "text",
+      "id": "article_2_category",
+      "label": "Categoria",
+      "default": "Dicas"
+    },
+    {
+      "type": "text",
+      "id": "article_2_title",
+      "label": "Título",
+      "default": "Como escolher o sérum ideal"
+    },
+    {
+      "type": "textarea",
+      "id": "article_2_excerpt",
+      "label": "Resumo",
+      "default": "Guia completo para encontrar o produto perfeito para sua pele."
+    },
+    {
+      "type": "header",
+      "content": "Artigo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "article_3_image",
+      "label": "Imagem"
+    },
+    {
+      "type": "text",
+      "id": "article_3_category",
+      "label": "Categoria",
+      "default": "Novidades"
+    },
+    {
+      "type": "text",
+      "id": "article_3_title",
+      "label": "Título",
+      "default": "Lançamentos do mês"
+    },
+    {
+      "type": "textarea",
+      "id": "article_3_excerpt",
+      "label": "Resumo",
+      "default": "Conheça os produtos que acabaram de chegar."
+    },
+    {
+      "type": "header",
+      "content": "Estilo"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Largura no desktop",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Cor de fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Espaçamento da seção",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Espaço entre elementos",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Espaçamento do conteúdo",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Tipografia"
+    },
+    {
+      "type": "select",
+      "id": "category_font",
+      "label": "Fonte da categoria",
+      "options": [
+        {
+          "value": "var(--font-body-family)",
+          "label": "Corpo"
+        },
+        {
+          "value": "var(--font-heading-family)",
+          "label": "Título"
+        },
+        {
+          "value": "var(--font-accent-family)",
+          "label": "Destaque"
+        }
+      ],
+      "default": "var(--font-accent-family)"
+    },
+    {
+      "type": "range",
+      "id": "category_size",
+      "label": "Tamanho da categoria",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "category_color",
+      "label": "Cor da categoria",
+      "default": "#766cff"
+    },
+    {
+      "type": "range",
+      "id": "excerpt_size",
+      "label": "Tamanho do resumo",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Artigos laterais"
+    },
+    {
+      "type": "color",
+      "id": "article_bg_color",
+      "label": "Cor de fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "article_text_color",
+      "label": "Cor do texto",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "article_padding",
+      "label": "Espaçamento interno",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "article_border_width",
+      "label": "Largura da borda",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "article_border_color",
+      "label": "Cor da borda",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "range",
+      "id": "article_category_size",
+      "label": "Tamanho da categoria",
+      "min": 8,
+      "max": 14,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "article_title_size",
+      "label": "Tamanho do título",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "article_excerpt_size",
+      "label": "Tamanho do resumo",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Divisores"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "Mostrar divisores",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "divider_height",
+      "label": "Altura do divisor",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Cor do divisor",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "range",
+      "id": "divider_margin",
+      "label": "Margem do divisor",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Layout editorial"
+    }
+  ]
+}
+{% endschema %}

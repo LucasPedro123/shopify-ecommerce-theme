@@ -1,0 +1,83 @@
+{%- assign block_settings = block.settings -%}
+{%- assign block_index = section.blocks | find_index: 'id', block.id -%}
+
+{%- if block_settings.announcement_image != blank -%}
+  {%- capture picture_element -%}
+    <picture class="banner-announcement_picture">
+      {%- if block_settings.announcement_image_mobile != blank -%}
+        <source
+          media="(max-width: 749px)"
+          srcset="{{ block_settings.announcement_image_mobile | image_url: width: 800 }}"
+          width="{{ block_settings.announcement_image_mobile.width }}"
+          height="{{ block_settings.announcement_image_mobile.height }}"
+        >
+      {%- endif -%}
+      <img
+        class="banner-announcement_image"
+        src="{{ block_settings.announcement_image | image_url: width: 2000 }}"
+        alt="{{ block_settings.announcement_alt | escape }}"
+        width="{{ block_settings.announcement_image.width }}"
+        height="{{ block_settings.announcement_image.height }}"
+        loading="{% if block_index == 0 %}eager{% else %}lazy{% endif %}"
+      >
+    </picture>
+  {%- endcapture -%}
+
+  <slideshow-slide
+    ref="slides[]"
+    class="banner-announcement-bar__slide"
+    {{ block.shopify_attributes }}
+    aria-hidden="{% if block_index == 0 %}false{% else %}true{% endif %}"
+  >
+    {% if block_settings.link != blank %}
+      <a
+        class="banner-announcement_link"
+        href="{{ block_settings.link }}"
+        {{ block.shopify_attributes }}
+      >
+        {{ picture_element }}
+      </a>
+    {% else %}
+      {{ picture_element }}
+    {% endif %}
+  </slideshow-slide>
+{%- else -%}
+  <slideshow-slide class="banner-announcement-bar__slide" {{ block.shopify_attributes }}>
+    <div>Selecione uma imagem para o banner</div>
+  </slideshow-slide>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Banner Anúncio",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "announcement_alt",
+      "label": "Texto Alternativo da Imagem",
+      "default": "Banner de Promoção"
+    },
+    {
+      "type": "image_picker",
+      "id": "announcement_image",
+      "label": "Banner para o Topo do Header"
+    },
+    {
+      "type": "image_picker",
+      "id": "announcement_image_mobile",
+      "label": "Banner para o Topo do Header"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link do Banner"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner Anúncio"
+    }
+  ]
+}
+{% endschema %}
