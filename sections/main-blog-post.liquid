@@ -2,6 +2,9 @@
   HDM BEAUTY: Layout Editorial de Blog (Estilo Magazine / Beleza na Web)
 {%- endcomment -%}
 
+{%- comment -%} Structured data for blog posts (Rich Snippets). {%- endcomment -%}
+{%- render 'json-ld-article', article: article, blog: blog -%}
+
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 
 <article

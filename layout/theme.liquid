@@ -31,6 +31,10 @@
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-schemes' -%}
 
+    {%- comment -%} Structured data (JSON-LD). Site-wide entities only here.
+       Page-specific (Product, Article, Breadcrumb) ficam nas próprias sections. {%- endcomment -%}
+    {%- render 'json-ld-organization' -%}
+
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}
     {% endif %}

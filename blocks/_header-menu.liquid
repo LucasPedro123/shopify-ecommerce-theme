@@ -41,12 +41,7 @@
                   class="menu-list__item"
                   {% if link.current %}aria-current="page"{% endif %}
                 >
-                  {% if link_title_downcase == 'dia das mães' %}
-                    <span class="hdm-mothers-day-badge">
-                      <span class="hdm-md-text-1">✪ Dia das Mães</span>
-                      <span class="hdm-md-text-2">✪ Presente ✪</span>
-                    </span>
-                  {% elsif link_title_downcase == 'outlet' %}
+                  {% if link_title_downcase == 'outlet' %}
                     <span class="hdm-blink-wrapper">
                       <span class="hdm-blink-1">Outlet</span>
                       <span class="hdm-blink-2">60% OFF</span>
@@ -101,11 +96,7 @@
                         <span class="hdm-blink-wrapper nav-blog">
                           <span class="hdm-blink-1">{{ link.title }}</span>
                         </span>
-                      {% elsif link_title_downcase == 'dia das mães' %}
-                        <span class="hdm-mothers-day-badge">
-                          <span class="hdm-md-text-1">✪ Dia das Mães</span>
-                          <span class="hdm-md-text-2">✪ Presente ✪</span>
-                        </span>
+                    
                       {% elsif link_title_downcase == 'outlet' %}
                         <span class="hdm-blink-wrapper nav-outlet">
                           <span class="hdm-blink-1">Outlet</span>
@@ -496,39 +487,7 @@
   content: ' ';
 }
 
-/* Dia das Mães */
-.hdm-mothers-day-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #10261A;
-  border: 1px solid #C29B57;
-  min-width: 125px;
-  height: 26px;
-  position: relative;
-  overflow: hidden;
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 0 5px;
-  vertical-align: middle;
-}
 
-.hdm-md-text-1,
-.hdm-md-text-2 {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-}
-
-.hdm-md-text-1 { animation: mdToggleText1 4s infinite; }
-.hdm-md-text-2 { animation: mdToggleText2 4s infinite; }
 
 @keyframes mdToggleText1 {
   0%, 45%  { opacity: 1; color: #C29B57; }

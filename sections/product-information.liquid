@@ -1,5 +1,8 @@
 {{ 'section-custom-pdp.css' | asset_url | stylesheet_tag }}
 
+{%- comment -%} Structured data — Rich Snippets (Google/Bing/IA crawlers). {%- endcomment -%}
+{%- render 'json-ld-product', product: product -%}
+
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
   assign main_image = current_variant.featured_image | default: product.featured_image
