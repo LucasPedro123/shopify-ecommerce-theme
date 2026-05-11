@@ -1,0 +1,17 @@
+{
+  "name": "hdm-shopify-theme",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HDM Beauty Shopify theme — Tailwind toolchain. Use `npm run build:css` para gerar assets/tailwind.css ou `npm run watch:css` durante o desenvolvimento.",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "tailwindcss": "^3.4.4"
+  }
+}
