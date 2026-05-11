@@ -63,13 +63,9 @@
     {% endif %}
 
   {% else %}
-<<<<<<< HEAD
     {%- comment -%} ── DESKTOP MEGA MENU ───────────────────────── {%- endcomment -%}
 
     <header-menu
-=======
-    {% comment %} <header-menu
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
       ref="headerMenu"
       class="header-menu"
       {{ block.shopify_attributes }}
@@ -153,18 +149,9 @@
         </nav>
       </div>
 
-<<<<<<< HEAD
       <script src="{{ 'header-menu.js' | asset_url }}" type="module" fetchpriority="low"></script>
     </header-menu>
 
-=======
-      <script
-        src="{{ 'header-menu.js' | asset_url }}"
-        type="module"
-        fetchpriority="low"
-      ></script>
-    </header-menu> {% endcomment %}
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
 {% endcase %}
 
 {% style %}

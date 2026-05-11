@@ -14,7 +14,6 @@
     "custom_footer_3WdPj6": {
       "type": "custom-footer",
       "blocks": {
-<<<<<<< HEAD
         "social_media_dgLQFc": {
           "type": "social_media",
           "settings": {
@@ -79,37 +78,10 @@
           "settings": {
             "title": "MINHA CONTA",
             "menu": "footer-my-account"
-=======
-        "menu_kKwF6X": {
-          "type": "menu",
-          "settings": {
-            "heading": "Institucional",
-            "menu": "footer"
-          }
-        },
-        "payment_icons_J3r3h6": {
-          "type": "payment-icons",
-          "settings": {
-            "heading": "Formas de Pagamento",
-            "payment_content_1": "shopify://shop_images/mastercard_vrt_pos_92px_2x_56094b1d-d80c-4248-8fe5-4969406a44b0.png",
-            "payment_content_2": "shopify://shop_images/Visa_Inc._logo.svg",
-            "payment_content_3": "shopify://shop_images/imagepng.png",
-            "payment_content_4": "shopify://shop_images/pix.png",
-            "payment_content_5": "shopify://shop_images/Elo_logo.png"
-          }
-        },
-        "contact_UbwUAw": {
-          "type": "contact",
-          "settings": {
-            "phone": "Rua Iguatemi, 252, Cj. 41",
-            "whatsapp": "(11) 5096-2913",
-            "email": "sac@hdmallparts.com.br"
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
           }
         }
       },
       "block_order": [
-<<<<<<< HEAD
         "social_media_dgLQFc",
         "benefit_LRcnyE",
         "benefit_Gimbzc",
@@ -119,31 +91,15 @@
         "menu_yAmLVf",
         "menu_NWfxkD",
         "menu_MHnm6H"
-=======
-        "menu_kKwF6X",
-        "payment_icons_J3r3h6",
-        "contact_UbwUAw"
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
       ],
       "name": "Footer By Dev Lucas",
       "settings": {
-<<<<<<< HEAD
         "newsletter_title": "CADASTRE-SE PARA RECEBER OFERTAS E PROMOÇÕES ESPECIAIS.",
         "newsletter_disclaimer": "Ao inserir seu e-mail e clicar em “inscrever-se”, você concorda em receber e-mails de marketing da Hdm. Você pode cancelar a inscrição a qualquer momento através do link de cancelamento presente em cada e-mail. Consulte nosso Aviso de Privacidade para obter mais detalhes, incluindo como suas informações pessoais são usadas e compartilhadas.",
         "email_suporte": "sac@hdmbeauty.com.br",
         "endereco_loja": "HDM ALL PARTS LTDA\n252 RUA IGUATEMI.\nSÃO PAULO, SP",
         "texto_copyright": "Todo o conteúdo é protegido por direitos autorais © 2020-2026. HDMBEAUTY.com, Inc.",
         "texto_copyright_bottom": "hdmbeauty.com é uma loja independente que vende produtos para a pele, produtos para o cabelo, velas e maquiagem de marcas autênticas. \nHDM BEAUTY é nome fantasia de HDM ALL PARTS LTDS Inc. e estão registradas no Escritório de Patentes e Marcas do Brasil.\n\nTodo o conteúdo do site, todas as fotos, imagens, logotipos, marcas, dizeres, som, software, conjunto imagem, layout, trade dress, aqui veiculados são de propriedade exclusiva da HDM Beauty Ltda. É vedada qualquer reprodução, total ou parcial, de qualquer elemento de identidade, sem expressa autorização. A violação de qualquer direito mencionado implicará na responsabilização cível e criminal nos termos da Lei. Os preços dos produtos estão sujeitos a alteração sem aviso prévio."
-=======
-        "send_icon": "shopify://shop_images/send.svg",
-        "newsletter_title": "Minha Loja",
-        "newsletter_heading": "Promoções",
-        "newsletter_subtext": "Cadastre seu e-mail e receba ofertas exclusivas",
-        "newsletter_placeholder": "Seu E-mail",
-        "bottom_text": "© 2025 HDM BEAUTY",
-        "terms_url": "",
-        "privacy_url": "shopify://policies/privacy-policy"
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
       }
     }
   },

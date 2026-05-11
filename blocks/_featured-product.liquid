@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 
 {%- liquid
@@ -12,8 +11,6 @@
   endfor
 -%}
 
-=======
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
 {% capture product_card_children %}
   <div class="featured-product-content-top">
     {% content_for 'block', type: 'product-title', id: 'featured-product-title' %}
@@ -31,34 +28,6 @@
 {% render 'product-card', children: product_card_children, product: closest.product, product_card_gap: 8 %}
 
 {% stylesheet %}
-<<<<<<< HEAD
-=======
-  .product-highlight-content {
-    background: var(--brand-primary);
-    border-radius: 0 6px 6px 0;
-    box-shadow: 10px 10px 20px #ddd;
-    color: var(--color-light100);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    height: 100%;
-    justify-content: center;
-    padding: 40px;
-    width: 480px;
-  }
-
-  .product-highlight {
-    display: flex !important;
-    gap: var(--gap-md);
-
-    .card-gallery {
-      width: 100%;
-      max-width: 400px;
-      height: 100%;
-    }
-  }
-
->>>>>>> d7ed080423c71e7a443c13419eec9fbd3894e287
   .featured-product-content-top {
     display: flex;
     justify-content: space-between;
