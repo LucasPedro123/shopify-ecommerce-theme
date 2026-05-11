@@ -2,9 +2,6 @@
   Schema.org/Organization + WebSite (SearchAction).
   Renderizado no <head> via layout/theme.liquid em todas as páginas.
 
-  Por que aqui? Organization e WebSite são meta-entidades de site inteiro —
-  o Google só precisa enxergá-las uma vez por crawl, então o lugar canônico
-  é o layout, fora do escopo de qualquer template específico.
 {%- enddoc -%}
 
 {%- liquid
@@ -55,7 +52,7 @@
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": {{ shop.url | append: '/search?q={search_term_string}' | json }}
+      "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
