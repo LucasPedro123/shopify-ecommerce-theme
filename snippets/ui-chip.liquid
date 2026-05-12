@@ -1,0 +1,49 @@
+{%- doc -%}
+  ui-chip — pill arredondado lilás, padrão do "Cupom: LUXO15" no card.
+  Diferente do badge: cantos pill, fundo brand-50/100, texto brand-800.
+
+  @param {string} label     - Texto do chip (obrigatório).
+  @param {string} [variant] - 'cupom' | 'category' | 'outline'. Default: 'cupom'.
+  @param {string} [size]    - 'sm' | 'md'. Default: 'sm'.
+  @param {string} [icon]    - Tabler-style icon name (opcional).
+  @param {string} [extra_classes]
+
+  @example
+  {%- render 'ui-chip', label: 'Cupom: LUXO15', variant: 'cupom' -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign _variant = variant | default: 'cupom'
+  assign _size = size | default: 'sm'
+
+  case _variant
+    when 'cupom'
+      assign variant_cls = 'tw-bg-brand-50 tw-text-brand-800 tw-border tw-border-brand-100'
+    when 'category'
+      assign variant_cls = 'tw-bg-ink-100 tw-text-ink-800'
+    when 'outline'
+      assign variant_cls = 'tw-bg-transparent tw-text-brand-700 tw-border tw-border-brand-300'
+    else
+      assign variant_cls = 'tw-bg-brand-50 tw-text-brand-800 tw-border tw-border-brand-100'
+  endcase
+
+  case _size
+    when 'sm'
+      assign size_cls = 'tw-text-2xs tw-px-xs tw-py-3xs tw-gap-3xs'
+    else
+      assign size_cls = 'tw-text-xs tw-px-sm tw-py-2xs tw-gap-2xs'
+  endcase
+
+  assign base = 'tw-inline-flex tw-items-center tw-font-semibold tw-rounded-pill tw-leading-none tw-whitespace-nowrap'
+  assign all_classes = base | append: ' ' | append: variant_cls | append: ' ' | append: size_cls
+  if extra_classes != blank
+    assign all_classes = all_classes | append: ' ' | append: extra_classes
+  endif
+-%}
+
+<span class="{{ all_classes }}">
+  {%- if icon != blank -%}
+    <span aria-hidden="true" class="tw-inline-flex">{%- render icon -%}</span>
+  {%- endif -%}
+  {{ label }}
+</span>
