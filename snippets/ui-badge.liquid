@@ -1,0 +1,46 @@
+{%- doc -%}
+  ui-badge — CVA-style badge (cantos quadrados/levemente arredondados,
+  uso típico: -50%, NOVO, LANÇAMENTO, ESGOTADO).
+
+  @param {string} label     - Texto do badge (obrigatório).
+  @param {string} [variant] - 'sale' | 'new' | 'soldout' | 'neutral' | 'success'.
+                              Default: 'sale'.
+  @param {string} [size]    - 'sm' | 'md'. Default: 'sm'.
+  @param {string} [extra_classes]
+
+  @example
+  {%- render 'ui-badge', label: '-50%', variant: 'sale' -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign _variant = variant | default: 'sale'
+  assign _size = size | default: 'sm'
+
+  case _variant
+    when 'sale'
+      assign variant_cls = 'tw-bg-gold-300 tw-text-ink-900'
+    when 'new'
+      assign variant_cls = 'tw-bg-brand-500 tw-text-white'
+    when 'soldout'
+      assign variant_cls = 'tw-bg-ink-200 tw-text-ink-600'
+    when 'success'
+      assign variant_cls = 'tw-bg-success tw-text-white'
+    else
+      assign variant_cls = 'tw-bg-ink-100 tw-text-ink-800'
+  endcase
+
+  case _size
+    when 'sm'
+      assign size_cls = 'tw-text-2xs tw-px-xs tw-py-3xs'
+    else
+      assign size_cls = 'tw-text-xs tw-px-sm tw-py-2xs'
+  endcase
+
+  assign base = 'tw-inline-flex tw-items-center tw-font-bold tw-uppercase tw-tracking-wider tw-rounded-sm tw-leading-none'
+  assign all_classes = base | append: ' ' | append: variant_cls | append: ' ' | append: size_cls
+  if extra_classes != blank
+    assign all_classes = all_classes | append: ' ' | append: extra_classes
+  endif
+-%}
+
+<span class="{{ all_classes }}" aria-label="{{ label | escape }}">{{ label }}</span>
