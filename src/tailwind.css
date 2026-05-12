@@ -1,32 +1,44 @@
 /*
- * Tailwind CSS — input file.
+ * HDM Beauty — Tailwind CSS input
  *
- * Compiled output: assets/tailwind.css (committed to the repo so Shopify can
- * serve it via {{ 'tailwind.css' | asset_url | stylesheet_tag }}).
+ * Build: npm run build:css   →  assets/tailwind.css
  *
- * Build commands:
- *   npm run build:css   →  one-off, minified production build
- *   npm run watch:css   →  rebuilds on file change during development
- *
- * The Tailwind utility prefix is `tw-` (see tailwind.config.js) so utilities
- * never clash with Dawn/base.css legacy classes.
- *
- * Preflight is OFF: we do NOT want Tailwind's CSS reset overriding the
- * carefully tuned Dawn typography reset already shipping in base.css.
+ * Prefixo: `tw-` (todas as utilidades)
+ * Preflight: OFF (não atropela base.css)
+ * Fonte: Inter (carregada via theme do Shopify — settings_data.json)
  */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ------------------------------------------------------------------ *
- * Project-wide component primitives.
- * Keep this section small — prefer composing utilities inside Liquid
- * snippets (see snippets/button.liquid for the CVA-style pattern).
- * ------------------------------------------------------------------ */
+/* ============================================================ *
+ * Component primitives — abstrações reutilizáveis.
+ * Use estas classes em vez de repetir o mesmo cluster de
+ * utilities. Quando precisar de variante, prefira o snippet
+ * CVA correspondente (ui-button, ui-badge, ui-chip, etc).
+ * ============================================================ */
 @layer components {
-  /* Visually hidden but accessible to screen readers — mirrors the
-     legacy `.visually-hidden` class so we can swap progressively. */
+  /* Container padrão de seção (page-width) */
+  .tw-section-wrap {
+    margin-inline: auto;
+    max-width: 1280px;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .tw-section-wrap { padding-inline: 24px; }
+  }
+  @media (min-width: 1200px) {
+    .tw-section-wrap { padding-inline: 32px; }
+  }
+
+  /* Full-bleed: usado pelo hero — quebra do page-width */
+  .tw-full-bleed {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  /* Visually hidden mas focável (acessibilidade) */
   .tw-sr-only-but-focusable:not(:focus):not(:focus-within) {
     position: absolute !important;
     width: 1px;
@@ -38,15 +50,44 @@
     white-space: nowrap;
     border: 0;
   }
+
+  /* Card de produto base — apenas o shell. */
+  .tw-card-product {
+    position: relative;
+    background: #fff;
+    border: 0.5px solid #E4E4E7;
+    border-radius: 16px;
+    padding: 12px;
+    transition: box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .tw-card-product:hover {
+    box-shadow: 0 4px 12px rgba(118, 108, 255, 0.12),
+                0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Scroll horizontal mobile com snap (benefícios, carrosséis) */
+  .tw-scroll-row {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tw-scroll-row::-webkit-scrollbar { display: none; }
+  .tw-scroll-row > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
 }
 
-/* ------------------------------------------------------------------ *
- * Container queries — opt-in named container.
- * Usage:
- *   <section class="tw-@container/card">
- *     <article class="tw-@md/card:tw-grid-cols-2 ...">
- * ------------------------------------------------------------------ */
+/* ============================================================ *
+ * Container queries — utility helpers.
+ * Plugin oficial @tailwindcss/container-queries habilita @{name}.
+ * ============================================================ */
 @layer utilities {
-  .tw-container-card { container-type: inline-size; container-name: card; }
+  .tw-container-card    { container-type: inline-size; container-name: card; }
   .tw-container-section { container-type: inline-size; container-name: section; }
+  .tw-container-banner  { container-type: inline-size; container-name: banner; }
 }
