@@ -1,0 +1,53 @@
+{%- doc -%}
+  Schema.org/Article JSON-LD for blog posts.
+
+  @param {object} article - The Liquid article object.
+  @param {object} [blog] - Optional blog context (defaults to article.blog if available).
+
+  @example
+  {%- render 'json-ld-article', article: article, blog: blog -%}
+{%- enddoc -%}
+
+{%- if article != blank -%}
+  {%- assign featured_image = article.image -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": {{ shop.url | append: article.url | json }}
+    },
+    "headline": {{ article.title | escape | json }},
+    "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    "dateModified": {{ article.updated_at | default: article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    "author": {
+      "@type": "Person",
+      "name": {{ article.author | json }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }}
+      {%- if settings.logo != blank -%}
+        , "logo": {
+          "@type": "ImageObject",
+          "url": {{ settings.logo | image_url: width: 600 | prepend: 'https:' | json }}
+        }
+      {%- endif -%}
+    }
+    {%- if featured_image != blank -%}
+      , "image": [
+        {{ featured_image | image_url: width: 1200 | prepend: 'https:' | json }}
+      ]
+    {%- endif -%}
+    {%- if article.excerpt != blank -%}
+      , "description": {{ article.excerpt | strip_html | truncate: 300 | json }}
+    {%- elsif article.content != blank -%}
+      , "description": {{ article.content | strip_html | truncate: 300 | json }}
+    {%- endif -%}
+    {%- if article.tags.size > 0 -%}
+      , "keywords": {{ article.tags | join: ', ' | json }}
+    {%- endif -%}
+  }
+  </script>
+{%- endif -%}

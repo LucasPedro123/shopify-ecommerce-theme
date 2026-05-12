@@ -230,16 +230,6 @@
               >
                 {%- if t == 'blog' or t == 'blog loucas' -%}
                   <span class="hdm-badge hdm-badge--blog badge">{{ link.title }}</span>
-                {%- elsif t == 'dia das mães' -%}
-                  <span class="hdm-badge hdm-badge--maes badge" aria-label="Dia das Mães">
-                    <span class="hdm-badge--maes__state hdm-badge--maes__state--presentes badge">
-                      PRESENTES ATÉ&nbsp;<strong>40<sup>%</sup>OFF</strong>
-                    </span>
-                    <span class="hdm-badge--maes__state hdm-badge--maes__state--nome">
-                      <span class="hdm-badge--maes__pre badge">DIA DAS</span>
-                      <span class="hdm-badge--maes__main badge">MÃES</span>
-                    </span>
-                  </span>
                 {%- elsif t == 'outlet' -%}
                   <span class="hdm-badge hdm-badge--outlet badge"> <span>Outlet</span> </span>
                 {%- else -%}
@@ -869,93 +859,7 @@
       letter-spacing: 0.3px;
       color: #fff;
     }
-  /* Dia das Mães */
-  .hdm-badge--maes {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 36px;
-    padding-inline: 14px;
-    white-space: nowrap;
-    vertical-align: middle;
-    position: relative;
-    overflow: hidden;
-    width: 276px;
-    min-width: 200px;
-    animation: hdmMaesBg 6s steps(1, end) infinite;
-  }
-
-  @keyframes hdmMaesBg {
-    0%   { background: linear-gradient(135deg, #c9972a 0%, #e8b84b 50%, #b87d1a 100%); }
-    50%  { background: linear-gradient(135deg, #2a1a2e 0%, #1a0d1e 60%, #0d0a0d 100%); }
-  }
-
-  .hdm-badge--maes__state {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding-inline: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  /* Estado 1 — Presentes ATÉ 40% OFF */
-  .hdm-badge--maes__state--presentes {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.08em;
-    animation: hdmMaesStatePresentes 6s steps(1, end) infinite;
-  }
-
-  .hdm-badge--maes__state--presentes strong {
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-  }
-
-  .hdm-badge--maes__state--presentes sup {
-    font-size: 0.5rem;
-    font-weight: 700;
-    vertical-align: super;
-  }
-
-  @keyframes hdmMaesStatePresentes {
-    0%   { opacity: 1; }
-    50%  { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  /* Estado 2 — DIA DAS MÃES */
-  .hdm-badge--maes__state--nome {
-    gap: 6px;
-    animation: hdmMaesStateNome 6s steps(1, end) infinite;
-  }
-
-  .hdm-badge--maes__pre {
-    font-size: 0.72rem;
-    font-weight: 400;
-    color: #C29B57;
-    letter-spacing: 0.12em;
-  }
-
-  .hdm-badge--maes__main {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #C29B57;
-    letter-spacing: 0.06em;
-  }
-
-  @keyframes hdmMaesStateNome {
-    0%   { opacity: 0; }
-    50%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
-
-
+ 
   /* Remove os antigos */
   .hdm-badge__text-1,
   .hdm-badge__text-2 { display: none; }

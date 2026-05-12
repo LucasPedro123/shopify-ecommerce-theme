@@ -31,6 +31,10 @@
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-schemes' -%}
 
+    {%- comment -%} Structured data (JSON-LD). Site-wide entities only here.
+       Page-specific (Product, Article, Breadcrumb) ficam nas próprias sections. {%- endcomment -%}
+    {%- render 'json-ld-organization' -%}
+
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}
     {% endif %}
@@ -51,9 +55,7 @@
 
   <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
-    <div id="header-group">
       {% sections 'header-group' %}
-    </div>
 
     <script>
       // Inline header height and menu style calculations to prevent layout shift
