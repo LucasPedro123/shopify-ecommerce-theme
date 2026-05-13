@@ -1,0 +1,86 @@
+{%- doc -%}
+  ui-image — wrapper sobre `image_tag` que padroniza:
+   - WebP/AVIF automático (responsabilidade do CDN da Shopify)
+   - `fetchpriority` correto baseado em `priority`
+   - `loading` correto (eager para LCP, lazy para resto)
+   - `sizes` calculado por contexto
+   - widths responsivos (srcset)
+   - alt fallback
+
+  Use sempre que renderizar imagem. NUNCA use `<img>` direto.
+
+  @param {object} image            - Objeto Liquid Image (product.featured_image,
+                                     article.image, settings.logo, etc).
+  @param {string} [alt]            - Texto alt explícito (sobrescreve image.alt).
+  @param {boolean} [priority]      - true se é LCP (hero, first product image).
+                                     Default: false.
+  @param {string} [sizes]          - CSS sizes. Default heurística por context.
+  @param {string} [context]        - 'hero' | 'product-card' | 'banner' | 'thumb'.
+                                     Define widths e sizes default.
+  @param {number} [width]          - Override numérico de largura máxima.
+  @param {string} [class_name]     - Classes Tailwind extras.
+  @param {string} [aspect]         - aspect-ratio CSS (ex: '1/1', '16/9').
+
+  @example
+  {%- render 'ui-image', image: product.featured_image,
+        context: 'product-card', alt: product.title -%}
+{%- enddoc -%}
+
+{%- liquid
+  if image == blank
+    echo ''
+  else
+    assign _alt = alt | default: image.alt | default: ''
+    assign _context = context | default: 'product-card'
+    assign _priority = priority | default: false
+
+    case _context
+      when 'hero'
+        assign default_widths = '480,768,1080,1440,1920,2400'
+        assign default_sizes = '100vw'
+        assign max_width = 2400
+      when 'banner'
+        assign default_widths = '480,768,1080,1440,1920'
+        assign default_sizes = '(min-width: 1200px) 1280px, 100vw'
+        assign max_width = 1920
+      when 'thumb'
+        assign default_widths = '120,180,240,360'
+        assign default_sizes = '120px'
+        assign max_width = 360
+      else
+        # product-card
+        assign default_widths = '240,360,480,720,960'
+        assign default_sizes = '(min-width: 990px) 25vw, (min-width: 640px) 50vw, 80vw'
+        assign max_width = 960
+    endcase
+
+    if width
+      assign max_width = width
+    endif
+
+    assign _sizes = sizes | default: default_sizes
+    assign _class = class_name | default: ''
+
+    if _priority
+      assign load = 'eager'
+      assign fp = 'high'
+    else
+      assign load = 'lazy'
+      assign fp = 'auto'
+    endif
+  endif
+-%}
+
+{%- if image != blank -%}
+  {{
+    image
+    | image_url: width: max_width
+    | image_tag:
+        loading: load,
+        fetchpriority: fp,
+        sizes: _sizes,
+        widths: default_widths,
+        alt: _alt,
+        class: _class
+  }}
+{%- endif -%}

@@ -1,18 +1,11 @@
 /*
- * Tailwind CSS — input file.
+ * HDM Beauty — Tailwind CSS input
  *
- * Compiled output: assets/tailwind.css (committed to the repo so Shopify can
- * serve it via {{ 'tailwind.css' | asset_url | stylesheet_tag }}).
+ * Build: npm run build:css   →  assets/tailwind.css
  *
- * Build commands:
- *   npm run build:css   →  one-off, minified production build
- *   npm run watch:css   →  rebuilds on file change during development
- *
- * The Tailwind utility prefix is `tw-` (see tailwind.config.js) so utilities
- * never clash with Dawn/base.css legacy classes.
- *
- * Preflight is OFF: we do NOT want Tailwind's CSS reset overriding the
- * carefully tuned Dawn typography reset already shipping in base.css.
+ * Prefixo: `tw-` (todas as utilidades)
+ * Preflight: OFF (não atropela base.css)
+ * Fonte: Inter (carregada via theme do Shopify — settings_data.json)
  */
 
 *, ::before, ::after {
@@ -66,7 +59,7 @@
   --tw-contain-size:  ;
   --tw-contain-layout:  ;
   --tw-contain-paint:  ;
-  --tw-contain-style:  
+  --tw-contain-style:  ;
 }
 
 ::backdrop {
@@ -120,182 +113,578 @@
   --tw-contain-size:  ;
   --tw-contain-layout:  ;
   --tw-contain-paint:  ;
-  --tw-contain-style:  
+  --tw-contain-style:  ;
 }
 
-/* Visually hidden but accessible to screen readers — mirrors the
-     legacy `.visually-hidden` class so we can swap progressively. */
+/* Container padrão de seção (page-width) */
+
+.tw-section-wrap {
+  margin-inline: auto;
+  max-width: 1280px;
+  padding-inline: 16px;
+}
+
+@media (min-width: 768px) {
+  .tw-section-wrap {
+    padding-inline: 24px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .tw-section-wrap {
+    padding-inline: 32px;
+  }
+}
+
+/* Full-bleed: usado pelo hero — quebra do page-width */
+
+/* Visually hidden mas focável (acessibilidade) */
+
+/* Card de produto base — apenas o shell. */
+
+.tw-card-product {
+  position: relative;
+  background: #fff;
+  border: 0.5px solid #E4E4E7;
+  border-radius: 16px;
+  padding: 12px;
+  transition: box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tw-card-product:hover {
+  box-shadow: 0 4px 12px rgba(118, 108, 255, 0.12),
+                0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Scroll horizontal mobile com snap (benefícios, carrosséis) */
+
+.tw-absolute {
+  position: absolute;
+}
+
+.tw-left-sm {
+  left: 12px;
+}
+
+.tw-right-12 {
+  right: 3rem;
+}
+
+.tw-right-xs {
+  right: 8px;
+}
+
+.tw-top-sm {
+  top: 12px;
+}
+
+.tw-top-xs {
+  top: 8px;
+}
+
+.tw-z-raised {
+  z-index: 10;
+}
+
+.tw-mb-2xl {
+  margin-bottom: 48px;
+}
+
+.tw-mb-2xs {
+  margin-bottom: 4px;
+}
+
+.tw-mb-lg {
+  margin-bottom: 24px;
+}
+
+.tw-mb-md {
+  margin-bottom: 16px;
+}
+
+.tw-mb-sm {
+  margin-bottom: 12px;
+}
+
+.tw-mb-xs {
+  margin-bottom: 8px;
+}
+
+.tw-mt-3xs {
+  margin-top: 2px;
+}
+
+.tw-mt-xl {
+  margin-top: 32px;
+}
+
+.tw-mt-xs {
+  margin-top: 8px;
+}
+
+.tw-flex {
+  display: flex;
+}
 
 .tw-inline-flex {
-  display: inline-flex
+  display: inline-flex;
 }
 
-.tw-min-h-\[2\.25rem\] {
-  min-height: 2.25rem
+.tw-grid {
+  display: grid;
 }
 
-.tw-min-h-\[2\.75rem\] {
-  min-height: 2.75rem
+.tw-aspect-square {
+  aspect-ratio: 1 / 1;
 }
 
-.tw-min-h-\[3\.25rem\] {
-  min-height: 3.25rem
+.tw-h-10 {
+  height: 2.5rem;
+}
+
+.tw-h-12 {
+  height: 3rem;
+}
+
+.tw-h-16 {
+  height: 4rem;
+}
+
+.tw-h-24 {
+  height: 6rem;
+}
+
+.tw-h-\[120px\] {
+  height: 120px;
+}
+
+.tw-h-\[88px\] {
+  height: 88px;
+}
+
+.tw-h-full {
+  height: 100%;
+}
+
+.tw-min-h-\[36px\] {
+  min-height: 36px;
+}
+
+.tw-min-h-\[44px\] {
+  min-height: 44px;
+}
+
+.tw-min-h-\[52px\] {
+  min-height: 52px;
+}
+
+.tw-w-10 {
+  width: 2.5rem;
+}
+
+.tw-w-12 {
+  width: 3rem;
+}
+
+.tw-w-16 {
+  width: 4rem;
+}
+
+.tw-w-\[120px\] {
+  width: 120px;
+}
+
+.tw-w-\[88px\] {
+  width: 88px;
 }
 
 .tw-w-full {
-  width: 100%
+  width: 100%;
+}
+
+.tw-max-w-narrow {
+  max-width: 960px;
+}
+
+.tw-shrink-0 {
+  flex-shrink: 0;
 }
 
 .tw-cursor-pointer {
-  cursor: pointer
+  cursor: pointer;
 }
 
-.tw-select-none {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none
+.tw-grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tw-grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tw-grid-cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.tw-flex-col {
+  flex-direction: column;
+}
+
+.tw-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.tw-items-end {
+  align-items: flex-end;
 }
 
 .tw-items-center {
-  align-items: center
+  align-items: center;
+}
+
+.tw-justify-end {
+  justify-content: flex-end;
 }
 
 .tw-justify-center {
-  justify-content: center
+  justify-content: center;
+}
+
+.tw-justify-between {
+  justify-content: space-between;
 }
 
 .tw-gap-2xs {
-  gap: var(--gap-2xs)
+  gap: 4px;
 }
 
-.tw-rounded-btn {
-  border-radius: calc(var(--button-border-radius-primary, 0) * 1px)
+.tw-gap-3xs {
+  gap: 2px;
 }
 
-.tw-rounded-btn-secondary {
-  border-radius: calc(var(--button-border-radius-secondary, 0) * 1px)
+.tw-gap-md {
+  gap: 16px;
+}
+
+.tw-gap-sm {
+  gap: 12px;
+}
+
+.tw-gap-xs {
+  gap: 8px;
+}
+
+.tw-overflow-hidden {
+  overflow: hidden;
+}
+
+.tw-whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.tw-rounded-full {
+  border-radius: 9999px;
+}
+
+.tw-rounded-lg {
+  border-radius: 12px;
+}
+
+.tw-rounded-md {
+  border-radius: 8px;
+}
+
+.tw-rounded-pill {
+  border-radius: 9999px;
+}
+
+.tw-rounded-sm {
+  border-radius: 4px;
 }
 
 .tw-border {
-  border-width: 1px
+  border-width: 1px;
 }
 
-.tw-border-btn-primary-border {
-  border-color: var(--color-primary-button-border)
+.tw-border-0 {
+  border-width: 0px;
 }
 
-.tw-border-btn-secondary-border {
-  border-color: var(--color-secondary-button-border)
-}
-
-.tw-border-error {
-  border-color: var(--color-error)
-}
-
-.tw-border-primary {
+.tw-border-brand-100 {
   --tw-border-opacity: 1;
-  border-color: rgb(var(--color-primary-rgb) / var(--tw-border-opacity, 1))
+  border-color: rgb(234 231 255 / var(--tw-border-opacity, 1));
 }
 
-.tw-border-transparent {
-  border-color: transparent
+.tw-border-brand-300 {
+  --tw-border-opacity: 1;
+  border-color: rgb(181 175 255 / var(--tw-border-opacity, 1));
 }
 
-.tw-bg-btn-primary {
-  background-color: var(--color-primary-button-background)
+.tw-border-brand-500 {
+  --tw-border-opacity: 1;
+  border-color: rgb(118 108 255 / var(--tw-border-opacity, 1));
 }
 
-.tw-bg-btn-secondary {
-  background-color: var(--color-secondary-button-background)
+.tw-border-ink-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(228 228 231 / var(--tw-border-opacity, 1));
+}
+
+.tw-bg-brand-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 243 255 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-brand-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(118 108 255 / var(--tw-bg-opacity, 1));
 }
 
 .tw-bg-error {
-  background-color: var(--color-error)
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-gold-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 207 118 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-ink-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 244 245 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-ink-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-ink-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 250 250 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-success {
+  --tw-bg-opacity: 1;
+  background-color: rgb(22 163 74 / var(--tw-bg-opacity, 1));
 }
 
 .tw-bg-transparent {
-  background-color: transparent
+  background-color: transparent;
+}
+
+.tw-bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+
+.tw-object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .tw-p-0 {
-  padding: 0
+  padding: 0;
+}
+
+.tw-p-lg {
+  padding: 24px;
+}
+
+.tw-p-sm {
+  padding: 12px;
+}
+
+.tw-p-xs {
+  padding: 8px;
 }
 
 .tw-px-lg {
-  padding-left: var(--gap-lg);
-  padding-right: var(--gap-lg)
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .tw-px-md {
-  padding-left: var(--gap-md);
-  padding-right: var(--gap-md)
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .tw-px-sm {
-  padding-left: var(--gap-sm);
-  padding-right: var(--gap-sm)
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.tw-px-xl {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.tw-px-xs {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.tw-py-2xl {
+  padding-top: 48px;
+  padding-bottom: 48px;
 }
 
 .tw-py-2xs {
-  padding-top: var(--gap-2xs);
-  padding-bottom: var(--gap-2xs)
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.tw-py-3xs {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.tw-py-md {
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .tw-py-sm {
-  padding-top: var(--gap-sm);
-  padding-bottom: var(--gap-sm)
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .tw-py-xs {
-  padding-top: var(--gap-xs);
-  padding-bottom: var(--gap-xs)
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.tw-font-body {
-  font-family: var(--font-body--family), system-ui, sans-serif
+.tw-font-sans {
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.tw-text-2xl {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.tw-text-2xs {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+}
+
+.tw-text-3xl {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.tw-text-5xl {
+  font-size: 3rem;
+  line-height: 1.05;
 }
 
 .tw-text-base {
-  font-size: var(--font-size--md)
-}
-
-.tw-text-lg {
-  font-size: var(--font-size--lg)
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .tw-text-sm {
-  font-size: var(--font-size--sm)
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-.tw-font-medium {
-  font-weight: 500
+.tw-text-xl {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.tw-text-xs {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.tw-font-bold {
+  font-weight: 700;
+}
+
+.tw-font-semibold {
+  font-weight: 600;
+}
+
+.tw-uppercase {
+  text-transform: uppercase;
+}
+
+.tw-leading-none {
+  line-height: 1;
 }
 
 .tw-leading-tight {
-  line-height: var(--line-height--body-tight)
+  line-height: 1.25;
 }
 
-.tw-text-btn-primary-fg {
-  color: var(--color-primary-button-text)
+.tw-tracking-wider {
+  letter-spacing: 0.05em;
 }
 
-.tw-text-btn-secondary-fg {
-  color: var(--color-secondary-button-text)
+.tw-tracking-widest {
+  letter-spacing: 0.1em;
 }
 
-.tw-text-foreground {
+.tw-text-brand-500 {
   --tw-text-opacity: 1;
-  color: rgb(var(--color-foreground-rgb) / var(--tw-text-opacity, 1))
+  color: rgb(118 108 255 / var(--tw-text-opacity, 1));
 }
 
-.tw-text-primary {
+.tw-text-brand-700 {
   --tw-text-opacity: 1;
-  color: rgb(var(--color-primary-rgb) / var(--tw-text-opacity, 1))
+  color: rgb(90 82 204 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-brand-800 {
+  --tw-text-opacity: 1;
+  color: rgb(63 56 158 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-brand-900 {
+  --tw-text-opacity: 1;
+  color: rgb(38 33 112 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-400 {
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-500 {
+  --tw-text-opacity: 1;
+  color: rgb(113 113 122 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-600 {
+  --tw-text-opacity: 1;
+  color: rgb(82 82 91 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-700 {
+  --tw-text-opacity: 1;
+  color: rgb(63 63 70 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-800 {
+  --tw-text-opacity: 1;
+  color: rgb(39 39 42 / var(--tw-text-opacity, 1));
+}
+
+.tw-text-ink-900 {
+  --tw-text-opacity: 1;
+  color: rgb(24 24 27 / var(--tw-text-opacity, 1));
 }
 
 .tw-text-white {
   --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.tw-line-through {
+  text-decoration-line: line-through;
 }
 
 .tw-transition {
@@ -303,88 +692,78 @@
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms
+  transition-duration: 250ms;
 }
 
-.tw-duration-theme {
-  transition-duration: var(--animation-speed)
+.tw-duration-fast {
+  transition-duration: 150ms;
 }
 
-.tw-ease-theme-out {
-  transition-timing-function: var(--ease-out-quad)
-}
+/* ============================================================ *
+ * Component primitives — abstrações reutilizáveis.
+ * Use estas classes em vez de repetir o mesmo cluster de
+ * utilities. Quando precisar de variante, prefira o snippet
+ * CVA correspondente (ui-button, ui-badge, ui-chip, etc).
+ * ============================================================ */
 
-/* ------------------------------------------------------------------ *
- * Project-wide component primitives.
- * Keep this section small — prefer composing utilities inside Liquid
- * snippets (see snippets/button.liquid for the CVA-style pattern).
- * ------------------------------------------------------------------ */
+/* ============================================================ *
+ * Container queries — utility helpers.
+ * Plugin oficial @tailwindcss/container-queries habilita @{name}.
+ * ============================================================ */
 
-/* ------------------------------------------------------------------ *
- * Container queries — opt-in named container.
- * Usage:
- *   <section class="tw-@container/card">
- *     <article class="tw-@md/card:tw-grid-cols-2 ...">
- * ------------------------------------------------------------------ */
-
-.hover\:tw-bg-btn-primary-hover:hover {
-  background-color: var(--color-primary-button-hover-background)
-}
-
-.hover\:tw-bg-btn-secondary-hover:hover {
-  background-color: var(--color-secondary-button-hover-background)
-}
-
-.hover\:tw-bg-foreground\/5:hover {
-  background-color: rgb(var(--color-foreground-rgb) / 0.05)
-}
-
-.hover\:tw-bg-primary:hover {
+.hover\:tw-bg-brand-50:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(var(--color-primary-rgb) / var(--tw-bg-opacity, 1))
+  background-color: rgb(244 243 255 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:tw-text-background:hover {
+.hover\:tw-bg-brand-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(124 121 231 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:tw-bg-ink-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 250 250 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:tw-text-error:hover {
   --tw-text-opacity: 1;
-  color: rgb(var(--color-background-rgb) / var(--tw-text-opacity, 1))
-}
-
-.hover\:tw-text-btn-primary-hover-fg:hover {
-  color: var(--color-primary-button-hover-text)
-}
-
-.hover\:tw-text-btn-secondary-hover-fg:hover {
-  color: var(--color-secondary-button-hover-text)
+  color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
 
 .hover\:tw-opacity-90:hover {
-  opacity: 0.9
+  opacity: 0.9;
+}
+
+.focus-visible\:tw-shadow-focus:focus-visible {
+  --tw-shadow: 0 0 0 3px rgba(118,108,255,0.35);
+  --tw-shadow-colored: 0 0 0 3px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .focus-visible\:tw-outline-none:focus-visible {
   outline: 2px solid transparent;
-  outline-offset: 2px
-}
-
-.focus-visible\:tw-ring-2:focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)
-}
-
-.focus-visible\:tw-ring-primary:focus-visible {
-  --tw-ring-opacity: 1;
-  --tw-ring-color: rgb(var(--color-primary-rgb) / var(--tw-ring-opacity, 1))
-}
-
-.focus-visible\:tw-ring-offset-2:focus-visible {
-  --tw-ring-offset-width: 2px
+  outline-offset: 2px;
 }
 
 .disabled\:tw-cursor-not-allowed:disabled {
-  cursor: not-allowed
+  cursor: not-allowed;
 }
 
 .disabled\:tw-opacity-50:disabled {
-  opacity: 0.5
+  opacity: 0.5;
+}
+
+@media (min-width: 990px) {
+  .lg\:tw-grid-cols-10 {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  .lg\:tw-grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lg\:tw-grid-cols-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
 }

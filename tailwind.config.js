@@ -1,42 +1,81 @@
 /**
- * Tailwind CSS configuration for HDM Beauty Shopify theme.
+ * Tailwind CSS — HDM Beauty Design System v1
  *
- * Strategy:
- *  - The Shopify admin (settings_schema.json + theme-styles-variables.liquid)
- *    is the single source of truth for colors, type scale, spacing and radii.
- *    This config maps Tailwind utilities onto the CSS custom properties the
- *    theme already emits, so editing tokens in the admin instantly reflects
- *    in any Tailwind class used across Liquid templates.
- *  - Colors that expose an `-rgb` companion variable use the `<alpha-value>`
- *    placeholder, enabling utilities like `text-primary/50`. Colors without
- *    `-rgb` fall back to plain `var(--token)`.
- *  - Tailwind ships alongside the existing base.css (NOT replacing it).
+ * Estratégia de tokens (decidida no Sprint 0):
+ *  - Brand identity (purple + gold + neutrals) é HARD-CODED aqui. Esta é a
+ *    fonte de verdade da marca; não deve ser editável por color scheme do
+ *    Shopify admin (consistência > flexibilidade nesse ponto).
+ *  - Tokens semânticos (background, foreground, border, heading) continuam
+ *    mapeados pra `--color-*` que o tema emite via theme-styles-variables
+ *    e color-schemes — assim cada section pode ter sua "color scheme"
+ *    (header dark, cards light etc) e o Tailwind respeita.
+ *  - Fonte única: Inter (4 pesos: 400/500/600/700). Outras famílias removidas.
+ *  - Spacing: 4pt grid. Radius: inclui pill (botões CTA são pill).
+ *  - Prefixo `tw-` para conviver com base.css legado.
+ *  - Preflight OFF (não atropela reset do Dawn/base.css).
  *
- * Build (local):  npm run build:css   →  assets/tailwind.css
- * Watch (dev):    npm run watch:css
+ * Build: npm run build:css  →  assets/tailwind.css
  */
 
 const containerQueries = require('@tailwindcss/container-queries');
 const forms = require('@tailwindcss/forms');
 const typography = require('@tailwindcss/typography');
 
-/** Helper: color from `-rgb` variable, supports Tailwind alpha-value. */
 const rgbVar = (name) => `rgb(var(${name}) / <alpha-value>)`;
-/** Helper: color from a plain CSS variable (no alpha-value support). */
 const cssVar = (name) => `var(${name})`;
+
+/* ============================================================ *
+ * BRAND PALETTE — fonte única de verdade
+ * Decidida com base nos hexes fornecidos pelo cliente:
+ *   âncoras: 50=#F4F3FF, 200=#E2E0FF, 300=#B5AFFF,
+ *            500=#766CFF, 600=#7C79E7
+ *   stops restantes derivados por curva HSL (matiz ~246°).
+ * ============================================================ */
+const brand = {
+  50:  '#F4F3FF',
+  100: '#EAE7FF',
+  200: '#E2E0FF',
+  300: '#B5AFFF',
+  400: '#948CFF',
+  500: '#766CFF', // CTA primário, ícones brand
+  600: '#7C79E7', // hover/active do primário
+  700: '#5A52CC',
+  800: '#3F389E',
+  900: '#262170',
+};
+
+/* Gold: usado em "-50%" badge e detalhes promocionais.
+   Âncora fornecida = #EECF76. Escala curta — uso pontual. */
+const gold = {
+  50:  '#FDF8E8',
+  100: '#FBEDC1',
+  200: '#F7E19A',
+  300: '#EECF76', // âncora — badge de desconto
+  500: '#D4A93D',
+  700: '#8B6E1F',
+  900: '#4A3B0F',
+};
+
+/* Neutrals (ink) — escala derivada do Zinc, ajustada para a marca. */
+const ink = {
+  0:   '#FFFFFF',
+  50:  '#FAFAFA',
+  100: '#F4F4F5',
+  200: '#E4E4E7',
+  300: '#D4D4D8',
+  400: '#A1A1AA',
+  500: '#71717A',
+  600: '#52525B',
+  700: '#3F3F46',
+  800: '#27272A',
+  900: '#18181B',
+  ink: '#000000',
+};
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Avoid clashing with Shopify Dawn / base.css legacy utilities.
-  // Every Tailwind class is prefixed with `tw-`. Example: `tw-flex tw-text-primary`.
-  // This guarantees Tailwind + base.css coexist without specificity wars.
   prefix: 'tw-',
-
-  // Disable preflight so we don't break Dawn's typography reset.
-  // Re-enable later when you fully migrate components to Tailwind.
-  corePlugins: {
-    preflight: false,
-  },
+  corePlugins: { preflight: false },
 
   content: [
     './layout/**/*.liquid',
@@ -49,224 +88,174 @@ module.exports = {
   ],
 
   theme: {
-    // Mobile-first breakpoints aligned with the legacy theme's media queries.
-    // Modify here if Shopify settings_schema introduces a custom page_width
-    // beyond `narrow|page-width|full-width`.
+    // Mobile-first, alinhado ao breakpoint legado do Dawn (lg=990).
     screens: {
       xs: '480px',
       sm: '640px',
       md: '768px',
-      lg: '990px', // Dawn uses 990px as the desktop boundary.
+      lg: '990px',
       xl: '1200px',
       '2xl': '1440px',
     },
 
-    // Map Tailwind color names → CSS variables emitted by theme-styles-variables.liquid
-    // and color-schemes.liquid. Anything edited in the admin propagates here.
-    colors: ({ colors }) => ({
-      // Tailwind defaults we still want
+    colors: {
       transparent: 'transparent',
       current: 'currentColor',
       inherit: 'inherit',
       white: '#ffffff',
       black: '#000000',
 
-      // Theme color scheme tokens (alpha-aware via -rgb companions).
+      // --- Brand (hard-coded) ---
+      brand,
+      primary: brand[500], // alias direto (tw-bg-primary)
+      'primary-hover': brand[600],
+
+      // --- Gold accent ---
+      gold,
+
+      // --- Neutrals (ink) ---
+      ink,
+
+      // --- Semantic (mapeadas via CSS vars do tema) ---
+      // Permite que color schemes do Shopify admin alterem
+      // o esquema visual por section.
       background: rgbVar('--color-background-rgb'),
       foreground: rgbVar('--color-foreground-rgb'),
       heading: rgbVar('--color-foreground-heading-rgb'),
-      primary: rgbVar('--color-primary-rgb'),
-      'primary-hover': rgbVar('--color-primary-hover-rgb'),
       border: rgbVar('--color-border-rgb'),
       shadow: rgbVar('--color-shadow-rgb'),
 
-      // Button tokens (no -rgb counterparts in schema, use plain var)
-      'btn-primary': cssVar('--color-primary-button-background'),
-      'btn-primary-fg': cssVar('--color-primary-button-text'),
-      'btn-primary-border': cssVar('--color-primary-button-border'),
-      'btn-primary-hover': cssVar('--color-primary-button-hover-background'),
-      'btn-primary-hover-fg': cssVar('--color-primary-button-hover-text'),
-      'btn-secondary': cssVar('--color-secondary-button-background'),
-      'btn-secondary-fg': cssVar('--color-secondary-button-text'),
-      'btn-secondary-border': cssVar('--color-secondary-button-border'),
-      'btn-secondary-hover': cssVar('--color-secondary-button-hover-background'),
-      'btn-secondary-hover-fg': cssVar('--color-secondary-button-hover-text'),
+      // --- Estado ---
+      success: '#16A34A',
+      warning: '#F59E0B',
+      error:   '#DC2626',
+      sale:    gold[300], // visual de "-50%" usa gold, não vermelho
+      'rating-star': '#FACC15',
+    },
 
-      // Form inputs
-      input: cssVar('--color-input-background'),
-      'input-fg': rgbVar('--color-input-text-rgb'),
-      'input-border': cssVar('--color-input-border-color'),
-      'input-hover': cssVar('--color-input-hover-background'),
-
-      // Variant pickers / swatches
-      variant: cssVar('--color-variant-background-color'),
-      'variant-fg': rgbVar('--color-variant-text-rgb'),
-      'variant-border': cssVar('--color-variant-border-color'),
-      'variant-selected': cssVar('--color-selected-variant-background-color'),
-      'variant-selected-fg': cssVar('--color-selected-variant-text-color'),
-
-      // Semantic state colors (theme-styles-variables emits these globally)
-      success: cssVar('--color-success'),
-      error: cssVar('--color-error'),
-      instock: cssVar('--color-instock'),
-      lowstock: cssVar('--color-lowstock'),
-      outofstock: cssVar('--color-outofstock'),
-    }),
-
-    // Map Tailwind spacing scale to theme gap-* variables so paddings/margins
-    // stay consistent with the existing design system. The legacy 4px-based
-    // numeric scale (px-2, py-4 ...) is preserved via `extend.spacing`.
     spacing: {
       px: '1px',
       0: '0',
-      // theme-styles-variables.liquid emits these from the spacing scale settings.
-      '3xs': 'var(--gap-3xs)',
-      '2xs': 'var(--gap-2xs)',
-      xs: 'var(--gap-xs)',
-      sm: 'var(--gap-sm)',
-      md: 'var(--gap-md)',
-      lg: 'var(--gap-lg)',
-      xl: 'var(--gap-xl)',
-      '2xl': 'var(--gap-2xl)',
-      '3xl': 'var(--gap-3xl)',
-      // Numeric fallbacks (Tailwind default) — kept so utilities like
-      // `tw-p-4` still work for tactical adjustments outside the token system.
-      1: '0.25rem',
-      2: '0.5rem',
-      3: '0.75rem',
-      4: '1rem',
-      5: '1.25rem',
-      6: '1.5rem',
-      8: '2rem',
-      10: '2.5rem',
-      12: '3rem',
-      16: '4rem',
-      20: '5rem',
-      24: '6rem',
-      32: '8rem',
-      40: '10rem',
-      48: '12rem',
-      64: '16rem',
+      // 4pt grid (token-based)
+      '3xs': '2px',   // 0.125rem
+      '2xs': '4px',   // 0.25rem
+      xs:    '8px',   // 0.5rem
+      sm:    '12px',  // 0.75rem
+      md:    '16px',  // 1rem
+      lg:    '24px',  // 1.5rem
+      xl:    '32px',  // 2rem
+      '2xl': '48px',  // 3rem
+      '3xl': '64px',  // 4rem
+      '4xl': '96px',  // 6rem
+      // Escala numérica (escape hatch — mesmo Tailwind default)
+      1: '0.25rem', 2: '0.5rem', 3: '0.75rem', 4: '1rem',
+      5: '1.25rem', 6: '1.5rem', 8: '2rem', 10: '2.5rem',
+      12: '3rem', 16: '4rem', 20: '5rem', 24: '6rem',
+      32: '8rem', 40: '10rem', 48: '12rem', 64: '16rem',
     },
 
-    // Border radius mapped to admin tokens for buttons/cards/inputs/badges.
     borderRadius: {
       none: '0',
-      sm: 'var(--border-radius-sm)',
-      // Buttons (pills)
-      btn: 'calc(var(--button-border-radius-primary, 0) * 1px)',
-      'btn-secondary': 'calc(var(--button-border-radius-secondary, 0) * 1px)',
-      pill: 'calc(var(--pills-border-radius, 100) * 1px)',
-      // Cards / inputs
-      input: 'calc(var(--inputs-border-radius, 8) * 1px)',
-      card: 'calc(var(--card-corner-radius, 0) * 1px)',
-      product: 'calc(var(--product-corner-radius, 0) * 1px)',
-      popover: 'calc(var(--popover-border-radius, 8) * 1px)',
-      // Standard rem scale (escape hatch)
-      DEFAULT: '0.25rem',
-      md: '0.375rem',
-      lg: '0.5rem',
-      xl: '0.75rem',
-      '2xl': '1rem',
-      '3xl': '1.5rem',
+      sm:   '4px',
+      DEFAULT: '8px',
+      md:   '8px',
+      lg:   '12px',
+      xl:   '16px',
+      '2xl': '20px',
+      '3xl': '24px',
+      card: '16px',    // product card, banner card
+      input: '8px',
+      pill: '9999px',  // botão CTA primário
       full: '9999px',
     },
 
     fontFamily: {
-      // 4 admin-pickable fonts → Tailwind families.
-      body: ['var(--font-body--family)', 'system-ui', 'sans-serif'],
-      heading: ['var(--font-heading--family)', 'serif'],
-      subheading: ['var(--font-subheading--family)', 'sans-serif'],
-      accent: ['var(--font-accent--family)', 'serif'],
-      sans: ['var(--font-body--family)', 'system-ui', 'sans-serif'],
+      // Inter como única família, 4 pesos
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      body: ['Inter', 'system-ui', 'sans-serif'],
+      heading: ['Inter', 'system-ui', 'sans-serif'],
+      subheading: ['Inter', 'system-ui', 'sans-serif'],
+      accent: ['Inter', 'system-ui', 'sans-serif'],
     },
 
     fontSize: {
-      // Step scale comes straight from theme-styles-variables.
-      '3xs': 'var(--font-size--3xs)',
-      '2xs': 'var(--font-size--2xs)',
-      xs: 'var(--font-size--xs)',
-      sm: 'var(--font-size--sm)',
-      base: 'var(--font-size--md)',
-      md: 'var(--font-size--md)',
-      lg: 'var(--font-size--lg)',
-      xl: 'var(--font-size--xl)',
-      '2xl': 'var(--font-size--2xl)',
-      '3xl': 'var(--font-size--3xl)',
-      '4xl': 'var(--font-size--4xl)',
-      '5xl': 'var(--font-size--5xl)',
-      '6xl': 'var(--font-size--6xl)',
+      // Escala estática (não mais via --font-size-* do schema).
+      // Type scale derivada do screenshot: caption 11, sm 14, base 16,
+      // h3 20, h2 32, h1 48.
+      '3xs': ['0.625rem', { lineHeight: '1' }],      // 10px
+      '2xs': ['0.6875rem', { lineHeight: '1.2' }],   // 11px caption
+      xs:   ['0.75rem',  { lineHeight: '1.4' }],     // 12px
+      sm:   ['0.875rem', { lineHeight: '1.5' }],     // 14px body sm
+      base: ['1rem',     { lineHeight: '1.55' }],    // 16px body
+      lg:   ['1.125rem', { lineHeight: '1.5' }],     // 18px
+      xl:   ['1.25rem',  { lineHeight: '1.4' }],     // 20px h3
+      '2xl':['1.5rem',   { lineHeight: '1.3' }],     // 24px
+      '3xl':['2rem',     { lineHeight: '1.15' }],    // 32px h2
+      '4xl':['2.5rem',   { lineHeight: '1.1' }],     // 40px
+      '5xl':['3rem',     { lineHeight: '1.05' }],    // 48px h1
+      '6xl':['3.75rem',  { lineHeight: '1' }],       // 60px display
     },
 
-    lineHeight: {
-      tight: 'var(--line-height--body-tight)',
-      normal: 'var(--line-height--body-normal)',
-      loose: 'var(--line-height--body-loose)',
-      'display-tight': 'var(--line-height--display-tight)',
-      'display-normal': 'var(--line-height--display-normal)',
-      'display-loose': 'var(--line-height--display-loose)',
-      'heading-tight': 'var(--line-height--heading-tight)',
-      'heading-normal': 'var(--line-height--heading-normal)',
-      'heading-loose': 'var(--line-height--heading-loose)',
+    fontWeight: {
+      normal: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
     },
 
     letterSpacing: {
-      tight: 'var(--letter-spacing--body-tight)',
-      normal: 'var(--letter-spacing--body-normal)',
-      loose: 'var(--letter-spacing--body-loose)',
-      'heading-tight': 'var(--letter-spacing--heading-tight)',
-      'heading-normal': 'var(--letter-spacing--heading-normal)',
-      'heading-loose': 'var(--letter-spacing--heading-loose)',
+      tighter: '-0.025em',
+      tight:   '-0.0125em',
+      normal:  '0',
+      wide:    '0.025em',
+      wider:   '0.05em',   // category eyebrow
+      widest:  '0.1em',    // CAPTION upper
     },
 
     zIndex: {
-      // Layer system already defined in theme-styles-variables.
-      base: 'var(--layer-base)',
-      flat: 'var(--layer-flat)',
-      raised: 'var(--layer-raised)',
-      sticky: 'var(--layer-sticky)',
-      heightened: 'var(--layer-heightened)',
-      'header-menu': 'var(--layer-header-menu)',
-      'menu-drawer': 'var(--layer-menu-drawer)',
-      overlay: 'var(--layer-overlay)',
-      'window-overlay': 'var(--layer-window-overlay)',
-      temporary: 'var(--layer-temporary)',
-      0: '0',
-      10: '10',
-      20: '20',
-      50: '50',
+      base: '0',
+      raised: '10',
+      sticky: '20',
+      header: '30',
+      drawer: '40',
+      overlay: '50',
+      modal: '60',
+      toast: '70',
       auto: 'auto',
     },
 
     extend: {
       maxWidth: {
-        body: 'var(--max-width--body-normal)',
-        'body-narrow': 'var(--max-width--body-narrow)',
-        heading: 'var(--max-width--heading-normal)',
-        'heading-narrow': 'var(--max-width--heading-narrow)',
-        display: 'var(--max-width--display-normal)',
-        'display-tight': 'var(--max-width--display-tight)',
-        'display-narrow': 'var(--max-width--display-narrow)',
-      },
-      transitionTimingFunction: {
-        'theme-out': 'var(--ease-out-quad)',
-        'theme-in-out': 'var(--ease-in-out-quad)',
-        'theme-bounce': 'var(--animation-timing-bounce)',
-      },
-      transitionDuration: {
-        'theme-fast': 'var(--animation-speed-fast)',
-        theme: 'var(--animation-speed)',
-        'theme-slow': 'var(--animation-speed-slow)',
+        body: '1280px',          // padrão de section
+        wide: '1440px',
+        narrow: '960px',
       },
       boxShadow: {
-        focus: '0 0 0 var(--focus-outline-width) var(--color-foreground)',
+        card: '0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06)',
+        'card-hover': '0 4px 12px rgba(118,108,255,0.12), 0 2px 4px rgba(0,0,0,0.06)',
+        focus: '0 0 0 3px rgba(118,108,255,0.35)',
+      },
+      aspectRatio: {
+        product: '1 / 1',
+        banner: '16 / 9',
+        'banner-wide': '21 / 9',
+        story: '9 / 16',
+      },
+      transitionTimingFunction: {
+        'brand-out': 'cubic-bezier(0.22, 1, 0.36, 1)',
+        'brand-in-out': 'cubic-bezier(0.65, 0, 0.35, 1)',
+      },
+      transitionDuration: {
+        fast: '150ms',
+        DEFAULT: '250ms',
+        slow: '400ms',
       },
     },
   },
 
   plugins: [
-    containerQueries, // Enables @container-based responsive utilities
-    forms({ strategy: 'class' }), // form utilities require explicit `form-input` etc.
+    containerQueries,
+    forms({ strategy: 'class' }),
     typography,
   ],
 };

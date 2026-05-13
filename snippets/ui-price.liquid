@@ -1,0 +1,57 @@
+{%- doc -%}
+  ui-price — formatação canônica de preço usada em todo o tema.
+
+  Exibe: preço promocional grande em brand purple + preço original riscado
+  + linha "ou R$ X no cartão" (parcela calculada).
+
+  @param {object} product_or_variant - product ou variant Liquid. Lê
+                                       `.price` e `.compare_at_price`.
+  @param {number} [installments]     - Default: 1 (sem parcelar).
+  @param {boolean} [show_installment] - Default: false. Quando true e
+                                        installments > 1, calcula e mostra.
+  @param {string} [size]             - 'sm' | 'md' | 'lg'. Default: 'md'.
+
+  @example
+  {%- render 'ui-price', product_or_variant: product, installments: 3 -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign p = product_or_variant
+  assign price = p.price | default: 0
+  assign compare = p.compare_at_price | default: 0
+  assign _size = size | default: 'md'
+
+  case _size
+    when 'sm'
+      assign sale_cls = 'tw-text-base tw-font-bold'
+      assign compare_cls = 'tw-text-2xs'
+      assign installment_cls = 'tw-text-2xs'
+    when 'lg'
+      assign sale_cls = 'tw-text-2xl tw-font-bold'
+      assign compare_cls = 'tw-text-sm'
+      assign installment_cls = 'tw-text-xs'
+    else
+      assign sale_cls = 'tw-text-xl tw-font-bold'
+      assign compare_cls = 'tw-text-xs'
+      assign installment_cls = 'tw-text-xs'
+  endcase
+-%}
+
+<div class="tw-flex tw-flex-col tw-gap-3xs">
+  {%- if compare > price -%}
+    <span class="{{ compare_cls }} tw-text-ink-400 tw-line-through" aria-label="Preço original {{ compare | money }}">
+      {{ compare | money }}
+    </span>
+  {%- endif -%}
+
+  <span class="{{ sale_cls }} tw-text-brand-500" aria-label="Preço atual {{ price | money }}">
+    {{ price | money }}
+  </span>
+
+  {%- if show_installment and installments and installments > 1 and price > 0 -%}
+    {%- assign installment_value = price | divided_by: installments -%}
+    <span class="{{ installment_cls }} tw-text-ink-500">
+      ou {{ installments }}x de {{ installment_value | money }} sem juros
+    </span>
+  {%- endif -%}
+</div>

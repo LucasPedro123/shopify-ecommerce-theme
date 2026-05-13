@@ -1,0 +1,51 @@
+{%- doc -%}
+  ui-icon-circle — círculo cinza claro com ícone/imagem dentro.
+  Usado na seção de benefícios (Escolha seu cupom, Descontos, etc).
+
+  @param {object} [image]   - Image picker (de bloco). Renderizado via ui-image.
+  @param {string} [icon]    - Nome de snippet de ícone (alternativa ao image).
+  @param {string} [size]    - 'sm' (48px) | 'md' (64px) | 'lg' (88px) |
+                              'xl' (120px). Default: 'lg'.
+  @param {string} [variant] - 'neutral' (ink-100) | 'brand' (brand-50).
+                              Default: 'neutral'.
+  @param {string} [alt]     - Necessário para image (acessibilidade).
+
+  @example
+  {%- render 'ui-icon-circle', image: block.settings.image,
+        size: 'lg', alt: block.settings.title -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign _size = size | default: 'lg'
+  assign _variant = variant | default: 'neutral'
+
+  case _size
+    when 'sm'
+      assign size_cls = 'tw-w-12 tw-h-12'
+      assign img_w = 48
+    when 'md'
+      assign size_cls = 'tw-w-16 tw-h-16'
+      assign img_w = 64
+    when 'xl'
+      assign size_cls = 'tw-w-[120px] tw-h-[120px]'
+      assign img_w = 120
+    else
+      assign size_cls = 'tw-w-[88px] tw-h-[88px]'
+      assign img_w = 88
+  endcase
+
+  case _variant
+    when 'brand'
+      assign variant_cls = 'tw-bg-brand-50'
+    else
+      assign variant_cls = 'tw-bg-ink-100'
+  endcase
+-%}
+
+<span class="tw-inline-flex tw-items-center tw-justify-center tw-rounded-full {{ size_cls }} {{ variant_cls }} tw-overflow-hidden tw-shrink-0">
+  {%- if image != blank -%}
+    {%- render 'ui-image', image: image, context: 'thumb', width: img_w, alt: alt, class_name: 'tw-w-full tw-h-full tw-object-cover' -%}
+  {%- elsif icon != blank -%}
+    {%- render icon -%}
+  {%- endif -%}
+</span>
