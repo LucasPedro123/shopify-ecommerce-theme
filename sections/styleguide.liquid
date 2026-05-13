@@ -1,0 +1,282 @@
+{%- comment -%}
+  HDM Beauty — Styleguide
+  Página viva renderizando todos os primitives do design system.
+
+  Como acessar:
+    1. No admin Shopify, crie uma página com handle "styleguide".
+    2. Em Online Store > Themes > Customize, escolha o template
+       "page.styleguide" para essa página.
+    3. Abra /pages/styleguide na storefront.
+
+  Esta section é READ-ONLY pra produção: serve como referência visual
+  e teste de regressão. Quando criar variante nova de componente,
+  adicione aqui primeiro.
+{%- endcomment -%}
+
+<section class="tw-section-wrap tw-py-2xl" aria-label="HDM Beauty design system styleguide">
+  <header class="tw-mb-2xl">
+    <p class="tw-text-2xs tw-uppercase tw-tracking-widest tw-text-brand-500 tw-font-semibold tw-mb-2xs">HDM Beauty · v1</p>
+    <h1 class="tw-text-3xl tw-font-bold tw-text-ink-900 tw-mb-xs">Design system</h1>
+    <p class="tw-text-base tw-text-ink-600 tw-max-w-narrow">Referência viva de tokens e componentes. Quando precisar de variante nova, gere aqui primeiro e use nas sections de produção.</p>
+  </header>
+
+  {%- comment -%} ============================================
+       PALETA
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-palette">
+    <h2 id="sg-palette" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Paleta</h2>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Brand purple</h3>
+    <div class="tw-grid tw-grid-cols-5 lg:tw-grid-cols-10 tw-gap-xs tw-mb-lg" role="list">
+      {%- assign brand_stops = '50,100,200,300,400,500,600,700,800,900' | split: ',' -%}
+      {%- assign brand_hexes = '#F4F3FF,#EAE7FF,#E2E0FF,#B5AFFF,#948CFF,#766CFF,#7C79E7,#5A52CC,#3F389E,#262170' | split: ',' -%}
+      {%- for stop in brand_stops -%}
+        {%- assign hex = brand_hexes[forloop.index0] -%}
+        {%- assign is_dark = false -%}
+        {%- if forloop.index0 >= 4 -%}{%- assign is_dark = true -%}{%- endif -%}
+        <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-aspect-square" style="background:{{ hex }};">
+          <span class="tw-text-2xs tw-font-bold {% if is_dark %}tw-text-white{% else %}tw-text-brand-900{% endif %}">{{ stop }}</span>
+          <span class="tw-text-2xs {% if is_dark %}tw-text-white{% else %}tw-text-brand-900{% endif %}">{{ hex }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Gold accent</h3>
+    <p class="tw-text-xs tw-text-ink-500 tw-mb-sm">Uso pontual: badge "-50%" e similares. Não usar como cor principal.</p>
+    <div class="tw-grid tw-grid-cols-5 lg:tw-grid-cols-7 tw-gap-xs tw-mb-lg" role="list">
+      {%- assign gold_stops = '50,100,200,300,500,700,900' | split: ',' -%}
+      {%- assign gold_hexes = '#FDF8E8,#FBEDC1,#F7E19A,#EECF76,#D4A93D,#8B6E1F,#4A3B0F' | split: ',' -%}
+      {%- for stop in gold_stops -%}
+        {%- assign hex = gold_hexes[forloop.index0] -%}
+        {%- assign is_dark = false -%}
+        {%- if forloop.index0 >= 4 -%}{%- assign is_dark = true -%}{%- endif -%}
+        <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-aspect-square" style="background:{{ hex }};">
+          <span class="tw-text-2xs tw-font-bold {% if is_dark %}tw-text-white{% else %}tw-text-ink-900{% endif %}">{{ stop }}{% if stop == '300' %} *{% endif %}</span>
+          <span class="tw-text-2xs {% if is_dark %}tw-text-white{% else %}tw-text-ink-900{% endif %}">{{ hex }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Neutrals (ink)</h3>
+    <div class="tw-grid tw-grid-cols-5 lg:tw-grid-cols-10 tw-gap-xs tw-mb-lg" role="list">
+      {%- assign ink_stops = '0,50,100,200,300,400,500,600,700,900' | split: ',' -%}
+      {%- assign ink_hexes = '#FFFFFF,#FAFAFA,#F4F4F5,#E4E4E7,#D4D4D8,#A1A1AA,#71717A,#52525B,#3F3F46,#18181B' | split: ',' -%}
+      {%- for stop in ink_stops -%}
+        {%- assign hex = ink_hexes[forloop.index0] -%}
+        {%- assign is_dark = false -%}
+        {%- if forloop.index0 >= 5 -%}{%- assign is_dark = true -%}{%- endif -%}
+        <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-aspect-square tw-border tw-border-ink-200" style="background:{{ hex }};">
+          <span class="tw-text-2xs tw-font-bold {% if is_dark %}tw-text-white{% else %}tw-text-ink-900{% endif %}">{{ stop }}</span>
+          <span class="tw-text-2xs {% if is_dark %}tw-text-white{% else %}tw-text-ink-900{% endif %}">{{ hex }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Estado</h3>
+    <div class="tw-grid tw-grid-cols-4 tw-gap-xs tw-mb-lg" role="list">
+      <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-h-24 tw-bg-success">
+        <span class="tw-text-2xs tw-font-bold tw-text-white">success</span>
+        <span class="tw-text-2xs tw-text-white">#16A34A</span>
+      </div>
+      <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-h-24" style="background:#F59E0B;">
+        <span class="tw-text-2xs tw-font-bold tw-text-white">warning</span>
+        <span class="tw-text-2xs tw-text-white">#F59E0B</span>
+      </div>
+      <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-h-24 tw-bg-error">
+        <span class="tw-text-2xs tw-font-bold tw-text-white">error</span>
+        <span class="tw-text-2xs tw-text-white">#DC2626</span>
+      </div>
+      <div role="listitem" class="tw-rounded-lg tw-p-sm tw-flex tw-flex-col tw-justify-end tw-h-24" style="background:#FACC15;">
+        <span class="tw-text-2xs tw-font-bold tw-text-ink-900">rating-star</span>
+        <span class="tw-text-2xs tw-text-ink-900">#FACC15</span>
+      </div>
+    </div>
+  </article>
+
+  {%- comment -%} ============================================
+       TIPOGRAFIA
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-type">
+    <h2 id="sg-type" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Tipografia — Inter</h2>
+    <div class="tw-bg-ink-50 tw-rounded-lg tw-p-lg tw-flex tw-flex-col tw-gap-md">
+      <div>
+        <p class="tw-text-5xl tw-font-bold tw-text-ink-900 tw-leading-tight" style="letter-spacing:-0.02em;">Display 48/700</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-5xl .tw-font-bold &mdash; h1 hero, banners</code>
+      </div>
+      <div>
+        <p class="tw-text-3xl tw-font-bold tw-text-ink-900 tw-leading-tight" style="letter-spacing:-0.01em;">Heading 32/700</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-3xl .tw-font-bold &mdash; h2 section title (NOVIDADES!)</code>
+      </div>
+      <div>
+        <p class="tw-text-xl tw-font-semibold tw-text-ink-900">Subheading 20/600</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-xl .tw-font-semibold &mdash; h3 card brand</code>
+      </div>
+      <div>
+        <p class="tw-text-base tw-text-ink-900">Body 16/400 &mdash; texto padrão de parágrafo e descrições.</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-base &mdash; p</code>
+      </div>
+      <div>
+        <p class="tw-text-sm tw-text-ink-600">Body sm 14/400 &mdash; preço parcela, mini descrição</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-sm &mdash; .text-sm</code>
+      </div>
+      <div>
+        <p class="tw-text-2xs tw-font-semibold tw-uppercase tw-tracking-widest tw-text-ink-900">CAPTION 11/600 UPPERCASE</p>
+        <code class="tw-text-2xs tw-text-ink-500">.tw-text-2xs .tw-font-semibold .tw-uppercase .tw-tracking-widest</code>
+      </div>
+    </div>
+  </article>
+
+  {%- comment -%} ============================================
+       BOTÕES (ui-button)
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-buttons">
+    <h2 id="sg-buttons" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Botões — <code class="tw-text-sm">ui-button</code></h2>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Variantes</h3>
+    <div class="tw-flex tw-flex-wrap tw-gap-sm tw-items-center tw-mb-lg">
+      {%- render 'ui-button', label: 'Primary', variant: 'primary' -%}
+      {%- render 'ui-button', label: 'Secondary', variant: 'secondary' -%}
+      {%- render 'ui-button', label: 'Outline', variant: 'outline' -%}
+      {%- render 'ui-button', label: 'Ghost', variant: 'ghost' -%}
+      {%- render 'ui-button', label: 'Destructive', variant: 'destructive' -%}
+      {%- render 'ui-button', label: 'Disabled', variant: 'primary', disabled: true -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Tamanhos</h3>
+    <div class="tw-flex tw-flex-wrap tw-gap-sm tw-items-center tw-mb-lg">
+      {%- render 'ui-button', label: 'Small', variant: 'primary', size: 'sm' -%}
+      {%- render 'ui-button', label: 'Medium', variant: 'primary', size: 'md' -%}
+      {%- render 'ui-button', label: 'Large', variant: 'primary', size: 'lg' -%}
+      {%- render 'ui-button', variant: 'icon-cart', aria_label: 'Adicionar ao carrinho' -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm">Full-width</h3>
+    <div class="tw-max-w-narrow tw-mb-lg">
+      {%- render 'ui-button', label: 'Adicionar à sacola', variant: 'primary', size: 'lg', full_width: true -%}
+    </div>
+  </article>
+
+  {%- comment -%} ============================================
+       BADGES & CHIPS
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-badges">
+    <h2 id="sg-badges" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Badges &amp; Chips</h2>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm"><code class="tw-text-sm">ui-badge</code></h3>
+    <div class="tw-flex tw-flex-wrap tw-gap-sm tw-items-center tw-mb-lg">
+      {%- render 'ui-badge', label: '-50%', variant: 'sale' -%}
+      {%- render 'ui-badge', label: 'NOVO', variant: 'new' -%}
+      {%- render 'ui-badge', label: 'ESGOTADO', variant: 'soldout' -%}
+      {%- render 'ui-badge', label: 'EM ESTOQUE', variant: 'success' -%}
+      {%- render 'ui-badge', label: 'NEUTRAL', variant: 'neutral' -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm"><code class="tw-text-sm">ui-chip</code></h3>
+    <div class="tw-flex tw-flex-wrap tw-gap-sm tw-items-center tw-mb-lg">
+      {%- render 'ui-chip', label: 'Cupom: LUXO15', variant: 'cupom' -%}
+      {%- render 'ui-chip', label: 'Skin Care', variant: 'category' -%}
+      {%- render 'ui-chip', label: 'Outline', variant: 'outline' -%}
+    </div>
+  </article>
+
+  {%- comment -%} ============================================
+       RATING & PRICE
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-rating">
+    <h2 id="sg-rating" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Rating &amp; Price</h2>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm"><code class="tw-text-sm">ui-rating-stars</code></h3>
+    <div class="tw-flex tw-flex-col tw-gap-sm tw-mb-lg">
+      {%- render 'ui-rating-stars', rating: 5, count: 248, size: 'sm' -%}
+      {%- render 'ui-rating-stars', rating: 4.5, count: 127, size: 'md' -%}
+      {%- render 'ui-rating-stars', rating: 3.2, count: 43, size: 'lg' -%}
+      {%- render 'ui-rating-stars', rating: 0, size: 'md' -%}
+    </div>
+
+    <h3 class="tw-text-sm tw-font-semibold tw-text-ink-700 tw-uppercase tw-tracking-wider tw-mb-sm"><code class="tw-text-sm">ui-price</code> (com produto mock)</h3>
+    <p class="tw-text-xs tw-text-ink-500 tw-mb-sm">Esta seção precisa de produto real no scope. Em produção, o snippet recebe <code>product</code> ou <code>variant</code>.</p>
+  </article>
+
+  {%- comment -%} ============================================
+       ICON-CIRCLE (benefícios)
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-icons">
+    <h2 id="sg-icons" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Icon circle (benefícios)</h2>
+    <p class="tw-text-xs tw-text-ink-500 tw-mb-sm"><code class="tw-text-sm">ui-icon-circle</code> &mdash; recebe image ou snippet de ícone. Aqui mostro o shell vazio.</p>
+    <div class="tw-flex tw-flex-wrap tw-gap-md tw-items-end tw-mb-lg">
+      <div class="tw-flex tw-flex-col tw-items-center tw-gap-xs">
+        {%- render 'ui-icon-circle', size: 'sm' -%}
+        <span class="tw-text-2xs tw-text-ink-500">sm 48</span>
+      </div>
+      <div class="tw-flex tw-flex-col tw-items-center tw-gap-xs">
+        {%- render 'ui-icon-circle', size: 'md' -%}
+        <span class="tw-text-2xs tw-text-ink-500">md 64</span>
+      </div>
+      <div class="tw-flex tw-flex-col tw-items-center tw-gap-xs">
+        {%- render 'ui-icon-circle', size: 'lg' -%}
+        <span class="tw-text-2xs tw-text-ink-500">lg 88</span>
+      </div>
+      <div class="tw-flex tw-flex-col tw-items-center tw-gap-xs">
+        {%- render 'ui-icon-circle', size: 'xl', variant: 'brand' -%}
+        <span class="tw-text-2xs tw-text-ink-500">xl 120 / brand</span>
+      </div>
+    </div>
+  </article>
+
+  {%- comment -%} ============================================
+       PRODUCT CARD ALVO (preview)
+       ============================================ {%- endcomment -%}
+  <article class="tw-mb-2xl" aria-labelledby="sg-card">
+    <h2 id="sg-card" class="tw-text-2xl tw-font-bold tw-text-ink-900 tw-mb-md">Product card — alvo Sprint 4</h2>
+    <p class="tw-text-xs tw-text-ink-500 tw-mb-md">Mock visual. A versão final usa <code>blocks/_product-card.liquid</code> refatorado.</p>
+
+    <div class="tw-grid tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-md">
+      {%- for i in (1..4) -%}
+        <article class="tw-card-product">
+          <div class="tw-absolute tw-top-sm tw-left-sm tw-z-raised">
+            {%- render 'ui-chip', label: 'Cupom: LUXO15', variant: 'cupom' -%}
+          </div>
+          <div class="tw-absolute tw-top-sm tw-right-12 tw-z-raised">
+            {%- render 'ui-badge', label: '-50%', variant: 'sale' -%}
+          </div>
+          <button type="button" class="tw-absolute tw-top-xs tw-right-xs tw-z-raised tw-p-xs tw-bg-transparent tw-border-0 tw-cursor-pointer tw-text-ink-400 hover:tw-text-error" aria-label="Favoritar produto">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="tw-bg-ink-50 tw-rounded-lg tw-aspect-square tw-mb-sm tw-mt-xl tw-flex tw-items-center tw-justify-center tw-text-ink-400 tw-text-2xs">imagem produto</div>
+          {%- render 'ui-rating-stars', rating: 5, count: 127, size: 'sm' -%}
+          <p class="tw-text-2xs tw-font-bold tw-uppercase tw-tracking-wider tw-text-ink-900 tw-mt-xs">Australian Gold</p>
+          <p class="tw-text-sm tw-text-ink-700 tw-mt-3xs tw-mb-xs">Antipoluição FPS 50 — Protetor Solar Facial 50g</p>
+          <div class="tw-flex tw-items-end tw-justify-between tw-gap-xs">
+            <div class="tw-flex tw-flex-col tw-gap-3xs">
+              <span class="tw-text-2xs tw-text-ink-400 tw-line-through">R$ 16,90</span>
+              <span class="tw-text-xl tw-font-bold tw-text-brand-500">R$ 5,31</span>
+              <span class="tw-text-2xs tw-text-ink-500">ou R$ 5,90 no cartão</span>
+            </div>
+            {%- render 'ui-button', variant: 'icon-cart', aria_label: 'Adicionar Australian Gold ao carrinho' -%}
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </article>
+
+</section>
+
+{% schema %}
+{
+  "name": "Styleguide (dev)",
+  "tag": "section",
+  "class": "section-styleguide",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Página viva do design system. Use o template page.styleguide.json em uma página com handle 'styleguide'."
+    }
+  ],
+  "presets": [
+    { "name": "Styleguide" }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  }
+}
+{% endschema %}
