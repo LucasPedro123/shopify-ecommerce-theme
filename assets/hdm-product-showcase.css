@@ -21,6 +21,12 @@
 /* ════════════════════════════════════════════════════════════════
  * SHOWCASE — outer wrapper
  * ════════════════════════════════════════════════════════════════ */
+
+*{
+  margin: 0;
+  padding: 0;
+}
+
 .hdm-showcase {
   --card-gap: 16px;
   --card-radius: 12px;
@@ -126,15 +132,14 @@
  * Mobile  (< 640px): position static, layout em grid junto com dots
  * ════════════════════════════════════════════════════════════════ */
 .hdm-showcase__nav {
-  width: 44px;
-  height: 44px;
+  width: 43.62px;
+  height: 95px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: #18181B;
-  border: 1px solid #E4E4E7;
-  border-radius: 8px;
+  background: #F5F6F6;
+  color: #000;
+  border: 0.1px solid #c4c4c4;
   cursor: pointer;
   z-index: 5;
   transition: background 200ms ease, opacity 200ms ease, transform 200ms ease;
@@ -162,8 +167,8 @@
 }
 
 @media (min-width: 640px) and (max-width: 1199px) {
-  .hdm-showcase__nav--prev { left: 8px; }
-  .hdm-showcase__nav--next { right: 8px; }
+  .hdm-showcase__nav--prev { left: -10px; }
+  .hdm-showcase__nav--next { right: -10px; }
 }
 
 /* Mobile: layout em grid colocando [< prev] [dots] [next >] na mesma linha */
@@ -268,7 +273,6 @@
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
 .hdm-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
 }
 
@@ -285,6 +289,18 @@
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.badge-text{
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 16px !important;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
 }
 
 .hdm-card__favorite {
@@ -318,7 +334,7 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 8px;
-  background: #FAFAFA;
+  background: #fff;
 }
 .hdm-card__image {
   width: 100%;
@@ -327,7 +343,6 @@
   display: block;
   transition: transform 300ms ease;
 }
-.hdm-card:hover .hdm-card__image { transform: scale(1.04); }
 .hdm-card__image--placeholder { padding: 24px; opacity: 0.4; }
 
 /* ── Rating ── */
@@ -335,13 +350,13 @@
 
 /* ── Brand (Jost Bold 14/20 upper #010101) ── */
 .hdm-card__brand {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Jost';
+  font-style: normal;
   font-weight: 700;
   font-size: 14px;
   line-height: 20px;
   text-transform: uppercase;
   color: #010101;
-  margin: 0;
 }
 
 /* ── Title (Jost Medium 14/20 #010101) ── */
@@ -357,7 +372,8 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 40px; /* reserva espaço pra evitar layout shift */
+  min-height: 40px;
+
 }
 .hdm-card__title a {
   color: inherit;
@@ -377,49 +393,67 @@
 .hdm-card__pricing-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .hdm-card__price-original {
   font-family: 'Jost', sans-serif;
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 18px;
-  color: #71717A;
-  text-decoration: line-through;
+  font-family: 'Jost';
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+  color: #515151;
 }
 .hdm-card__price-current {
   font-family: 'Jost', sans-serif;
   font-weight: 700;
-  font-size: 22px;
-  line-height: 28px;
   color: var(--color-brand-500, #766CFF);
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-size: 24px;
 }
 .hdm-card__price-card {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 12px;
-  line-height: 16px;
   color: #71717A;
+
+  /* ou R$ 5,90 no cartão */
+
+  font-family: 'Jost';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #212121;
 }
 
 /* CTA sacola — botão roxo quadrado */
 .hdm-card__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
   background: var(--color-brand-500, #766CFF);
   color: #ffffff;
   border-radius: 10px;
   text-decoration: none;
   flex-shrink: 0;
   transition: background 200ms ease, transform 200ms ease;
+
+  /* Adicionar à sacola */
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  gap: 10px;
+  width: 68px;
+  height: 68px;
+  background: #766CFF;
+  border-radius: 4px;
+
+  img{
+    width: 25px;
+    height: 28px;
+  }
 }
 .hdm-card__cta:hover {
   background: var(--color-brand-600, #5A52CC);
-  transform: scale(1.05);
 }
 .hdm-card__cta:focus-visible {
   outline: 2px solid var(--color-brand-700, #5A52CC);
@@ -429,15 +463,12 @@
 /* ── Descrição curta (3 linhas máx) ── */
 .hdm-card__description {
   font-family: 'Jost', sans-serif;
+  font-family: 'Jost';
   font-weight: 400;
-  font-size: 13px;
-  line-height: 18px;
-  color: #71717A;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 12px;
+  line-height: 16px;
+  color: #666666;
+  padding-inline: 27px;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -459,4 +490,10 @@
   }
   .hdm-card:hover { transform: none; }
   .hdm-showcase__track { scroll-behavior: auto; }
+}
+
+.card-wrapper-info{
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
 }
