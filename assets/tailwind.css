@@ -183,6 +183,10 @@
   left: 0;
 }
 
+.tw-left-1\/2 {
+  left: 50%;
+}
+
 .tw-left-sm {
   left: 12px;
 }
@@ -299,6 +303,10 @@
   height: 6rem;
 }
 
+.tw-h-5 {
+  height: 1.25rem;
+}
+
 .tw-h-6 {
   height: 1.5rem;
 }
@@ -307,13 +315,16 @@
   height: 120px;
 }
 
-.tw-h-\[88px\] {
-  height: 88px;
+.tw-h-\[18px\] {
+  height: 18px;
 }
 
-.tw-h-fit {
-  height: -moz-fit-content;
-  height: fit-content;
+.tw-h-\[48px\] {
+  height: 48px;
+}
+
+.tw-h-\[88px\] {
+  height: 88px;
 }
 
 .tw-h-full {
@@ -323,18 +334,6 @@
 .tw-h-max {
   height: -moz-max-content;
   height: max-content;
-}
-
-.tw-h-5 {
-  height: 1.25rem;
-}
-
-.tw-h-\[18px\] {
-  height: 18px;
-}
-
-.tw-h-\[48px\] {
-  height: 48px;
 }
 
 .tw-min-h-\[36px\] {
@@ -365,6 +364,10 @@
   width: 1.5rem;
 }
 
+.tw-w-\[100vw\] {
+  width: 100vw;
+}
+
 .tw-w-\[120px\] {
   width: 120px;
 }
@@ -391,6 +394,11 @@
 
 .tw-shrink-0 {
   flex-shrink: 0;
+}
+
+.-tw-translate-x-1\/2 {
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .-tw-translate-y-1\/2 {
@@ -522,10 +530,6 @@
   border-width: 0px;
 }
 
-.tw-border-b {
-  border-bottom-width: 1px;
-}
-
 .tw-border-brand-100 {
   --tw-border-opacity: 1;
   border-color: rgb(234 231 255 / var(--tw-border-opacity, 1));
@@ -583,11 +587,6 @@
 .tw-bg-ink-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(250 250 250 / var(--tw-bg-opacity, 1));
-}
-
-.tw-bg-ink-900 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
 }
 
 .tw-bg-success {
@@ -771,10 +770,6 @@
 
 .tw-leading-tight {
   line-height: 1.25;
-}
-
-.tw-tracking-wide {
-  letter-spacing: 0.025em;
 }
 
 .tw-tracking-wider {
@@ -1015,19 +1010,6 @@
   .md\:tw-px-sm {
     padding-left: 12px;
     padding-right: 12px;
-  }
-
-  .md\:tw-text-2xl {
-    font-size: 1.5rem;
-    line-height: 1.3;
-  }
-
-  .md\:tw-text-\[clamp\(16px\2c 2vw\2c 24px\)\] {
-    font-size: clamp(16px, 2vw, 24px);
-  }
-
-  .md\:tw-text-\[clamp\(16px\2c 2vw\2c 20px\)\] {
-    font-size: clamp(16px, 2vw, 20px);
   }
 
   .md\:tw-text-\[clamp\(16px\2c 2vw\2c 22px\)\] {

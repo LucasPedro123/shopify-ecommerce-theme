@@ -15,43 +15,9 @@
         "slide_weJc9y": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/banner-dia-das-maes-apresentacao-hero-joys_1.png",
-            "mobile_image": "shopify://shop_images/banner-celular-dia-das-maes-apresentacao-hero.png",
+            "image": "shopify://shop_images/Design_sem_nome_-_2026-05-12T121642.550_1.png",
+            "mobile_image": "shopify://shop_images/Design_sem_nome_-_2026-05-14T152109.981.png",
             "link": "shopify://collections/joys-cosmeticos",
-            "show_countdown": false,
-            "countdown_end": "2025-12-31T23:59:00",
-            "countdown_x": "75%",
-            "countdown_y": "50%",
-            "countdown_align_h": "left",
-            "countdown_align_v": "center",
-            "countdown_box_size": 72,
-            "countdown_num_size": 40,
-            "countdown_label_size": 11
-          }
-        },
-        "slide_9CznPJ": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/banner-dia-das-maes-apresentacao-hero_4.png",
-            "mobile_image": "shopify://shop_images/banner-celular-dia-das-maes-apresentacao-hero-2_2.png",
-            "link": "shopify://collections/presente-dia-das-maes-hdm-beauty",
-            "show_countdown": true,
-            "countdown_end": "2026-05-09T23:59:00",
-            "countdown_x": "55%",
-            "countdown_y": "70%",
-            "countdown_align_h": "left",
-            "countdown_align_v": "center",
-            "countdown_box_size": 96,
-            "countdown_num_size": 50,
-            "countdown_label_size": 10
-          }
-        },
-        "slide_YbrzaV": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/O-EXTRAORDIARIO-BANNER-SPRAY-CAPILAR-CABELO-hdmbeauty.png",
-            "mobile_image": "shopify://shop_images/O-EXTRAORDIARIO-BANNER-SPRAY-CAPILAR-CABELO-hdmbeauty-mobile_4743799d-ee03-478d-8260-79791cf7bbd0.png",
-            "link": "shopify://products/tonico-capilar-extraordinario-protetor-termico-100ml-joys",
             "show_countdown": false,
             "countdown_end": "2025-12-31T23:59:00",
             "countdown_x": "75%",
@@ -65,9 +31,7 @@
         }
       },
       "block_order": [
-        "slide_weJc9y",
-        "slide_9CznPJ",
-        "slide_YbrzaV"
+        "slide_weJc9y"
       ],
       "name": "Hero Banner Principal",
       "settings": {
