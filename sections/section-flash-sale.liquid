@@ -1,34 +1,270 @@
-<div class="flash-sale-container">
-    <div class="image-flash-sale"></div>
-    <div class="flash-sale-wrapper">
-        <h2></h2>
-        <div class="countdown-timer-flash-sale">
+{%- comment -%}
+  ═════════════════════════════════════════════════════════════════════
+   HDM BEAUTY — Flash Sale (Oferta Relâmpago)
+   Diretrizes aplicadas:
+   - Web Component: <flash-sale-timer> para o contador.
+   - Animação de Preço: CSS Keyframes (Zero JS para a animação).
+   - Layout: Grid/Flex responsivo com sobreposição mobile.
+  ═════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
 
-        </div>
-        <div>
+<style>
+  /* Animação infinita de troca de preço (CSS puro para alta performance) */
+  .hdm-price-swap {
+    position: relative;
+    width: 100%;
+    height: 32px; /* Altura fixa do container do preço */
+    overflow: hidden;
+  }
+  
+  .hdm-price-item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-        </div>
+  .hdm-price--compare {
+    text-decoration: line-through;
+    opacity: 0.7;
+    animation-name: swapOut;
+  }
+
+  .hdm-price--actual {
+    font-weight: 800;
+    animation-name: swapIn;
+  }
+
+  @keyframes swapOut {
+    0%, 40% { opacity: 1; transform: translateY(0); }
+    45%, 50% { opacity: 0; transform: translateY(-100%); }
+    51%, 95% { opacity: 0; transform: translateY(100%); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes swapIn {
+    0%, 40% { opacity: 0; transform: translateY(100%); }
+    45%, 50% { opacity: 1; transform: translateY(0); }
+    90%, 95% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-100%); }
+  }
+
+  /* Estilo Split-Flap para o Contador */
+  .hdm-timer-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #F8F8F8 0%, #FFFFFF 50%, #EAEAEA 100%);
+    border: 1px solid #D4D4D8;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    color: #18181B;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<section class="tw-w-full tw-max-w-[1920px] tw-mx-auto tw-px-4 md:tw-px-8 tw-py-8 lg:tw-py-12">
+  <div class="tw-flex tw-flex-col lg:tw-flex-row tw-bg-white tw-rounded-2xl tw-overflow-hidden tw-shadow-sm tw-border tw-border-ink-100">
+    
+    {%- comment -%} ── LADO ESQUERDO: IMAGEM LCP ── {%- endcomment -%}
+    <div class="tw-w-full lg:tw-w-1/2 tw-relative tw-min-h-[300px] lg:tw-min-h-[500px] tw-bg-ink-50">
+      {%- if section.settings.flash_sale_image != blank -%}
+        <picture class="tw-block tw-w-full tw-h-full">
+          {%- if section.settings.mobile_image != blank -%}
+            <source media="(max-width: 1023px)" srcset="{{ section.settings.mobile_image | image_url: width: 800 }}">
+          {%- endif -%}
+          {{- section.settings.flash_sale_image | image_url: width: 1000 | image_tag: 
+              loading: 'lazy', 
+              class: 'tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-cover', 
+              alt: section.settings.title | escape 
+          -}}
+        </picture>
+      {%- else -%}
+        {{ 'collection-1' | placeholder_svg_tag: 'tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-cover tw-opacity-50' }}
+      {%- endif -%}
     </div>
-</div>
+
+    {%- comment -%} ── LADO DIREITO: CONTEÚDO E PRODUTOS ── {%- endcomment -%}
+    <div class="tw-w-full lg:tw-w-1/2 tw-relative tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 md:tw-p-8 lg:tw-p-12 tw-bg-white tw-z-10 -tw-mt-10 lg:tw-mt-0 lg:tw-ml-0 tw-rounded-t-2xl lg:tw-rounded-none">
+      
+      {%- comment -%} Título {%- endcomment -%}
+      <h2 class="tw-text-center tw-text-lg md:tw-text-2xl tw-font-medium tw-text-ink-900 tw-uppercase tw-tracking-wide tw-mb-6">
+        {{ section.settings.title }}
+      </h2>
+
+      {%- comment -%} Contador Web Component {%- endcomment -%}
+      {%- if section.settings.end_time != blank -%}
+        <flash-sale-timer data-end="{{ section.settings.end_time }}" class="tw-flex tw-items-center tw-gap-2 md:tw-gap-4 tw-mb-10">
+          <div class="hdm-timer-box tw-w-16 tw-h-16 md:tw-w-20 md:tw-h-20 tw-text-3xl md:tw-text-5xl tw-font-bold" data-unit="h">00</div>
+          <span class="tw-text-3xl md:tw-text-5xl tw-font-bold tw-text-ink-900 tw-mb-2">:</span>
+          <div class="hdm-timer-box tw-w-16 tw-h-16 md:tw-w-20 md:tw-h-20 tw-text-3xl md:tw-text-5xl tw-font-bold" data-unit="m">00</div>
+          <span class="tw-text-3xl md:tw-text-5xl tw-font-bold tw-text-ink-900 tw-mb-2">:</span>
+          <div class="hdm-timer-box tw-w-16 tw-h-16 md:tw-w-20 md:tw-h-20 tw-text-3xl md:tw-text-5xl tw-font-bold" data-unit="s">00</div>
+        </flash-sale-timer>
+      {%- endif -%}
+
+      {%- comment -%} Grade de Produtos (3 itens) {%- endcomment -%}
+      <ul class="tw-grid tw-grid-cols-3 tw-gap-2 md:tw-gap-6 tw-w-full" role="list">
+        {%- for product in section.settings.flash_product_list limit: 3 -%}
+          <li class="tw-flex tw-flex-col tw-bg-white tw-border tw-border-ink-100 tw-rounded-xl tw-overflow-hidden tw-shadow-sm hover:tw-shadow-md tw-transition-shadow">
+            
+            <a href="{{ product.url }}" class="tw-block tw-relative tw-aspect-[4/5] tw-bg-ink-50" aria-label="{{ product.title }}">
+              {%- if product.featured_image != blank -%}
+                {{ product.featured_image | image_url: width: 400 | image_tag: 
+                    loading: 'lazy', 
+                    class: 'tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-p-2', 
+                    alt: product.title 
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'tw-w-full tw-h-full tw-opacity-30' }}
+              {%- endif -%}
+            </a>
+
+            {%- comment -%} Animação de Preço (Swap) {%- endcomment -%}
+            <div class="tw-bg-[#E5E0FF] tw-text-brand-700 tw-w-full">
+              <div class="hdm-price-swap">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="hdm-price-item hdm-price--compare tw-text-xs md:tw-text-sm">
+                    {{ product.compare_at_price | money }}
+                  </span>
+                  <span class="hdm-price-item hdm-price--actual tw-text-sm md:tw-text-base">
+                    {{ product.price | money }}
+                  </span>
+                {%- else -%}
+                  {%- comment -%} Fallback caso o lojista esqueça de botar o preço comparativo {%- endcomment -%}
+                  <span class="tw-flex tw-items-center tw-justify-center tw-w-full tw-h-full tw-font-bold tw-text-sm md:tw-text-base">
+                    {{ product.price | money }}
+                  </span>
+                {%- endif -%}
+              </div>
+            </div>
+
+          </li>
+        {%- else -%}
+          {%- comment -%} Onboarding Padrão caso não haja produtos selecionados {%- endcomment -%}
+          {%- for i in (1..3) -%}
+            <li class="tw-flex tw-flex-col tw-bg-white tw-border tw-border-ink-100 tw-rounded-xl tw-overflow-hidden">
+              <div class="tw-aspect-[4/5] tw-bg-ink-50 tw-flex tw-items-center tw-justify-center">
+                {{ 'product-' | append: i | placeholder_svg_tag: 'tw-w-1/2 tw-h-1/2 tw-opacity-30' }}
+              </div>
+              <div class="tw-bg-[#E5E0FF] tw-text-brand-700 tw-h-[32px] tw-flex tw-items-center tw-justify-center tw-font-bold tw-text-sm">
+                R$ 99,90
+              </div>
+            </li>
+          {%- endfor -%}
+        {%- endfor -%}
+      </ul>
+
+    </div>
+  </div>
+</section>
+
+<script>
+/**
+ * HDM Beauty - Flash Sale Timer Web Component
+ */
+class FlashSaleTimer extends HTMLElement {
+  constructor() {
+    super();
+    this.endRaw = this.dataset.end;
+    this.elH = this.querySelector('[data-unit="h"]');
+    this.elM = this.querySelector('[data-unit="m"]');
+    this.elS = this.querySelector('[data-unit="s"]');
+    
+    if (!this.endRaw || !this.elH || !this.elM || !this.elS) return;
+    
+    // Tratamento Cross-Browser de Data (Resolve o bug do Safari com o "T")
+    this.endDate = new Date(this.endRaw.replace('T', ' ').replace(/-/g, '/'));
+    if (isNaN(this.endDate.getTime())) return;
+
+    this.tick = this.tick.bind(this);
+    this.tick();
+  }
+
+  pad(n) { 
+    return String(n).padStart(2, '0'); 
+  }
+
+  tick() {
+    const diff = this.endDate.getTime() - Date.now();
+
+    if (diff <= 0) {
+      this.elH.textContent = '00';
+      this.elM.textContent = '00';
+      this.elS.textContent = '00';
+      return;
+    }
+
+    const totalSecs = Math.floor(diff / 1000);
+    this.elH.textContent = this.pad(Math.floor(totalSecs / 3600));
+    this.elM.textContent = this.pad(Math.floor((totalSecs % 3600) / 60));
+    this.elS.textContent = this.pad(totalSecs % 60);
+
+    // Usa requestAnimationFrame para precisão e performance em vez de setInterval
+    setTimeout(() => requestAnimationFrame(this.tick), 1000);
+  }
+}
+
+if (!customElements.get('flash-sale-timer')) {
+  customElements.define('flash-sale-timer', FlashSaleTimer);
+}
+</script>
 
 {% schema %}
-  {
-    "name": "Flash Sale",
-    "tag": "section",
-    "class": "product",
-    "settings": [
-        {
-          "type": "image_picker",
-          "id": "flash_sale_image",
-          "label": "Imagem da seção Oferta Relâmpago"
-        },
-        {
-        "type": "product_list",
-        "id": "flash_product_list",
-        "label": "Produto em Oferta Relâmpago",
-        "limit": 3
-      },
-    ],
-   
-  }
+{
+  "name": "Oferta Relâmpago",
+  "tag": "section",
+  "class": "section-flash-sale",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título da Seção",
+      "default": "OFERTA RELÂMPAGO: linha laurel"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "Data de Fim (Contador)",
+      "info": "Formato: AAAA-MM-DD HH:MM:SS (Ex: 2026-12-31 23:59:00)",
+      "default": "2026-12-31 23:59:00"
+    },
+    {
+      "type": "header",
+      "content": "Mídia"
+    },
+    {
+      "type": "image_picker",
+      "id": "flash_sale_image",
+      "label": "Imagem Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Imagem Mobile (Opcional)",
+      "info": "Se deixado em branco, usará a imagem desktop redimensionada."
+    },
+    {
+      "type": "header",
+      "content": "Produtos"
+    },
+    {
+      "type": "product_list",
+      "id": "flash_product_list",
+      "label": "Produtos em Oferta (Máx 3)",
+      "limit": 3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Oferta Relâmpago"
+    }
+  ]
+}
 {% endschema %}
