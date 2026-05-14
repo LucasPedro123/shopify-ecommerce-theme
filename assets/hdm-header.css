@@ -62,7 +62,8 @@ ul {
 }
 
 .hdm-header__search {
-  height: stretch;
+  height: -webkit-fill-available; /* Para Safari e iOS */
+  height: stretch; /* Para Chrome e outros navegadores atualizados */
 }
 
 /* === Search input === */
