@@ -1,0 +1,209 @@
+{%- doc -%}
+  hdm-product-card — Card de produto seguindo design HDM Beauty.
+
+  Composição:
+   - Badges no topo (cupom via tag + desconto auto/tag) + botão favorito
+   - Imagem do produto (link para PDP)
+   - Rating stars (via metafields ou fallback)
+   - Brand (vendor) em Jost Bold 14/20 uppercase
+   - Title em Jost Medium 14/20
+   - Pricing: compare_at_price riscado + price em destaque + linha "no cartão"
+   - CTA sacola (link para PDP)
+   - Descrição curta truncada (80 chars, sem HTML)
+
+  Lê tags do produto:
+   - cupom:CODIGO       → exibe chip "Cupom: CODIGO"
+   - desconto:NUMERO    → exibe badge "-NUMERO%" (sobrescreve cálculo automático)
+
+  Sem tag `desconto:`, calcula o % automaticamente de compare_at_price vs price.
+
+  Integra com wishlist via localStorage key 'hdm_wishlist'. O Web Component
+  <product-showcase> lê esta chave e atualiza aria-pressed nos botões.
+
+  @param {product} product             - Obrigatório.
+  @param {boolean} [prioritize_image]      - Default: false. true para LCP.
+  @param {number} [installment_fee_pct]    - Default: 11. % acréscimo no cartão.
+  @param {string} [extra_classes]          - Classes extras no <article>.
+
+  @example
+  {%- render 'hdm-product-card', product: product, installment_fee_pct: 11 -%}
+{%- enddoc -%}
+
+{%- liquid
+  if product == blank
+    echo ''
+  else
+    assign _prioritize = prioritize_image | default: false
+    assign _fee_pct = installment_fee_pct | default: 11
+
+    # ── Parse de tags ─────────────────────────────────────────
+    assign cupom_code = ''
+    assign desconto_override = ''
+    for t in product.tags
+      assign t_lower = t | downcase
+      if t_lower contains 'cupom:'
+        assign cupom_code = t | split: ':' | last | strip
+      endif
+      if t_lower contains 'desconto:'
+        assign desconto_override = t | split: ':' | last | strip
+      endif
+    endfor
+
+    # ── Cálculo de desconto ──────────────────────────────────
+    # Prioridade: tag desconto: > cálculo automático compare_at vs price
+    assign discount_pct = 0
+    if desconto_override != blank
+      assign discount_pct = desconto_override | plus: 0
+    elsif product.compare_at_price > product.price
+      assign diff = product.compare_at_price | minus: product.price
+      assign discount_pct = diff | times: 100.0 | divided_by: product.compare_at_price | round
+    endif
+
+    # ── Preço no cartão (price + fee%) ───────────────────────
+    assign card_multiplier = _fee_pct | plus: 100
+    assign price_card = product.price | times: card_multiplier | divided_by: 100
+
+    # ── Rating: metafield se existir, senão null (não renderiza) ──
+    assign rating_value = product.metafields.reviews.rating.value | default: nil
+    assign rating_count = product.metafields.reviews.rating_count.value | default: nil
+
+    # ── Descrição curta ──────────────────────────────────────
+    assign short_desc = product.description | strip_html | truncate: 80
+
+    # ── Título sem o vendor duplicado (caso esteja prefixado) ──
+    assign title_clean = product.title
+    if product.vendor != blank
+      assign vendor_prefix = product.vendor | append: ' '
+      assign title_clean = product.title | remove_first: vendor_prefix | strip
+    endif
+
+    # ── Classes do article ────────────────────────────────────
+    assign card_classes = 'hdm-card tw-flex tw-flex-col tw-bg-white'
+    if extra_classes != blank
+      assign card_classes = card_classes | append: ' ' | append: extra_classes
+    endif
+  endif
+-%}
+
+{%- if product != blank -%}
+  <article
+    class="{{ card_classes }}"
+    data-product-id="{{ product.id }}"
+    data-product-handle="{{ product.handle }}"
+    itemscope
+    itemtype="https://schema.org/Product"
+  >
+    {%- comment -%} ── Top row: badges (esq) + favorito (dir) ── {%- endcomment -%}
+    <div class="hdm-card__top">
+      <div class="hdm-card__badges">
+        {%- if cupom_code != blank -%}
+          {%- render 'ui-chip',
+            label: 'Cupom: ' | append: cupom_code,
+            variant: 'cupom',
+            size: 'sm',
+            icon: 'icon-coupon'
+          -%}
+        {%- endif -%}
+        {%- if discount_pct > 0 -%}
+          {%- assign discount_label = '-' | append: discount_pct | append: '%' -%}
+          {%- render 'ui-badge', label: discount_label, variant: 'sale', size: 'sm' -%}
+        {%- endif -%}
+      </div>
+
+      <button
+        type="button"
+        class="hdm-card__favorite"
+        data-action="toggle-favorite"
+        data-product-id="{{ product.id }}"
+        aria-label="Adicionar {{ product.title | escape }} aos favoritos"
+        aria-pressed="false"
+      >
+        <svg class="hdm-card__favorite-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- comment -%} ── Imagem (link para PDP) ── {%- endcomment -%}
+    <a href="{{ product.url }}" class="hdm-card__image-link" aria-label="Ver {{ product.title | escape }}">
+      <div class="hdm-card__image-wrap">
+        {%- if product.featured_image != blank -%}
+          {%- render 'ui-image',
+            image: product.featured_image,
+            context: 'product-card',
+            priority: _prioritize,
+            alt: product.featured_image.alt | default: product.title,
+            class_name: 'hdm-card__image'
+          -%}
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'hdm-card__image hdm-card__image--placeholder' }}
+        {%- endif -%}
+      </div>
+    </a>
+
+    {%- comment -%} ── Rating ── {%- endcomment -%}
+    {%- if rating_value != blank -%}
+      <div class="hdm-card__rating">
+        {%- render 'ui-rating-stars',
+          rating: rating_value,
+          count: rating_count,
+          size: 'sm',
+          show_count: false
+        -%}
+      </div>
+    {%- else -%}
+      <div class="hdm-card__rating">
+        {%- render 'ui-rating-stars', rating: 5, size: 'sm', show_count: false -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Brand (vendor) ── {%- endcomment -%}
+    {%- if product.vendor != blank -%}
+      <p class="hdm-card__brand" itemprop="brand" itemscope itemtype="https://schema.org/Brand">
+        <span itemprop="name">{{ product.vendor }}</span>
+      </p>
+    {%- endif -%}
+
+    {%- comment -%} ── Title (link para PDP) ── {%- endcomment -%}
+    <h3 class="hdm-card__title">
+      <a href="{{ product.url }}" itemprop="name">{{ title_clean }}</a>
+    </h3>
+
+    {%- comment -%} ── Pricing + CTA sacola ── {%- endcomment -%}
+    <div class="hdm-card__pricing" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+      <meta itemprop="price" content="{{ product.price | money_without_currency | replace: ',', '.' }}">
+      <meta itemprop="availability" content="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+
+      <div class="hdm-card__pricing-text">
+        {%- if product.compare_at_price > product.price -%}
+          <s class="hdm-card__price-original" aria-label="Preço original {{ product.compare_at_price | money }}">
+            {{- product.compare_at_price | money -}}
+          </s>
+        {%- endif -%}
+        <span class="hdm-card__price-current" aria-label="Preço atual {{ product.price | money }}">
+          {{- product.price | money -}}
+        </span>
+        <span class="hdm-card__price-card">
+          ou {{ price_card | money }} no cartão
+        </span>
+      </div>
+
+      <a
+        href="{{ product.url }}"
+        class="hdm-card__cta"
+        aria-label="Comprar {{ product.title | escape }}"
+      >
+        <svg class="hdm-card__cta-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 7h12l-1.5 12.5a2 2 0 0 1-2 1.75H9.5a2 2 0 0 1-2-1.75L6 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    {%- comment -%} ── Descrição curta ── {%- endcomment -%}
+    {%- if short_desc != blank -%}
+      <p class="hdm-card__description">{{ short_desc }}</p>
+    {%- endif -%}
+  </article>
+{%- endif -%}

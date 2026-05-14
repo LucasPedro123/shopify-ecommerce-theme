@@ -1,0 +1,223 @@
+{%- comment -%}
+  ═════════════════════════════════════════════════════════════════════
+    HDM BEAUTY — Product Showcase (Sprint 2)
+
+    Carrossel horizontal de produtos a partir de uma collection.
+    Suporta banner promocional lateral opcional (ex: L'Oréal em "Mais Vendidos").
+
+    A11y:
+      - <section> com aria-labelledby ligado ao h2 do título
+      - Botões chevron com aria-label e aria-disabled
+      - Dots de paginação com aria-selected e aria-label dinâmicos
+      - Cada card é <article> com schema.org/Product
+
+    Performance:
+      - Primeira imagem visível recebe fetchpriority="high" (LCP)
+      - Demais recebem loading="lazy"
+      - Web Component carregado com defer
+  ═════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{{ 'hdm-product-showcase.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'hdm-product-showcase.js' | asset_url }}" type="module" defer></script>
+
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign limit = section.settings.product_limit | default: 12
+  assign fee_pct = section.settings.installment_fee_pct | default: 11
+  assign show_more = section.settings.show_more_link
+  assign title_text = section.settings.title | default: 'Produtos'
+  assign title_id = 'hdm-showcase-title-' | append: section.id
+  assign promo_image = section.settings.promo_image
+  assign promo_image_mobile = section.settings.promo_image_mobile
+  assign promo_link = section.settings.promo_link
+-%}
+
+<section
+  class="hdm-showcase hdm-spacing-x"
+  aria-labelledby="{{ title_id }}"
+  data-section-id="{{ section.id }}"
+>
+  <header class="hdm-showcase__head">
+    <h2 id="{{ title_id }}" class="hdm-showcase__title">{{ title_text }}</h2>
+
+    {%- if show_more and collection != blank -%}
+      <a href="{{ collection.url }}" class="hdm-showcase__more">
+        <span>Ver Mais</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </a>
+    {%- endif -%}
+  </header>
+
+  <product-showcase class="hdm-showcase__carousel">
+    <button
+      type="button"
+      class="hdm-showcase__nav hdm-showcase__nav--prev"
+      data-action="prev"
+      aria-label="Produtos anteriores"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <div class="hdm-showcase__track" data-track role="list">
+      {%- if promo_image != blank -%}
+        <div class="hdm-showcase__promo" role="listitem">
+          {%- if promo_link != blank -%}
+            <a href="{{ promo_link }}" aria-label="{{ promo_image.alt | default: 'Promoção em destaque' | escape }}">
+          {%- endif -%}
+          <picture>
+            {%- if promo_image_mobile != blank -%}
+              <source media="(max-width: 639px)" srcset="{{ promo_image_mobile | image_url: width: 800 }}">
+            {%- endif -%}
+            {%- render 'ui-image',
+              image: promo_image,
+              context: 'product-card',
+              priority: true,
+              alt: promo_image.alt | default: 'Promoção em destaque'
+            -%}
+          </picture>
+          {%- if promo_link != blank -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if collection != blank and collection.products.size > 0 -%}
+        {%- for product in collection.products limit: limit -%}
+          {%- comment -%}
+            Prioriza a imagem do primeiro card visível (forloop.first) quando
+            não há promo image. Quando há promo image, ela é o LCP.
+          {%- endcomment -%}
+          {%- assign is_first_product = forloop.first -%}
+          {%- if promo_image != blank -%}
+            {%- assign is_lcp = false -%}
+          {%- else -%}
+            {%- assign is_lcp = is_first_product -%}
+          {%- endif -%}
+
+          <div role="listitem">
+            {%- render 'hdm-product-card',
+              product: product,
+              prioritize_image: is_lcp,
+              installment_fee_pct: fee_pct
+            -%}
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%} Placeholders quando não há collection configurada {%- endcomment -%}
+        {%- for i in (1..4) -%}
+          <div role="listitem">
+            <div class="hdm-card hdm-card--placeholder">
+              <div class="hdm-card__image-wrap">
+                {{ 'product-1' | placeholder_svg_tag: 'hdm-card__image hdm-card__image--placeholder' }}
+              </div>
+              <p class="hdm-card__brand">Marca</p>
+              <h3 class="hdm-card__title">Nome do produto exemplo</h3>
+              <div class="hdm-card__pricing">
+                <div class="hdm-card__pricing-text">
+                  <span class="hdm-card__price-current">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    <button
+      type="button"
+      class="hdm-showcase__nav hdm-showcase__nav--next"
+      data-action="next"
+      aria-label="Próximos produtos"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+
+    <div class="hdm-showcase__controls">
+      <div class="hdm-showcase__dots" role="tablist" aria-label="Páginas do carrossel" data-dots></div>
+    </div>
+  </product-showcase>
+</section>
+
+{% schema %}
+{
+  "name": "HDM Product Showcase",
+  "tag": "section",
+  "class": "hdm-product-showcase-section",
+  "settings": [
+    { "type": "header", "content": "Conteúdo" },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título da seção",
+      "default": "Novidades!"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection (fonte dos produtos)"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "label": "Máximo de produtos exibidos",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_more_link",
+      "label": "Exibir link 'Ver Mais'",
+      "default": true,
+      "info": "Aponta automaticamente para a página da collection selecionada."
+    },
+
+    { "type": "header", "content": "Banner promocional lateral (opcional)" },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Imagem desktop",
+      "info": "Aparece como primeira célula do carrossel. Sugerido: 480x720px (3:4)."
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image_mobile",
+      "label": "Imagem mobile (opcional)",
+      "info": "Se vazia, usa a versão desktop. Sugerido: 480x600px."
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "Link do banner"
+    },
+
+    { "type": "header", "content": "Preço" },
+    {
+      "type": "range",
+      "id": "installment_fee_pct",
+      "label": "Acréscimo no cartão (%)",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 11,
+      "info": "Percentual adicional aplicado ao preço para exibir 'ou R$ X no cartão'."
+    }
+  ],
+  "presets": [
+    {
+      "name": "HDM Product Showcase",
+      "settings": {
+        "title": "Novidades!"
+      }
+    }
+  ]
+}
+{% endschema %}

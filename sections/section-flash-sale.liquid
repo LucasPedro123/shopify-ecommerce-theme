@@ -1,0 +1,34 @@
+<div class="flash-sale-container">
+    <div class="image-flash-sale"></div>
+    <div class="flash-sale-wrapper">
+        <h2></h2>
+        <div class="countdown-timer-flash-sale">
+
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Flash Sale",
+    "tag": "section",
+    "class": "product",
+    "settings": [
+        {
+          "type": "image_picker",
+          "id": "flash_sale_image",
+          "label": "Imagem da seção Oferta Relâmpago"
+        },
+        {
+        "type": "product_list",
+        "id": "flash_product_list",
+        "label": "Produto em Oferta Relâmpago",
+        "limit": 3
+      },
+    ],
+   
+  }
+{% endschema %}

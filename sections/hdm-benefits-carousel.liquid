@@ -1,0 +1,175 @@
+{%- comment -%}
+  ═════════════════════════════════════════════════════════════════════
+   HDM BEAUTY — Benefícios Slider (Web Component + Tailwind)
+   Diretrizes aplicadas:
+   - Web Component: <benefits-carousel> isolando lógica JS.
+   - Performance: CSS Scroll Snap + image_tag nativo (AVIF/WebP).
+   - A11y: Semântica de lista (role="list"), botões com aria-label.
+   - Tailwind Lado a Lado: Construído com os tokens da Sprint 0.
+  ═════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+<script src="{{ 'hdm-benefits-carousel.js' | asset_url }}" type="module" defer></script>
+
+<style>
+  /* Utilitários complementares */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Desativa o snap de hardware durante o arrasto do mouse para não "tremer" */
+  [data-slider].is-dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+  [data-slider] {
+    cursor: grab;
+  }
+
+  /* Padrão dos Dots */
+  .hdm-slider-dot {
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 8px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.24);
+    border-radius: 40px;
+    padding: 0;
+  }
+  .hdm-slider-dot.is-active {
+    width: 24px;
+    background-color: #766CFF; 
+  }
+
+  .benefit-item{
+     padding-inline: 10px;
+     border-radius: 10px;
+     background: #EFEFEF;
+}
+</style>
+
+<benefits-carousel class="tw-block tw-w-full tw-py-8 md:tw-py-12 tw-bg-white tw-overflow-hidden">
+  <section aria-labelledby="benefits-heading-{{ section.id }}" class="hdm-spacing-x">
+    <h2 id="benefits-heading-{{ section.id }}" class="tw-sr-only">{{ section.settings.title | default: 'Nossos Benefícios' }}</h2>
+
+    <div class="tw-relative tw-w-full tw-max-w-[1920px] tw-mx-auto tw-flex tw-flex-col tw-items-center">
+      
+      {%- comment -%} ── CONTAINER DO SLIDER (Scroll Snap Nativo) ── {%- endcomment -%}
+      <ul 
+        class="tw-flex tw-items-center tw-gap-8 md:tw-gap-12 tw-overflow-x-auto tw-snap-x tw-snap-mandatory no-scrollbar tw-pb-4 tw-w-full tw-justify-start md:tw-justify-center" 
+        data-slider 
+        role="list"
+        tabindex="0"
+      >
+        {%- for block in section.blocks -%}
+          <li 
+            class="benefit-item tw-snap-center tw-shrink-0 tw-flex tw-items-center tw-gap-4 md:tw-gap-5" 
+            data-slide="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- comment -%} Círculo do Ícone Expandido (84px) {%- endcomment -%}
+            <div class="tw-w-[84px] tw-h-[84px] tw-rounded-full tw-bg-[#F4F4F5] tw-flex tw-items-center tw-justify-center tw-shrink-0 tw-text-brand-500">
+              {%- if block.settings.custom_svg != blank -%}
+                <div class="tw-w-10 tw-h-10 tw-flex tw-items-center tw-justify-center">
+                  {{ block.settings.custom_svg }}
+                </div>
+              {%- elsif block.settings.icon_image != blank -%}
+                {{ block.settings.icon_image | image_url: width: 84 | image_tag: 
+                    loading: 'lazy', 
+                    class: 'tw-w-10 tw-h-10 tw-object-contain', 
+                    alt: block.settings.title | escape 
+                }}
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag: 'tw-w-10 tw-h-10 tw-text-ink-300' }}
+              {%- endif -%}
+            </div>
+            
+            {%- comment -%} Texto Expandido (24px) com max-width ajustado para evitar esmagamento {%- endcomment -%}
+            <span class="tw-text-[0.9rem] md:tw-text-[1.2rem] tw-font-semibold tw-text-ink-900 tw-leading-tight tw-max-w-[160px] md:tw-max-w-[200px]">
+              {{ block.settings.title | replace: ' ', '<br>' }}
+            </span>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- comment -%} ── CONTROLES (Setas e Bolinhas iguais ao Figma) ── {%- endcomment -%}
+      {% comment %} {%- if section.blocks.size > 1 -%}
+        <div class="tw-flex tw-items-center tw-justify-center tw-gap-4 tw-mt-6">
+          
+          <button type="button" class="tw-flex tw-items-center tw-justify-center tw-w-8 tw-h-8 tw-rounded-md tw-border tw-border-brand-500 tw-text-brand-500 hover:tw-bg-brand-50 tw-transition-colors disabled:tw-opacity-50 disabled:tw-cursor-not-allowed" aria-label="Anterior" data-prev>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <div class="tw-flex tw-items-center tw-gap-3" data-dots-container>
+            {%- for block in section.blocks -%}
+              <button 
+                type="button" 
+                class="hdm-slider-dot {% if forloop.first %}is-active{% endif %}" 
+                aria-label="Ir para benefício {{ forloop.index }}" 
+                data-dot="{{ forloop.index0 }}">
+              </button>
+            {%- endfor -%}
+          </div>
+
+          <button type="button" class="tw-flex tw-items-center tw-justify-center tw-w-8 tw-h-8 tw-rounded-md tw-border tw-border-brand-500 tw-text-brand-500 hover:tw-bg-brand-50 tw-transition-colors disabled:tw-opacity-50 disabled:tw-cursor-not-allowed" aria-label="Próximo" data-next>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+        </div>
+      {%- endif -%} {% endcomment %}
+
+    </div>
+  </section>
+</benefits-carousel>
+
+{% schema %}
+{
+  "name": "Benefícios (Slider)",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título invisível (SEO/Acessibilidade)",
+      "default": "Nossos Benefícios"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefício",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Texto do Benefício",
+          "info": "Espaços serão convertidos em quebra de linha. Ex: 'Escolha seu cupom'",
+          "default": "Escolha cupom"
+        },
+        {
+          "type": "html",
+          "id": "custom_svg",
+          "label": "Ícone em SVG (Recomendado)",
+          "info": "Cole o código SVG cru para melhor performance e troca de cor (usará a cor primária brand-500)."
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Ou Imagem (PNG/WEBP)",
+          "info": "Usado se o SVG estiver vazio."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Benefícios (Slider)",
+      "blocks": [
+        { "type": "benefit", "settings": { "title": "Escolha cupom" } },
+        { "type": "benefit", "settings": { "title": "Promoções exclusivas" } },
+        { "type": "benefit", "settings": { "title": "+ Promoção" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

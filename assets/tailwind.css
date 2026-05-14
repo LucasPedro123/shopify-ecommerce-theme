@@ -159,6 +159,18 @@
 
 /* Scroll horizontal mobile com snap (benefícios, carrosséis) */
 
+.tw-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .tw-fixed {
   position: fixed;
 }
@@ -227,6 +239,11 @@
   margin: 0;
 }
 
+.tw-mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .tw-mb-2xl {
   margin-bottom: 48px;
 }
@@ -261,6 +278,10 @@
 
 .tw-mt-xs {
   margin-top: 8px;
+}
+
+.tw-mt-6 {
+  margin-top: 1.5rem;
 }
 
 .tw-block {
@@ -336,6 +357,18 @@
   height: max-content;
 }
 
+.tw-h-2 {
+  height: 0.5rem;
+}
+
+.tw-h-8 {
+  height: 2rem;
+}
+
+.tw-h-\[84px\] {
+  height: 84px;
+}
+
 .tw-min-h-\[36px\] {
   min-height: 36px;
 }
@@ -380,12 +413,40 @@
   width: 100%;
 }
 
+.tw-w-2 {
+  width: 0.5rem;
+}
+
+.tw-w-8 {
+  width: 2rem;
+}
+
+.tw-w-\[84px\] {
+  width: 84px;
+}
+
 .tw-min-w-\[18px\] {
   min-width: 18px;
 }
 
 .tw-max-w-narrow {
   max-width: 960px;
+}
+
+.tw-max-w-\[120px\] {
+  max-width: 120px;
+}
+
+.tw-max-w-\[1920px\] {
+  max-width: 1920px;
+}
+
+.tw-max-w-\[200px\] {
+  max-width: 200px;
+}
+
+.tw-max-w-\[160px\] {
+  max-width: 160px;
 }
 
 .tw-flex-1 {
@@ -414,8 +475,16 @@
   scroll-snap-type: x var(--tw-scroll-snap-strictness);
 }
 
+.tw-snap-mandatory {
+  --tw-scroll-snap-strictness: mandatory;
+}
+
 .tw-snap-start {
   scroll-snap-align: start;
+}
+
+.tw-snap-center {
+  scroll-snap-align: center;
 }
 
 .tw-list-none {
@@ -448,6 +517,10 @@
 
 .tw-items-center {
   align-items: center;
+}
+
+.tw-justify-start {
+  justify-content: flex-start;
 }
 
 .tw-justify-end {
@@ -484,6 +557,22 @@
 
 .tw-gap-xs {
   gap: 8px;
+}
+
+.tw-gap-2 {
+  gap: 0.5rem;
+}
+
+.tw-gap-3 {
+  gap: 0.75rem;
+}
+
+.tw-gap-4 {
+  gap: 1rem;
+}
+
+.tw-gap-8 {
+  gap: 2rem;
 }
 
 .tw-overflow-hidden {
@@ -603,8 +692,23 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 
+.tw-bg-ink-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(212 212 216 / var(--tw-bg-opacity, 1));
+}
+
+.tw-bg-\[\#F4F4F5\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 244 245 / var(--tw-bg-opacity, 1));
+}
+
 .tw-bg-opacity-100 {
   --tw-bg-opacity: 1;
+}
+
+.tw-object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 
 .tw-object-cover {
@@ -692,6 +796,11 @@
   padding-bottom: 8px;
 }
 
+.tw-py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .tw-pl-md {
   padding-left: 16px;
 }
@@ -702,6 +811,10 @@
 
 .tw-pr-lg {
   padding-right: 24px;
+}
+
+.tw-pb-4 {
+  padding-bottom: 1rem;
 }
 
 .tw-text-center {
@@ -750,6 +863,22 @@
 .tw-text-xs {
   font-size: 0.75rem;
   line-height: 1.4;
+}
+
+.tw-text-\[24px\] {
+  font-size: 24px;
+}
+
+.tw-text-\[20px\] {
+  font-size: 20px;
+}
+
+.tw-text-\[1rem\] {
+  font-size: 1rem;
+}
+
+.tw-text-\[0\.9rem\] {
+  font-size: 0.9rem;
 }
 
 .tw-font-bold {
@@ -835,6 +964,11 @@
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+.tw-text-ink-300 {
+  --tw-text-opacity: 1;
+  color: rgb(212 212 216 / var(--tw-text-opacity, 1));
+}
+
 .tw-underline {
   text-decoration-line: underline;
 }
@@ -857,8 +991,24 @@
   transition-duration: 250ms;
 }
 
+.tw-transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 250ms;
+}
+
+.tw-transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 250ms;
+}
+
 .tw-duration-fast {
   transition-duration: 150ms;
+}
+
+.tw-duration-300 {
+  transition-duration: 300ms;
 }
 
 /* ============================================================ *
@@ -991,12 +1141,20 @@
     max-width: 420px;
   }
 
+  .md\:tw-max-w-\[200px\] {
+    max-width: 200px;
+  }
+
   .md\:tw-flex-row {
     flex-direction: row;
   }
 
   .md\:tw-items-center {
     align-items: center;
+  }
+
+  .md\:tw-justify-center {
+    justify-content: center;
   }
 
   .md\:tw-justify-between {
@@ -1007,13 +1165,51 @@
     gap: 16px;
   }
 
+  .md\:tw-gap-4 {
+    gap: 1rem;
+  }
+
+  .md\:tw-gap-8 {
+    gap: 2rem;
+  }
+
+  .md\:tw-gap-5 {
+    gap: 1.25rem;
+  }
+
+  .md\:tw-gap-12 {
+    gap: 3rem;
+  }
+
   .md\:tw-px-sm {
     padding-left: 12px;
     padding-right: 12px;
   }
 
+  .md\:tw-py-12 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
   .md\:tw-text-\[clamp\(16px\2c 2vw\2c 22px\)\] {
     font-size: clamp(16px, 2vw, 22px);
+  }
+
+  .md\:tw-text-base {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .md\:tw-text-\[24px\] {
+    font-size: 24px;
+  }
+
+  .md\:tw-text-\[1rem\] {
+    font-size: 1rem;
+  }
+
+  .md\:tw-text-\[1\.2rem\] {
+    font-size: 1.2rem;
   }
 }
 

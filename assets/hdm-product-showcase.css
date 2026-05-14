@@ -1,0 +1,462 @@
+/* assets/hdm-product-showcase.css
+ * HDM Beauty — Product Showcase (carrossel de produtos)
+ *
+ * Estrutura:
+ *   .hdm-showcase                  → wrapper externo (usa .hdm-spacing-x global)
+ *   .hdm-showcase__head            → título + "Ver Mais"
+ *   .hdm-showcase__carousel        → relativo, contém chevrons absolutos
+ *   .hdm-showcase__track           → grid horizontal scrollável
+ *   .hdm-showcase__promo           → banner lateral opcional (1ª célula)
+ *   .hdm-showcase__nav             → botões chevron prev/next
+ *   .hdm-showcase__dots            → indicadores de página (mobile principalmente)
+ *
+ *   .hdm-card                      → article do produto
+ *
+ * Responsividade:
+ *   ≥ 990px : 4 cards visíveis
+ *   640-989 : 2 cards visíveis
+ *   < 640   : 1.5 cards visíveis (sinaliza swipe)
+ */
+
+/* ════════════════════════════════════════════════════════════════
+ * SHOWCASE — outer wrapper
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase {
+  --card-gap: 16px;
+  --card-radius: 12px;
+  --card-bg: #ffffff;
+  --card-border: transparent;
+
+  padding-block: clamp(32px, 6vw, 64px);
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .hdm-showcase { --card-gap: 20px; }
+}
+@media (min-width: 1200px) {
+  .hdm-showcase { --card-gap: 24px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * HEAD — título + Ver Mais
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.hdm-showcase__title {
+  font-family: 'Jost', sans-serif;
+  font-weight: 700;
+  font-size: clamp(22px, 3.5vw, 32px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #010101;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.hdm-showcase__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #010101;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+.hdm-showcase__more:hover { color: var(--color-brand-500, #766CFF); }
+.hdm-showcase__more svg { flex-shrink: 0; }
+
+/* ════════════════════════════════════════════════════════════════
+ * CARROSSEL — track + chevrons
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase__carousel {
+  position: relative;
+}
+
+.hdm-showcase__track {
+  display: grid;
+  grid-auto-flow: column;
+  /* default: 1.5 cards mobile */
+  grid-auto-columns: calc((100% - (var(--card-gap) * 0.5)) / 1.5);
+  gap: var(--card-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Esconde scrollbar visual mas mantém funcionalidade */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Padding para que o último/primeiro card não cole nas bordas durante scroll */
+  padding-block: 4px;
+}
+.hdm-showcase__track::-webkit-scrollbar { display: none; }
+
+@media (min-width: 640px) {
+  .hdm-showcase__track {
+    grid-auto-columns: calc((100% - var(--card-gap)) / 2);
+  }
+}
+@media (min-width: 990px) {
+  .hdm-showcase__track {
+    grid-auto-columns: calc((100% - (var(--card-gap) * 3)) / 4);
+  }
+}
+
+/* Snap das células */
+.hdm-showcase__track > * {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * NAV — chevrons (botões prev/next)
+ *
+ * Desktop (≥ 640px): position absolute, laterais ao track
+ * Mobile  (< 640px): position static, layout em grid junto com dots
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase__nav {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #18181B;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 200ms ease, opacity 200ms ease, transform 200ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.hdm-showcase__nav:hover {
+  background: var(--color-brand-50, #F4F3FF);
+  color: var(--color-brand-700, #5A52CC);
+}
+.hdm-showcase__nav[disabled],
+.hdm-showcase__nav[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .hdm-showcase__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .hdm-showcase__nav--prev { left: -22px; }
+  .hdm-showcase__nav--next { right: -22px; }
+}
+
+@media (min-width: 640px) and (max-width: 1199px) {
+  .hdm-showcase__nav--prev { left: 8px; }
+  .hdm-showcase__nav--next { right: 8px; }
+}
+
+/* Mobile: layout em grid colocando [< prev] [dots] [next >] na mesma linha */
+@media (max-width: 639px) {
+  product-showcase {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 16px;
+  }
+  .hdm-showcase__track {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .hdm-showcase__nav--prev {
+    grid-column: 1;
+    grid-row: 2;
+    width: 40px;
+    height: 40px;
+  }
+  .hdm-showcase__controls {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0;
+  }
+  .hdm-showcase__nav--next {
+    grid-column: 3;
+    grid-row: 2;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * DOTS — paginação visual
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.hdm-showcase__dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hdm-showcase__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: #D4D4D8;
+  cursor: pointer;
+  transition: background 200ms ease, width 200ms ease;
+}
+.hdm-showcase__dot[aria-selected="true"] {
+  background: var(--color-brand-500, #766CFF);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * PROMO IMAGE — banner lateral (1ª célula do grid)
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-showcase__promo {
+  position: relative;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.hdm-showcase__promo a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+.hdm-showcase__promo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * CARD — article do produto
+ * ════════════════════════════════════════════════════════════════ */
+.hdm-card {
+  display: grid;
+  grid-template-rows: auto auto auto auto auto auto auto;
+  row-gap: 12px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--card-border);
+  padding: 12px;
+  position: relative;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.hdm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Top row: badges + favorito ── */
+.hdm-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+}
+.hdm-card__badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.hdm-card__favorite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: #71717A;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 200ms ease, background 200ms ease;
+}
+.hdm-card__favorite:hover { background: #F4F4F5; color: #DC2626; }
+.hdm-card__favorite[aria-pressed="true"] { color: #DC2626; }
+.hdm-card__favorite[aria-pressed="true"] .hdm-card__favorite-icon path {
+  fill: currentColor;
+}
+
+/* ── Imagem ── */
+.hdm-card__image-link {
+  display: block;
+  text-decoration: none;
+}
+.hdm-card__image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #FAFAFA;
+}
+.hdm-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 300ms ease;
+}
+.hdm-card:hover .hdm-card__image { transform: scale(1.04); }
+.hdm-card__image--placeholder { padding: 24px; opacity: 0.4; }
+
+/* ── Rating ── */
+.hdm-card__rating { display: flex; }
+
+/* ── Brand (Jost Bold 14/20 upper #010101) ── */
+.hdm-card__brand {
+  font-family: 'Jost', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+  color: #010101;
+  margin: 0;
+}
+
+/* ── Title (Jost Medium 14/20 #010101) ── */
+.hdm-card__title {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #010101;
+  margin: 0;
+  /* Limita a 2 linhas */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 40px; /* reserva espaço pra evitar layout shift */
+}
+.hdm-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.hdm-card__title a:hover {
+  color: var(--color-brand-500, #766CFF);
+}
+
+/* ── Pricing + CTA (grid 2 colunas) ── */
+.hdm-card__pricing {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.hdm-card__pricing-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hdm-card__price-original {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #71717A;
+  text-decoration: line-through;
+}
+.hdm-card__price-current {
+  font-family: 'Jost', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 28px;
+  color: var(--color-brand-500, #766CFF);
+  letter-spacing: -0.01em;
+}
+.hdm-card__price-card {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: #71717A;
+}
+
+/* CTA sacola — botão roxo quadrado */
+.hdm-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--color-brand-500, #766CFF);
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.hdm-card__cta:hover {
+  background: var(--color-brand-600, #5A52CC);
+  transform: scale(1.05);
+}
+.hdm-card__cta:focus-visible {
+  outline: 2px solid var(--color-brand-700, #5A52CC);
+  outline-offset: 2px;
+}
+
+/* ── Descrição curta (3 linhas máx) ── */
+.hdm-card__description {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #71717A;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * RESPONSIVIDADE — ajustes de card em telas pequenas
+ * ════════════════════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .hdm-card { padding: 8px; row-gap: 10px; }
+  .hdm-card__price-current { font-size: 20px; line-height: 26px; }
+  .hdm-card__cta { width: 40px; height: 40px; }
+  .hdm-card__description { -webkit-line-clamp: 2; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * REDUCED MOTION
+ * ════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .hdm-card, .hdm-card__image, .hdm-card__cta, .hdm-showcase__nav, .hdm-showcase__dot, .hdm-card__favorite {
+    transition: none;
+  }
+  .hdm-card:hover { transform: none; }
+  .hdm-showcase__track { scroll-behavior: auto; }
+}

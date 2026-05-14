@@ -39,6 +39,57 @@
         "speed": 5
       }
     },
+    "hdm_benefits_carousel_G8Wfhj": {
+      "type": "hdm-benefits-carousel",
+      "blocks": {
+        "benefit_aN4FHD": {
+          "type": "benefit",
+          "settings": {
+            "title": "Escolha cupom",
+            "custom_svg": ""
+          }
+        },
+        "benefit_MT86iD": {
+          "type": "benefit",
+          "settings": {
+            "title": "Escolha cupom",
+            "custom_svg": ""
+          }
+        },
+        "benefit_g44WgE": {
+          "type": "benefit",
+          "settings": {
+            "title": "Escolha cupom",
+            "custom_svg": ""
+          }
+        },
+        "benefit_KxNhhJ": {
+          "type": "benefit",
+          "settings": {
+            "title": "Promoções exclusivas",
+            "custom_svg": ""
+          }
+        },
+        "benefit_98RwPc": {
+          "type": "benefit",
+          "settings": {
+            "title": "+ Promoções",
+            "custom_svg": ""
+          }
+        }
+      },
+      "block_order": [
+        "benefit_aN4FHD",
+        "benefit_MT86iD",
+        "benefit_g44WgE",
+        "benefit_KxNhhJ",
+        "benefit_98RwPc"
+      ],
+      "name": "Benefícios (Slider)",
+      "settings": {
+        "title": "Nossos Benefícios"
+      }
+    },
     "custom_collection_list_UDXFm4": {
       "type": "custom-collection-list",
       "blocks": {
@@ -503,6 +554,7 @@
   },
   "order": [
     "custom_hero_banner_bfYfEa",
+    "hdm_benefits_carousel_G8Wfhj",
     "custom_collection_list_UDXFm4",
     "custom_product_slider_bW4iAE",
     "product_hotspots_RzCyE8",
