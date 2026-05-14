@@ -1,180 +1,479 @@
-{% comment %}
-  ═══════════════════════════════════════════════════════════════════
-  HDM BEAUTY — Header Principal
-  Arquivo: sections/hdm-header.liquid
+{%- comment -%}
+  section/hdm-header.liquid
+  ═════════════════════════════════════════════════════════════════════
+    HDM BEAUTY — Header (Sprint 1, refactor 2026-05)
 
-  Estrutura:
-    ┌─────────────────────────────────────────────────────────┐
-    │ .hdm-header__topbar   → logo | busca | cep | ações     │
-    ├─────────────────────────────────────────────────────────┤
-    │ .hdm-header__navbar   → mega menu desktop (some scroll) │
-    └─────────────────────────────────────────────────────────┘
+    Estrutura Responsiva:
+    - Mobile: 3 Linhas (Logo/Fav, Busca/Menu/Ações, CEP)
+    - Desktop: 1 Linha (Busca, Logo, Ações) + Nav
+  ═════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
 
-  Mobile: topbar com drawer hamburger + logo + ações
-  ═══════════════════════════════════════════════════════════════════
-{% endcomment %}
+{{ 'hdm-header.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'hdm-header.js' | asset_url }}" type="module" defer></script>
 
 {%- liquid
   assign main_menu = linklists[section.settings.menu]
   assign sticky = section.settings.sticky_header
+  assign show_subheader = section.settings.show_subheader
 -%}
 
-{% render 'hdm-announcement-bar' %}
-
-{%- comment -%} Schema JSON-LD {%- endcomment -%}
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "Organization",
-    "name": {{ shop.name | json }},
-    {% if settings.logo %}"logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},{% endif %}
-    "url": {{ request.origin | json }}
-  }
-</script>
-
-{%- comment -%} ── MODAL CEP ─────────────────────────────────────────────────── {%- endcomment -%}
-<div class="hdm-cep-modal" id="hdm-cep-modal" role="dialog" aria-modal="true" aria-label="Informar CEP" hidden>
-  <div class="hdm-cep-modal__backdrop" id="hdm-cep-backdrop"></div>
-  <div class="hdm-cep-modal__box">
-    <button class="hdm-cep-modal__close" id="hdm-cep-close" aria-label="Fechar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-    <p class="hdm-cep-modal__title">Informe seu CEP</p>
-    <p class="hdm-cep-modal__sub">Para calcular frete e prazo de entrega</p>
-    <div class="hdm-cep-modal__field">
-      <input
-        id="hdm-cep-input"
-        class="hdm-cep-modal__input"
-        type="text"
-        inputmode="numeric"
-        maxlength="9"
-        placeholder="00000-000"
-        aria-label="CEP"
-      >
-      <button class="hdm-cep-modal__btn" id="hdm-cep-save">Salvar</button>
-    </div>
-    <a
-      class="hdm-cep-modal__link"
-      href="https://buscacepinter.correios.com.br/app/endereco/index.php"
-      target="_blank"
-      rel="noopener"
-      >Não sei meu CEP</a
-    >
-  </div>
-</div>
-
-{%- comment -%} ── HEADER ────────────────────────────────────────────────────── {%- endcomment -%}
-<hdm-header
-  class="hdm-header{% if sticky %} hdm-header--sticky{% endif %}"
-  id="hdm-header"
-  {% if sticky %}
-    data-sticky
-  {% endif %}
+<header-component
+  class="hdm-header tw-fixed tw-top-0 tw-left-0 tw-w-full"
+  data-state="initial"
+  data-sticky="{{ sticky }}"
+  role="banner"
 >
-  {%- comment -%} ── TOPBAR ── {%- endcomment -%}
-  <div class="hdm-header__topbar">
-    <div class="hdm-header__topbar-inner">
-      {%- comment -%} Hamburger — só mobile {%- endcomment -%}
-      <div class="hdm-header__drawer-trigger">
-        {%- render 'header-drawer', linklist: main_menu, data_header_drawer_type: 'mobile-drawer' -%}
-      </div>
+  {% render 'hdm-announcement-bar' %}
 
-      {%- comment -%} Logo {%- endcomment -%}
-      <a href="{{ routes.root_url }}" class="hdm-header__logo" aria-label="{{ shop.name }}">
-        {%- if settings.logo != blank -%}
-          {{-
-            settings.logo
-            | image_url: width: 200
-            | image_tag: alt: shop.name, class: 'hdm-header__logo-img', loading: 'eager', fetchpriority: 'high'
-          -}}
-        {%- else -%}
-          <span class="hdm-header__logo-text">{{ shop.name }}</span>
-        {%- endif -%}
-      </a>
-
-      {%- comment -%} Busca — desktop e mobile {%- endcomment -%}
-      <form
-        action="{{ routes.search_url }}"
-        method="get"
-        class="hdm-header__search"
-        role="search"
-      >
-        <input type="hidden" name="type" value="product">
-        <div class="hdm-header__search-wrap">
-          <input
-            class="hdm-header__search-input"
-            type="search"
-            name="q"
-            placeholder="{{ section.settings.search_placeholder | default: 'O que você procura hoje?' }}"
-            aria-label="Buscar produtos"
-            autocomplete="off"
-          >
-          <button class="hdm-header__search-btn" type="submit" aria-label="Buscar">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-        </div>
-      </form>
-
-      {%- comment -%} Ações direita {%- endcomment -%}
-      <div class="hdm-header__actions">
-        {%- comment -%} CEP {%- endcomment -%}
-        <button class="hdm-header__action hdm-header__action--cep" id="hdm-cep-trigger" aria-label="Informar CEP">
+  <div class="hdm-header__main hdm-spacing-x tw-shadow ">
+    <div class="tw-flex tw-flex-col md:tw-flex-row md:tw-items-center md:tw-justify-between tw-gap-sm md:tw-gap-md tw-py-sm tw-h-max">
+      <div class="tw-flex tw-items-center tw-justify-between tw-w-full md:tw-hidden">
+        <a
+          href="{{ routes.root_url }}"
+          class="hdm-header__logo tw-flex tw-items-center tw-shrink-0"
+          aria-label="{{ shop.name }} — Página inicial"
+        >
+          {%- if settings.logo != blank -%}
+            <span class="hdm-logo-variant hdm-logo-variant--light" aria-hidden="false">
+              {%- render 'logo', isWhite: true -%}
+            </span>
+            <span class="hdm-logo-variant hdm-logo-variant--dark" aria-hidden="true">
+              {%- render 'logo', isWhite: false -%}
+            </span>
+          {%- else -%}
+            <span class="tw-text-xl tw-font-bold">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+        <a
+          href="/pages/favoritos"
+          class="hdm-action-btn tw-flex tw-items-center tw-justify-center tw-p-xs tw-bg-transparent tw-rounded-lg"
+          aria-label="Meus favoritos"
+        >
           <svg
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            aria-hidden="true"
           >
-            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
-          <span class="hdm-header__action-label" id="hdm-cep-label">Informar CEP</span>
+        </a>
+      </div>
+
+      <div class="tw-flex tw-items-center tw-justify-between tw-w-full tw-gap-2xs md:tw-gap-md">
+        <button
+          type="button"
+          class="hdm-header__menu-toggle md:tw-hidden tw-p-xs tw-shrink-0"
+          aria-label="Abrir menu"
+          aria-expanded="false"
+          aria-controls="hdm-mobile-drawer"
+          data-action="open-drawer"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
         </button>
 
-        {%- comment -%} Conta {%- endcomment -%}
-        {%- if shop.customer_accounts_enabled -%}
-          <a
-            href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
-            class="hdm-header__action"
-            aria-label="{%- if customer -%}Minha conta{%- else -%}Entrar{%- endif -%}"
+        <form
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+          class="hdm-header__search tw-flex-1 md:tw-max-w-[420px] tw-relative tw-h-[48px] md:tw-h-[72px]"
+        >
+          <input
+            type="search"
+            name="q"
+            class="hdm-header__search-input tw-h-full tw-w-full tw-rounded-xl tw-pl-md tw-pr-12 tw-text-sm md:tw-text-[clamp(16px,2vw,22px)] tw-border-0 focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-brand-500"
+            placeholder="O que você procura?"
+            aria-label="Buscar produtos"
+            autocomplete="off"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+            <button
+              type="submit"
+              class="hdm-header__search-submit tw-absolute tw-right-xs tw-top-1/2 -tw-translate-y-1/2 tw-bg-transparent tw-border-0 tw-p-xs tw-cursor-pointer"
+              aria-label="Buscar"
             >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span class="hdm-header__action-label">
-              {%- if customer -%}Olá, {{ customer.first_name }}{%- else -%}Entrar{%- endif -%}
-            </span>
-          </a>
-        {%- endif -%}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </button>
+        </form>
 
-        {%- comment -%} Carrinho {%- endcomment -%}
-        <a href="{{ routes.cart_url }}" class="hdm-header__action hdm-header__action--cart" aria-label="Carrinho">
-          <span class="hdm-header__cart-wrap">
+        <a
+          href="{{ routes.root_url }}"
+          class="hdm-header__logo tw-hidden md:tw-flex tw-items-center tw-gap-sm tw-shrink-0"
+          aria-label="{{ shop.name }} — Página inicial"
+        >
+          {%- if settings.logo != blank -%}
+            <span class="hdm-logo-variant hdm-logo-variant--light" aria-hidden="false">
+              {%- render 'logo', isWhite: true -%}
+            </span>
+            <span class="hdm-logo-variant hdm-logo-variant--dark" aria-hidden="true">
+              {%- render 'logo', isWhite: false -%}
+            </span>
+          {%- else -%}
+            <span class="tw-text-xl tw-font-bold">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+
+        <div class="hdm-header__actions tw-flex tw-items-center tw-gap-xs tw-shrink-0 tw-h-[48px] md:tw-h-[45px]">
+          <div class="hdm-dropdown tw-hidden md:tw-block" data-dropdown="cep">
+            <button
+              type="button"
+              class="hdm-action-btn tw-flex tw-items-center tw-rounded-lg tw-px-sm tw-h-full tw-text-sm tw-font-semibold header-input-cep"
+              aria-label="Informar CEP"
+              aria-expanded="false"
+              aria-controls="hdm-pop-cep"
+              aria-haspopup="dialog"
+              data-action="toggle-dropdown"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Informar Cep</span>
+              <img
+                src="{{ 'chevrow-hdm.svg' | asset_url}}"
+                width="10"
+                height="10"
+                class="header-chevron-actions"
+                alt="Seta"
+              >
+            </button>
+            <div
+              id="hdm-pop-cep"
+              class="hdm-pop hdm-pop--cep"
+              role="dialog"
+              aria-label="CEP"
+              data-cep-state="invite"
+              hidden
+            >
+              <div
+                class="hdm-cep-pane hdm-cep-pane--invite tw-p-md tw-flex tw-flex-col tw-gap-sm"
+                data-cep-pane="invite"
+              >
+                <button type="button" class="hdm-pop__close" aria-label="Fechar" data-action="close-dropdown">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+                <p class="tw-text-sm tw-text-ink-700 tw-pr-lg">
+                  Descubra as melhores ofertas e fretes para a sua região! 🤩
+                </p>
+                <div class="tw-flex tw-justify-end">
+                  {% render 'ui-button',
+                    label: 'Informar CEP',
+                    variant: 'primary',
+                    size: 'sm',
+                    type: 'button',
+                    extra_classes: 'hdm-cep-show-form-btn'
+                  %}
+                </div>
+              </div>
+              <form
+                class="hdm-cep-pane hdm-cep-pane--form tw-p-md tw-flex tw-flex-col tw-gap-sm"
+                data-cep-pane="form"
+                data-cep-form
+                hidden
+              >
+                <div class="tw-flex tw-items-center tw-justify-between">
+                  <label class="tw-text-sm tw-font-semibold tw-text-ink-900" for="hdm-cep-input">Calcule o frete</label>
+                  <button type="button" class="hdm-cep-back" aria-label="Voltar" data-action="cep-back-to-invite">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                  </button>
+                </div>
+                <input
+                  id="hdm-cep-input"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="9"
+                  placeholder="00000-000"
+                  class="tw-rounded-md tw-border tw-border-ink-200 tw-px-sm tw-py-xs tw-text-sm"
+                  autocomplete="postal-code"
+                >
+                {% render 'ui-button',
+                  label: 'Salvar',
+                  variant: 'primary',
+                  size: 'sm',
+                  type: 'submit',
+                  full_width: true
+                %}
+              </form>
+            </div>
+          </div>
+
+          <div class="hdm-dropdown" data-dropdown="account">
+            <button
+              type="button"
+              class="hdm-action-btn tw-flex tw-items-center tw-gap-2xs tw-rounded-lg tw-px-xs md:tw-px-sm tw-h-full tw-text-sm tw-font-semibold"
+              aria-label="Minha conta"
+              aria-expanded="false"
+              aria-controls="hdm-pop-account"
+              aria-haspopup="menu"
+              data-action="toggle-dropdown"
+            >
+              <svg
+                class="account-icon"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span class="tw-hidden md:tw-inline">Minha Conta</span>
+              <img
+                src="{{ 'chevrow-hdm.svg' | asset_url}}"
+                width="10"
+                height="10"
+                class="header-chevron-actions tw-hidden md:tw-inline"
+                alt="Seta"
+              >
+            </button>
+            <div id="hdm-pop-account" class="hdm-pop hdm-pop--account" role="menu" aria-label="Minha conta" hidden>
+              <div class="hdm-account__header tw-p-md tw-flex tw-flex-col tw-gap-sm">
+                {%- if customer -%}
+                  <p class="tw-text-sm tw-font-semibold tw-text-ink-900">Olá, {{ customer.first_name }}</p>
+                  {%- render 'ui-button',
+                    label: 'Meus pedidos',
+                    variant: 'primary',
+                    size: 'sm',
+                    href: routes.account_url,
+                    full_width: true
+                  -%}
+                {%- else -%}
+                  {%- render 'ui-button',
+                    label: 'Acessar minha conta',
+                    variant: 'primary',
+                    size: 'sm',
+                    href: routes.account_login_url,
+                    full_width: true
+                  -%}
+                  <p class="tw-text-sm tw-text-ink-700 tw-text-center">
+                    Não tem conta?
+                    <a
+                      href="{{ routes.account_register_url }}"
+                      class="tw-text-brand-500 tw-font-semibold hover:tw-underline"
+                      >Cadastrar.</a
+                    >
+                  </p>
+                {%- endif -%}
+              </div>
+              <div class="hdm-account__divider"></div>
+              <ul class="hdm-account__list tw-flex tw-flex-col tw-list-none tw-m-0 tw-p-0" role="menu">
+                <li role="none">
+                  <a href="{{ routes.account_url }}" class="hdm-account__item" role="menuitem">
+                    <svg
+                      class="hdm-account__icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>Meus Dados</span></a
+                  >
+                </li>
+                <li role="none">
+                  <a href="{{ routes.account_url }}/orders" class="hdm-account__item" role="menuitem">
+                    <svg
+                      class="hdm-account__icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="13" y2="17"/>
+                    </svg>
+                    <span>Meus Pedidos</span></a
+                  >
+                </li>
+                <li role="none">
+                  <a href="/pages/favoritos" class="hdm-account__item" role="menuitem">
+                    <svg
+                      class="hdm-account__icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span>Favoritos</span></a
+                  >
+                </li>
+                <li role="none">
+                  <a href="/pages/contato" class="hdm-account__item" role="menuitem">
+                    <svg
+                      class="hdm-account__icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    <span>Atendimento</span></a
+                  >
+                </li>
+                {%- if customer -%}
+                  <li role="none">
+                    <a
+                      href="{{ routes.account_logout_url }}"
+                      class="hdm-account__item hdm-account__item--logout"
+                      role="menuitem"
+                    >
+                      <svg
+                        class="hdm-account__icon"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                      </svg>
+                      <span>Sair</span></a
+                    >
+                  </li>
+                {%- endif -%}
+              </ul>
+            </div>
+          </div>
+
+          <div class="hdm-dropdown" data-dropdown="cart">
+            <button
+              type="button"
+              class="hdm-action-btn tw-flex tw-items-center tw-gap-2xs tw-rounded-lg tw-px-xs md:tw-px-sm tw-h-full tw-text-sm tw-font-semibold tw-relative"
+              aria-label="Sacola com {{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}itens{% endif %}"
+              aria-expanded="false"
+              aria-controls="hdm-pop-cart"
+              aria-haspopup="dialog"
+              data-action="toggle-dropdown"
+            >
+              <img
+                src="{{ 'cart-icon-hdm.svg' | asset_url }}"
+                width="24"
+                height="20"
+                class="icon-cart tw-w-6 tw-h-5 md:tw-w-[24px] md:tw-h-[19.45px]"
+                alt="Cart"
+              >
+              <span class="tw-hidden md:tw-inline">Sacola</span>
+              {%- if cart.item_count > 0 -%}
+                <span
+                  class="hdm-cart-badge tw-absolute tw-bg-brand-500 tw-text-white tw-text-2xs tw-font-bold tw-rounded-full tw-min-w-[18px] tw-h-[18px] tw-flex tw-items-center tw-justify-center tw-top-0 tw-right-0 md:tw-top-[2px] md:tw-left-[25px]"
+                  aria-hidden="true"
+                  data-cart-count
+                >
+                  {{- cart.item_count -}}
+                </span>
+              {%- endif -%}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                aria-hidden="true"
+                class="hdm-action-btn__chevron tw-hidden md:tw-inline"
+              >
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div id="hdm-pop-cart" class="hdm-pop hdm-pop--wide" role="dialog" aria-label="Sua sacola" hidden>
+              <div class="tw-p-md tw-flex tw-flex-col tw-gap-sm" data-mini-cart>
+                <p class="tw-text-sm tw-font-semibold tw-text-ink-900">Sua sacola</p>
+                <p class="tw-text-sm tw-text-ink-500" data-empty-msg>
+                  {% if cart.item_count == 0 %}Sua sacola está vazia.{% else %}Carregando…{% endif %}
+                </p>
+                {%- render 'ui-button',
+                  label: 'Ver sacola completa',
+                  variant: 'primary',
+                  size: 'sm',
+                  href: routes.cart_url,
+                  full_width: true
+                -%}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tw-w-full md:tw-hidden hdm-dropdown hdm-mobile-cep-wrapper" data-dropdown="cep-mobile">
+        <button
+          type="button"
+          class="hdm-action-btn header-input-cep tw-flex tw-items-center tw-justify-between tw-w-full tw-rounded-lg tw-px-sm tw-h-[48px] tw-text-sm tw-font-semibold tw-bg-opacity-100"
+          aria-label="Informar CEP"
+          aria-expanded="false"
+          aria-controls="hdm-pop-cep-mobile"
+          aria-haspopup="dialog"
+          data-action="toggle-dropdown"
+        >
+          <span class="tw-flex tw-items-center tw-gap-2xs">
             <svg
               width="20"
               height="20"
@@ -182,829 +481,258 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              aria-hidden="true"
             >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
             </svg>
-            {%- if cart.item_count > 0 -%}
-              <span class="hdm-header__cart-badge">{{ cart.item_count }}</span>
-            {%- endif -%}
+            Informar Cep
           </span>
-        </a>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            aria-hidden="true"
+            class="hdm-action-btn__chevron"
+          >
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div
+          id="hdm-pop-cep-mobile"
+          class="hdm-pop hdm-pop--cep tw-w-full tw-left-0"
+          role="dialog"
+          aria-label="CEP"
+          data-cep-state="invite"
+          hidden
+        >
+          <div class="hdm-cep-pane hdm-cep-pane--invite tw-p-md tw-flex tw-flex-col tw-gap-sm" data-cep-pane="invite">
+            <button type="button" class="hdm-pop__close" aria-label="Fechar" data-action="close-dropdown">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <p class="tw-text-sm tw-text-ink-700 tw-pr-lg">
+              Descubra as melhores ofertas e fretes para a sua região! 🤩
+            </p>
+            <div class="tw-flex tw-justify-end">
+              {% render 'ui-button',
+                label: 'Informar CEP',
+                variant: 'primary',
+                size: 'sm',
+                type: 'button',
+                extra_classes: 'hdm-cep-show-form-btn'
+              %}
+            </div>
+          </div>
+          <form
+            class="hdm-cep-pane hdm-cep-pane--form tw-p-md tw-flex tw-flex-col tw-gap-sm"
+            data-cep-pane="form"
+            data-cep-form
+            hidden
+          >
+            <div class="tw-flex tw-items-center tw-justify-between">
+              <label class="tw-text-sm tw-font-semibold tw-text-ink-900" for="hdm-cep-input-mob">Calcule o frete</label>
+              <button type="button" class="hdm-cep-back" aria-label="Voltar" data-action="cep-back-to-invite">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+            </div>
+            <input
+              id="hdm-cep-input-mob"
+              type="text"
+              inputmode="numeric"
+              maxlength="9"
+              placeholder="00000-000"
+              class="tw-rounded-md tw-border tw-border-ink-200 tw-px-sm tw-py-xs tw-text-sm"
+              autocomplete="postal-code"
+            >
+            {% render 'ui-button', label: 'Salvar', variant: 'primary', size: 'sm', type: 'submit', full_width: true %}
+          </form>
+        </div>
       </div>
-      {%- comment -%} /.hdm-header__actions {%- endcomment -%}
     </div>
-    {%- comment -%} /.hdm-header__topbar-inner {%- endcomment -%}
   </div>
-  {%- comment -%} /.hdm-header__topbar {%- endcomment -%}
 
-  {%- comment -%} ── NAVBAR (desktop) ── {%- endcomment -%}
-  <div class="hdm-header__navbar" id="hdm-navbar">
-    <div class="hdm-header__navbar-inner">
-      <div class="hdm-nav__track-wrapper">
-        <ul class="hdm-nav__track" role="list">
-          {%- for link in main_menu.links -%}
-            {%- liquid
-              assign t = link.title | downcase
-              assign has_sub = false
-              if link.links != blank
-                assign has_sub = true
-              endif
-            -%}
-            <li
-              class="hdm-nav__item"
-              {% if has_sub %}
-                data-has-submenu
+  {%- if main_menu.links.size > 0 -%}
+    <nav class="hdm-header__nav tw-relative tw-hidden md:tw-block" aria-label="Categorias principais">
+      <button
+        type="button"
+        class="hdm-nav__chevron hdm-nav__chevron--left tw-absolute tw-left-0 tw-top-0 tw-bottom-0 tw-z-raised tw-cursor-pointer tw-items-center"
+        aria-label="Categorias anteriores"
+        data-action="nav-scroll"
+        data-direction="left"
+        hidden
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          aria-hidden="true"
+        >
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <ul
+        class="hdm-nav__list tw-flex tw-justify-center tw-items-center tw-gap-lg tw-py-sm tw-overflow-x-auto tw-snap-x tw-list-none tw-m-0"
+        data-nav-scroller
+        role="list"
+      >
+        {%- for link in main_menu.links -%}
+          {%- assign has_children = false -%}
+          {%- if link.links.size > 0 -%}{%- assign has_children = true -%}{%- endif -%}
+          <li
+            class="tw-snap-start tw-shrink-0 hdm-nav__item{% if has_children %} hdm-nav__item--has-mega{% endif %}"
+            data-megamenu-trigger="{{ has_children }}"
+            {% if has_children %}
+              data-mega-target="hdm-mega-{{ forloop.index }}"
+            {% endif %}
+          >
+            <a
+              href="{{ link.url }}"
+              class="hdm-nav__link tw-flex tw-items-center tw-gap-2xs tw-text-sm tw-font-bold tw-uppercase tw-tracking-wider tw-py-xs tw-whitespace-nowrap"
+              {% if has_children %}
+                aria-haspopup="true" aria-expanded="false" aria-controls="hdm-mega-{{ forloop.index }}"
               {% endif %}
             >
-              <a
-                href="{{ link.url }}"
-                class="hdm-nav__link{% if link.active %} hdm-nav__link--active{% endif %}"
-                {% if has_sub %}
-                  aria-haspopup="true" aria-expanded="false"
-                {% endif %}
-                {% if link.current %}
-                  aria-current="page"
-                {% endif %}
-              >
-                {%- if t == 'blog' or t == 'blog loucas' -%}
-                  <span class="hdm-badge hdm-badge--blog badge">{{ link.title }}</span>
-                {%- elsif t == 'outlet' -%}
-                  <span class="hdm-badge hdm-badge--outlet badge"> <span>Outlet</span> </span>
-                {%- else -%}
-                  {{- link.title -}}
-                {%- endif -%}
-              </a>
+              {{ link.title }}
+              {%- if has_children -%}
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              {%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
 
-              {%- if has_sub -%}
-                <div class="hdm-mega" role="region" aria-label="{{ link.title }}">
-                  <div class="hdm-mega__inner">
-                    <ul class="hdm-mega__list">
-                      {%- for child in link.links -%}
-                        <li class="hdm-mega__col">
-                          <a href="{{ child.url }}" class="hdm-mega__parent-link">{{ child.title }}</a>
-                          {%- if child.links != blank -%}
-                            {%- assign max_visible = 8 -%}
-                            <ul class="hdm-mega__children">
-                              {%- for grandchild in child.links limit: max_visible -%}
-                                <li>
-                                  <a href="{{ grandchild.url }}" class="hdm-mega__child-link">{{ grandchild.title }}</a>
-                                </li>
-                              {%- endfor -%}
-                            </ul>
-                            {%- if child.links.size > max_visible -%}
-                              {%- assign remaining = child.links.size | minus: max_visible -%}
-                              <a href="{{ child.url }}" class="hdm-mega__more"
-                                >+ {{ remaining }} em {{ child.title | downcase -}}
-                              </a>
-                            {%- endif -%}
-                          {%- endif -%}
+      {%- for link in main_menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <div
+            id="hdm-mega-{{ forloop.index }}"
+            class="hdm-megamenu"
+            role="region"
+            aria-label="{{ link.title }}"
+            hidden
+          >
+            <div class="hdm-megamenu__inner hdm-spacing-x tw-py-lg tw-grid tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-lg">
+              {%- for child in link.links -%}
+                <div class="hdm-megamenu__column">
+                  <p class="tw-text-base tw-font-bold tw-uppercase tw-tracking-wider tw-text-ink-900 tw-mb-sm">
+                    {{ child.title }}
+                  </p>
+                  {%- if child.links.size > 0 -%}
+                    <ul class="tw-flex tw-flex-col tw-gap-2xs tw-list-none tw-m-0 tw-p-0">
+                      {%- for grandchild in child.links -%}
+                        <li>
+                          <a
+                            href="{{ grandchild.url }}"
+                            class="tw-text-sm tw-text-ink-700 hover:tw-text-brand-500 tw-transition tw-block tw-py-3xs"
+                          >
+                            {{- grandchild.title -}}
+                          </a>
                         </li>
                       {%- endfor -%}
                     </ul>
-                  </div>
+                  {%- endif -%}
                 </div>
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        </ul>
-      </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
 
-      <div class="hdm-nav__arrows" aria-hidden="true">
-        <button class="hdm-nav__arrow hdm-nav__arrow--prev" type="button" tabindex="-1">&#8249;</button>
-        <button class="hdm-nav__arrow hdm-nav__arrow--next" type="button" tabindex="-1">&#8250;</button>
-      </div>
-    </div>
-    {%- comment -%} /.hdm-header__navbar-inner {%- endcomment -%}
-  </div>
-  {%- comment -%} /.hdm-header__navbar {%- endcomment -%}
-  <div
-    class="hdm-subheader-wrapper"
-    style="background-color: {{ section.settings.subheader_bg_color }}; color: {{ section.settings.subheader_text_color }}; --subheader-height: {{ section.settings.height_subheader }}px"
-  >
-    <div class="page-width hdm-subheader__inner">
-      <div class="hdm-subheader__item">
-        <span class="hdm-subheader__text">{{ section.settings.subheader_text_1 }}</span>
-        {%- if section.settings.subheader_link_1 != blank and section.settings.subheader_link_text_1 != blank -%}
-          <a
-            href="{{ section.settings.subheader_link_1 }}"
-            class="hdm-subheader__link"
-            style="color: {{ section.settings.subheader_text_color }};"
+      <button
+        type="button"
+        class="hdm-nav__chevron hdm-nav__chevron--right tw-absolute tw-right-0 tw-top-0 tw-bottom-0 tw-z-raised tw-cursor-pointer tw-flex tw-items-center"
+        aria-label="Próximas categorias"
+        data-action="nav-scroll"
+        data-direction="right"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          aria-hidden="true"
+        >
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </nav>
+  {%- endif -%}
+
+  {%- if show_subheader -%}
+    <aside class="hdm-header__strip tw-bg-brand-50 tw-text-ink-900" aria-label="Promoções ativas">
+      <div class="tw-flex tw-items-center tw-justify-center tw-gap-md tw-py-2xs tw-text-xs tw-flex-wrap">
+        {%- if section.settings.subheader_text_1 != blank -%}
+          <span class="tw-flex tw-items-center tw-gap-2xs">
+            <strong class="tw-font-bold">{{ section.settings.subheader_text_1 }}</strong>
+            {%- if section.settings.subheader_link_1 != blank and section.settings.subheader_link_text_1 != blank -%}
+              <a href="{{ section.settings.subheader_link_1 }}" class="tw-underline hover:tw-text-brand-700">
+                {{- section.settings.subheader_link_text_1 -}}
+              </a>
+            {%- endif -%}
+          </span>
+        {%- endif -%}
+        {%- if section.settings.subheader_text_2 != blank and section.settings.subheader_text_1 != blank -%}
+          <span class="tw-inline-flex tw-items-center tw-justify-center tw-w-6 tw-h-6 tw-rounded-full tw-bg-white tw-text-2xs tw-font-bold"
+            >OU</span
           >
-            {{ section.settings.subheader_link_text_1 }}
-          </a>
+        {%- endif -%}
+        {%- if section.settings.subheader_text_2 != blank -%}
+          <span class="tw-flex tw-items-center tw-gap-2xs">
+            <strong class="tw-font-bold">{{ section.settings.subheader_text_2 }}</strong>
+            {%- if section.settings.subheader_link_2 != blank and section.settings.subheader_link_text_2 != blank -%}
+              <a href="{{ section.settings.subheader_link_2 }}" class="tw-underline hover:tw-text-brand-700">
+                {{- section.settings.subheader_link_text_2 -}}
+              </a>
+            {%- endif -%}
+          </span>
         {%- endif -%}
       </div>
+    </aside>
+  {%- endif -%}
 
-      <div class="hdm-subheader__divider">
-        <span style="color: {{ section.settings.subheader_text_color }}; background-color: transparent;">OU</span>
-      </div>
-
-      <div class="hdm-subheader__item">
-        <span class="hdm-subheader__text">{{ section.settings.subheader_text_2 }}</span>
-        {%- if section.settings.subheader_link_2 != blank and section.settings.subheader_link_text_2 != blank -%}
-          <a
-            href="{{ section.settings.subheader_link_2 }}"
-            class="hdm-subheader__link"
-            style="color: {{ section.settings.subheader_text_color }};"
-          >
-            {{ section.settings.subheader_link_text_2 }}
-          </a>
-        {%- endif -%}
-      </div>
-    </div>
+  <div class="md:tw-hidden">
+    {% render 'header-drawer' %}
   </div>
-</hdm-header>
+</header-component>
 
-{%- comment -%} ── OVERLAY do mega menu ─────────────────────────────────────── {%- endcomment -%}
-<div class="hdm-mega-overlay" id="hdm-mega-overlay" aria-hidden="true"></div>
-
-<script src="{{ 'hdm-header.js' | asset_url }}" defer></script>
-
-{% stylesheet %}
-    /* ═══════════════════════════════════════════════════════════
-       HDM HEADER — Design Tokens
-       ═══════════════════════════════════════════════════════════ */
-    :root {
-      --hdm-topbar-height:    72px;
-      --hdm-navbar-height:    44px;
-      --hdm-header-height:    calc(var(--hdm-topbar-height) + var(--hdm-navbar-height));
-
-      --hdm-color-bg:         #ffffff;
-      --hdm-color-border:     #ebebeb;
-      --hdm-color-text:       #000;
-      --hdm-color-text-muted: #6b7280;
-      --hdm-color-accent:     #7c79e7;
-      --hdm-color-outlet:     #9B7FD4;
-
-      --hdm-search-radius:    24px;
-      --hdm-page-max:         1280px;
-      --hdm-page-padding:     clamp(16px, 4vw, 48px);
-
-      --hdm-shadow-header:    0 2px 8px rgba(0,0,0,0.06);
-      --hdm-shadow-mega:      0 8px 32px rgba(0,0,0,0.10);
-
-      --hdm-transition-fast:  0.15s ease;
-      --hdm-transition-base:  0.22s ease;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       RESET / BASE
-       ═══════════════════════════════════════════════════════════ */
-    hdm-header,
-    .hdm-header__topbar,
-    .hdm-header__navbar {
-      display: block;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       HEADER WRAPPER
-       ═══════════════════════════════════════════════════════════ */
-    .hdm-header {
-      background: var(--hdm-color-bg);
-      box-shadow: var(--hdm-shadow-header);
-      position: relative;
-      z-index: 200;
-    }
-
-    .hdm-header--sticky {
-      position: sticky;
-      top: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 21px;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       TOPBAR
-       ═══════════════════════════════════════════════════════════ */
-
-       .badge{
-          font-size: 20px !important;
-       }
-
-    .hdm-header__topbar-inner {
-      max-width: var(--hdm-page-max);
-      margin-inline: auto;
-      padding-inline: var(--hdm-page-padding);
-      height: var(--hdm-topbar-height);
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      grid-template-areas: "logo search actions";
-      align-items: center;
-      gap: 24px;
-    }
-
-    /* Mobile: hamburger + logo + ações */
-    @media screen and (max-width: 989px) {
-      .hdm-header__topbar-inner {
-        grid-template-columns: 44px 1fr auto;
-        grid-template-areas: "drawer logo actions";
-        gap: 12px;
-        height: max-content;
-      }
-    }
-
-    /* ── Logo ── */
-    .hdm-header__logo {
-        height: 100px;
-      grid-area: logo;
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
-
-    @media screen and (max-width: 989px) {
-      .hdm-header__logo {
-        justify-content: center;
-      }
-    }
-
-    .hdm-header__logo-img {
-      height: 60px;
-      width: auto;
-      object-fit: contain;
-      display: block;
-    }
-
-    .hdm-header__logo-text {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--hdm-color-text);
-    }
-
-    /* ── Drawer trigger (mobile only) ── */
-    .hdm-header__drawer-trigger {
-      grid-area: drawer;
-      display: none;
-      align-items: center;
-    }
-
-    @media screen and (max-width: 989px) {
-      .hdm-header__drawer-trigger {
-        display: flex;
-      }
-    }
-
-    /* ── Search ── */
-    .hdm-header__search {
-      grid-area: search;
-    }
-
-    @media screen and (max-width: 989px) {
-      .hdm-header__search {
-        display: none;
-      }
-    }
-
-    .hdm-header__search-wrap {
-      display: flex;
-      align-items: center;
-      background: #f4f4f6;
-      border: 1.5px solid transparent;
-      border-radius: var(--hdm-search-radius);
-      transition: border-color var(--hdm-transition-fast), box-shadow var(--hdm-transition-fast);
-      overflow: hidden;
-    }
-
-    .hdm-header__search-wrap:focus-within {
-      border-color: var(--hdm-color-accent);
-      box-shadow: 0 0 0 3px rgba(124,121,231,0.12);
-      background: #fff;
-    }
-
-    .hdm-header__search-input {
-      flex: 1;
-      border: none;
-      background: transparent !important;
-      padding: 10px 16px;
-      font-size: 0.9375rem;
-      color: var(--hdm-color-text);
-      outline: none;
-      min-width: 0;
-    }
-
-    .hdm-header__search-input::placeholder {
-      color: var(--hdm-color-text-muted);
-    }
-
-    .hdm-header__search-btn {
-      flex-shrink: 0;
-      background: none;
-      border: none;
-      padding: 10px 14px;
-      cursor: pointer;
-      color: var(--hdm-color-text-muted);
-      display: flex;
-      align-items: center;
-      transition: color var(--hdm-transition-fast);
-    }
-
-    .hdm-header__search-btn:hover {
-      color: var(--hdm-color-accent);
-    }
-
-    /* ── Actions ── */
-    .hdm-header__actions {
-      grid-area: actions;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .hdm-header__action {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--hdm-color-text);
-      text-decoration: none;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      transition: background var(--hdm-transition-fast), color var(--hdm-transition-fast);
-      white-space: nowrap;
-    }
-
-    .hdm-header__action:hover {
-      background: #f4f4f6;
-      color: var(--hdm-color-accent);
-    }
-
-    .hdm-header__action-label {
-      font-size: 0.8125rem;
-    }
-
-    /* Oculta labels de texto em telas pequenas */
-    @media screen and (max-width: 989px) {
-      .hdm-header__action-label {
-        display: none;
-      }
-
-      .hdm-header__action--cep {
-        display: none; /* CEP some no mobile — drawer tem outra UX */
-      }
-    }
-
-    /* Carrinho */
-    .hdm-header__cart-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .hdm-header__cart-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: var(--hdm-color-accent);
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 700;
-      min-width: 16px;
-      height: 16px;
-      border-radius: 99px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-inline: 3px;
-      line-height: 1;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       NAVBAR
-       ═══════════════════════════════════════════════════════════ */
-    .hdm-header__navbar {
-      z-index: 6;
-      background: var(--hdm-color-bg);
-    }
-
-    /* Esconde no mobile */
-    @media screen and (max-width: 989px) {
-      .hdm-header__navbar {
-        display: none;
-      }
-    }
-
-    /* Navbar some ao rolar (sticky = só topbar) */
-    .hdm-header--sticky .hdm-header__navbar {
-      transition: max-height var(--hdm-transition-base), opacity var(--hdm-transition-base), border-color var(--hdm-transition-base);
-      max-height: var(--hdm-navbar-height);
-      overflow: hidden;
-      opacity: 1;
-    }
-
-    .hdm-header--sticky.hdm-header--scrolled .hdm-header__navbar {
-      max-height: 0;
-      opacity: 0;
-      border-bottom-color: transparent;
-    }
-
-    .hdm-header__navbar-inner {
-      max-width: var(--hdm-page-max);
-      margin-inline: auto;
-      padding-inline: var(--hdm-page-padding);
-      height: var(--hdm-navbar-height);
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-
-    /* ── Track scrollável ── */
-    .hdm-nav__track-wrapper {
-      flex: 1 1 0;
-      min-width: 0;
-      overflow: hidden;
-      height: 100%;
-      display: flex;
-      align-items: center;
-    }
-
-    .hdm-nav__track {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      overflow-x: auto;
-      overflow-y: visible;
-      scroll-behavior: smooth;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      justify-content: flex-start;
-    }
-
-    .hdm-nav__track::-webkit-scrollbar { display: none; }
-
-    /* ── Item ── */
-    .hdm-nav__item {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      height: var(--hdm-navbar-height);
-      position: relative;
-    }
-
-    /* ── Link topo ── */
-    .hdm-nav__link {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding-inline: 14px;
-      font-size: 1.1rem;
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--hdm-color-text);
-      text-decoration: none;
-      white-space: nowrap;
-      position: relative;
-      transition: color var(--hdm-transition-fast);
-    }
-
-    /* Sublinhado indicador */
-    .hdm-nav__link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 14px;
-      right: 14px;
-      height: 2px;
-      background: var(--hdm-color-text);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform var(--hdm-transition-fast);
-    }
-
-    .hdm-nav__link:hover::after,
-    .hdm-nav__link--active::after,
-    .hdm-nav__link[aria-expanded="true"]::after {
-      transform: scaleX(1);
-    }
-
-    /* ── Setas de scroll ── */
-    .hdm-nav__arrows {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      padding-left: 6px;
-    }
-
-    .hdm-nav__arrow {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.4rem;
-      line-height: 1;
-      color: var(--hdm-color-text-muted);
-      padding: 4px 5px;
-      display: flex;
-      align-items: center;
-      transition: color var(--hdm-transition-fast), opacity var(--hdm-transition-fast);
-      user-select: none;
-    }
-
-    .hdm-nav__arrow:hover { color: var(--hdm-color-text); }
-    .hdm-nav__arrow:disabled { opacity: 0.25; cursor: default; }
-
-    /* ═══════════════════════════════════════════════════════════
-       MEGA MENU
-       ═══════════════════════════════════════════════════════════ */
-
-    /* O painel fica como filho do <li>.hdm-nav__item,
-       mas é exibido como fixed via JS (portal pattern)
-       para escapar do overflow:hidden do track-wrapper. */
-    .hdm-mega {
-      display: none;
-      position: fixed;
-      left: 0;
-      right: 0;
-      background: #fff;
-      box-shadow: var(--hdm-shadow-mega);
-      border-top: 1px solid var(--hdm-color-border);
-      z-index: 199;
-      opacity: 0;
-      transform: translateY(-4px);
-      transition: opacity var(--hdm-transition-fast), transform var(--hdm-transition-fast);
-    }
-
-    .hdm-mega--open {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .hdm-mega__inner {
-      max-width: var(--hdm-page-max);
-      margin-inline: auto;
-      padding: 28px var(--hdm-page-padding) 32px;
-    }
-
-    /* Colunas */
-    .hdm-mega__list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px 40px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .hdm-mega__col {
-      display: flex;
-      flex-direction: column;
-      min-width: 110px;
-    }
-
-    .hdm-mega__parent-link {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      color: #111;
-      text-decoration: none;
-      margin-bottom: 10px;
-      display: block;
-      line-height: 1.3;
-    }
-
-    .hdm-mega__parent-link:hover { text-decoration: underline; }
-
-    .hdm-mega__children {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .hdm-mega__child-link {
-      font-size: 0.875rem;
-      color: #555;
-      text-decoration: none;
-      line-height: 1.5;
-      display: block;
-      padding-block: 2px;
-    }
-
-    .hdm-mega__child-link:hover { color: #111; text-decoration: underline; }
-
-    .hdm-mega__more {
-      font-size: 0.75rem;
-      color: var(--hdm-color-accent);
-      margin-top: 6px;
-      display: block;
-      text-decoration: none;
-    }
-
-    .hdm-mega__more:hover { text-decoration: underline; }
-
-    /* Overlay escurece o conteúdo abaixo */
-    /* Overlay escurece o conteúdo abaixo — fica ATRÁS do header */
-    .hdm-mega-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      z-index: 198; /* abaixo do header (300) e do mega (199) */
-      pointer-events: none;
-      top: 0; /* começa do topo mas o header fica sobre ele pelo z-index */
-    }
-
-    .hdm-mega-overlay--visible {
-      display: block;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       BADGES DE NAVEGAÇÃO
-       ═══════════════════════════════════════════════════════════ */
-
-    /* Blog — gradiente animado */
-    .hdm-badge--blog {
-      display: inline-flex;
-      align-items: center;
-      background: linear-gradient(110deg, #6ee2f5 0%, #f4e285 25%, #ff5e98 55%, #b100e8 100%);
-      background-size: 200% 200%;
-      animation: hdmHoloFlow 4s infinite;
-      height: 36px;
-      font-size: 0.9rem;
-      padding-inline: 10px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: #000;
-    }
-
-    @keyframes hdmHoloFlow {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Outlet — roxo estático */
-    .hdm-badge--outlet {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--hdm-color-outlet);
-      height: 36px;
-      font-size: 0.9rem;
-      padding-inline: 10px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      color: #fff;
-    }
- 
-  /* Remove os antigos */
-  .hdm-badge__text-1,
-  .hdm-badge__text-2 { display: none; }
-
-    /* ═══════════════════════════════════════════════════════════
-       MODAL CEP
-       ═══════════════════════════════════════════════════════════ */
-    .hdm-cep-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hdm-cep-modal[hidden] { display: none; }
-
-    .hdm-cep-modal__backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-    }
-
-    .hdm-cep-modal__box {
-      position: relative;
-      background: #fff;
-      border-radius: 16px;
-      padding: 32px 28px 28px;
-      width: min(92vw, 380px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      text-align: center;
-    }
-
-    .hdm-cep-modal__close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #888;
-      padding: 4px;
-      display: flex;
-      border-radius: 6px;
-      transition: background var(--hdm-transition-fast);
-    }
-
-    .hdm-cep-modal__close:hover { background: #f4f4f6; color: #333; }
-
-    .hdm-cep-modal__title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #111;
-      margin: 0;
-    }
-
-    .hdm-cep-modal__sub {
-      font-size: 0.875rem;
-      color: #666;
-      margin: 0 0 8px;
-    }
-
-    .hdm-cep-modal__field {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .hdm-cep-modal__input {
-      flex: 1;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color var(--hdm-transition-fast);
-      text-align: center;
-      letter-spacing: 0.05em;
-    }
-
-    .hdm-cep-modal__input:focus {
-      border-color: var(--hdm-color-accent);
-    }
-
-    .hdm-cep-modal__btn {
-      background: var(--hdm-color-accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity var(--hdm-transition-fast);
-    }
-
-    .hdm-cep-modal__btn:hover { opacity: 0.88; }
-
-    .hdm-cep-modal__link {
-      font-size: 0.8rem;
-      color: var(--hdm-color-accent);
-      margin-top: 4px;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ESPAÇADOR — evita conteúdo esconder atrás do header sticky
-       ═══════════════════════════════════════════════════════════ */
-    .hdm-header--sticky ~ * {
-      /* nada — o sticky não tira do flow */
-    }
-
-    /* Offset de página quando sticky ativo */
-    .hdm-header--sticky {
-      /* Já está no flow, sem necessidade de margin adicional */
-    }
-
-    /* Sticky aplicado na <header> pai gerada pelo Shopify */
-  .hdm-header-section {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 300;
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .hdm-header-section.hdm-header--hidden {
-    transform: translateY(-100%);
-  }
-
-  /* Remove sticky do custom element — não é mais necessário */
-  .hdm-header--sticky {
-    position: relative;
-  }
-
-  /* Compensa o espaço que o fixed ocupa */
-  body {
-    padding-top: var(--hdm-header-fixed-height, 130px);
-  }
-{% endstylesheet %}
+<div id="hdm-header-overlay" class="hdm-overlay tw-fixed tw-inset-0 tw-bg-black/50" hidden></div>
 
 {% schema %}
 {
@@ -1012,90 +740,25 @@
   "tag": "header",
   "class": "hdm-header-section",
   "settings": [
-    {
-      "type": "range",
-      "id": "height_subheader",
-      "label": "Altura do subheader",
-      "min": 20,
-      "max": 80,
-      "step": 1,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "checkbox",
-      "id": "show_subheader",
-      "label": "Exibir Subheader",
-      "default": true
-    },
-    {
-      "type": "color",
-      "id": "subheader_bg_color",
-      "label": "Cor de Fundo",
-      "default": "#8b628b"
-    },
-    {
-      "type": "color",
-      "id": "subheader_text_color",
-      "label": "Cor do Texto",
-      "default": "#ffffff"
-    },
-    {
-      "type": "header",
-      "content": "Bloco 1"
-    },
-    {
-      "type": "text",
-      "id": "subheader_text_1",
-      "label": "Texto Principal 1",
-      "default": "Frete grátis acima de R$199"
-    },
-    {
-      "type": "text",
-      "id": "subheader_link_text_1",
-      "label": "Texto do Link 1",
-      "default": "Ver regras"
-    },
-    {
-      "type": "url",
-      "id": "subheader_link_1",
-      "label": "Link 1"
-    },
-    {
-      "type": "header",
-      "content": "Bloco 2"
-    },
-    {
-      "type": "text",
-      "id": "subheader_text_2",
-      "label": "Texto Principal 2",
-      "default": "10% OFF na primeira compra"
-    },
-    {
-      "type": "text",
-      "id": "subheader_link_text_2",
-      "label": "Texto do Link 2",
-      "default": "Pegar Cupom"
-    },
-    {
-      "type": "url",
-      "id": "subheader_link_2",
-      "label": "Link 2"
-    },
-    {
-      "type": "header",
-      "content": "Menu"
-    },
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Menu principal",
-      "default": "main-menu"
-    },
-    {
-      "type": "header",
-      "content": "Logo"
-    },
+    { "type": "header", "content": "Promo bar (topo)" },
+    { "type": "checkbox", "id": "show_top_promo", "label": "Exibir barra de promo no topo", "default": true },
+    { "type": "text", "id": "top_promo_text_1", "label": "Promo 1 — destaque", "default": "GANHE KIT SURPRESA" },
+    { "type": "text", "id": "top_promo_subtext_1", "label": "Promo 1 — subtexto", "default": "acima de R$ 149" },
+    { "type": "text", "id": "top_promo_code_1", "label": "Promo 1 — cupom" },
+    { "type": "text", "id": "top_promo_text_2", "label": "Promo 2 — destaque", "default": "TRIO DE MINIS" },
+    { "type": "text", "id": "top_promo_subtext_2", "label": "Promo 2 — subtexto", "default": "acima de R$ 329 no app" },
+    { "type": "text", "id": "top_promo_code_2", "label": "Promo 2 — cupom" },
+    { "type": "header", "content": "Faixa de cupom (abaixo do menu)" },
+    { "type": "checkbox", "id": "show_subheader", "label": "Exibir faixa lilás", "default": true },
+    { "type": "text", "id": "subheader_text_1", "label": "Cupom 1 — texto", "default": "25% OFF - CUPOM" },
+    { "type": "text", "id": "subheader_link_text_1", "label": "Cupom 1 — texto link", "default": "clique aqui" },
+    { "type": "url", "id": "subheader_link_1", "label": "Cupom 1 — link" },
+    { "type": "text", "id": "subheader_text_2", "label": "Cupom 2 — texto", "default": "FRETE GRÁTIS ACIMA R$60" },
+    { "type": "text", "id": "subheader_link_text_2", "label": "Cupom 2 — texto link", "default": "clique aqui" },
+    { "type": "url", "id": "subheader_link_2", "label": "Cupom 2 — link" },
+    { "type": "header", "content": "Menu" },
+    { "type": "link_list", "id": "menu", "label": "Menu principal", "default": "main-menu" },
+    { "type": "header", "content": "Logo" },
     {
       "type": "range",
       "id": "logo_height",
@@ -1105,32 +768,373 @@
       "step": 2,
       "default": 40
     },
-    {
-      "type": "header",
-      "content": "Busca"
-    },
+    { "type": "header", "content": "Busca" },
     {
       "type": "text",
       "id": "search_placeholder",
-      "label": "Placeholder da busca",
-      "default": "O que você procura hoje?"
+      "label": "Placeholder",
+      "default": "Ei, o que você está procurando?"
     },
-    {
-      "type": "header",
-      "content": "Comportamento"
-    },
-    {
-      "type": "checkbox",
-      "id": "sticky_header",
-      "label": "Header fixo ao rolar",
-      "default": true,
-      "info": "A barra de navegação some ao rolar, mantendo apenas o topo."
-    }
+    { "type": "header", "content": "Comportamento" },
+    { "type": "checkbox", "id": "sticky_header", "label": "Header fixo ao rolar", "default": true }
   ],
-  "presets": [
-    {
-      "name": "HDM Header"
-    }
-  ]
+  "presets": [{ "name": "HDM Header" }]
 }
 {% endschema %}
+
+{% stylesheet %}
+  ul {
+    padding: 0;
+  }
+
+  .hdm-header {
+    --hdr-bg: rgba(76, 76, 76, 0.5);
+    --hdr-text: #ffffff;
+    --hdr-text-muted: rgba(255, 255, 255, 0.85);
+    --hdr-search-bg: rgba(42, 42, 42, 0.5);
+    --hdr-search-text: #ffffff;
+    --hdr-search-placeholder: #c2bfbf;
+    --hdr-action-bg: #ffffff;
+    --hdr-action-text: #18181b;
+    --hdr-action-border: transparent;
+    --hdr-action-hover-bg: #f4f4f5;
+    --hdr-nav-link: #ffffff;
+    --hdr-nav-link-hover: rgba(255, 255, 255, 0.7);
+    --hdr-chevron-bg: rgba(76, 76, 76, 0.5);
+    --hdr-chevron-color: #ffffff;
+
+    background-color: var(--hdr-bg);
+    color: var(--hdr-text);
+    transition: background-color 300ms cubic-bezier(0.22, 1, 0.36, 1), color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .hdm-header:hover,
+  .hdm-header[data-state='scrolled'],
+  .hdm-header[data-state='megamenu-open'] {
+    --hdr-bg: #ffffff;
+    --hdr-text: #18181b;
+    --hdr-text-muted: #52525b;
+    --hdr-search-bg: #f2f2f2;
+    --hdr-search-text: #71717a;
+    --hdr-search-placeholder: #71717a;
+    --hdr-action-bg: transparent;
+    --hdr-action-text: #18181b;
+    --hdr-action-border: #e4e4e7;
+    --hdr-action-hover-bg: #f4f4f5;
+    --hdr-nav-link: #18181b;
+    --hdr-nav-link-hover: #766cff;
+    --hdr-chevron-bg: #ffffff;
+    --hdr-chevron-color: #18181b;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .hdm-header__search {
+    height: stretch;
+  }
+  .hdm-header__search-input {
+    background-color: var(--hdr-search-bg);
+    color: var(--hdr-search-text);
+  }
+  .hdm-header__search-input::placeholder {
+    color: var(--hdr-search-placeholder);
+    opacity: 1;
+  }
+  .hdm-header__search-submit {
+    color: var(--hdr-search-text);
+  }
+
+  .hdm-action-btn {
+    background-color: var(--hdr-action-bg);
+    color: var(--hdr-action-text);
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  .hdm-action-btn:hover {
+    background-color: var(--hdr-action-hover-bg);
+  }
+  .hdm-action-btn[aria-expanded='true'] .hdm-action-btn__chevron {
+    transform: rotate(180deg);
+  }
+
+  .hdm-header__menu-toggle {
+    color: var(--hdr-text);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .hdm-nav__link {
+    color: var(--hdr-nav-link);
+    text-decoration: none;
+  }
+  .hdm-nav__link:hover {
+    color: var(--hdr-nav-link-hover);
+  }
+  .hdm-nav__list {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hdm-nav__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hdm-nav__chevron {
+    background: var(--hdr-chevron-bg);
+    color: var(--hdr-chevron-color);
+    border: 0;
+    display: none;
+  }
+  .hdm-nav__chevron[data-visible='true'] {
+    display: flex;
+  }
+  .hdm-nav__chevron--left {
+    box-shadow: 8px 0 16px -4px var(--hdr-bg);
+  }
+  .hdm-nav__chevron--right {
+    box-shadow: -8px 0 16px -4px var(--hdr-bg);
+  }
+
+  .hdm-dropdown {
+    position: relative;
+  }
+  .hdm-pop {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 280px;
+    background: #ffffff;
+    color: #18181b;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.15);
+    z-index: 15;
+  }
+  .hdm-pop--wide {
+    min-width: 360px;
+  }
+
+  .hdm-overlay {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hdm-overlay[data-visible='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .hdm-mobile-drawer {
+    position: fixed;
+    inset: 0;
+  }
+  .hdm-mobile-drawer[hidden] {
+    display: none;
+  }
+  .hdm-mobile-drawer__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(85vw, 360px);
+    background: #ffffff;
+    transform: translateX(100%);
+    overflow-y: auto;
+  }
+  .hdm-mobile-drawer[data-open='true'] .hdm-mobile-drawer__panel {
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hdm-header,
+    .hdm-header__search-input,
+    .hdm-action-btn,
+    .hdm-nav__link,
+    .hdm-overlay,
+    .hdm-mobile-drawer__panel,
+    .hdm-action-btn__chevron {
+      transition: none;
+    }
+  }
+
+  .header-chevron-actions {
+    width: 12px;
+  }
+  .hdm-cart-badge {
+    position: absolute;
+    background-color: #000;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+  }
+  .icon-cart {
+    width: 24px;
+    height: 19.45px;
+  }
+
+  .hdm-spacing-x {
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .hdm-spacing-x {
+      padding-inline: 32px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .hdm-spacing-x {
+      padding-inline: 48px;
+    }
+  }
+  @media (min-width: 1440px) {
+    .hdm-spacing-x {
+      padding-inline: 64px;
+    }
+  }
+
+  .hdm-header {
+    z-index: 999;
+  }
+  .hdm-overlay {
+    z-index: 990;
+  }
+  .hdm-mobile-drawer {
+    z-index: 1000;
+  }
+
+  .hdm-logo-variant {
+    display: inline-flex;
+    align-items: center;
+  }
+  .hdm-logo-variant--dark {
+    display: none;
+  }
+  .hdm-header:hover .hdm-logo-variant--light,
+  .hdm-header[data-state='scrolled'] .hdm-logo-variant--light,
+  .hdm-header[data-state='megamenu-open'] .hdm-logo-variant--light {
+    display: none;
+  }
+  .hdm-header:hover .hdm-logo-variant--dark,
+  .hdm-header[data-state='scrolled'] .hdm-logo-variant--dark,
+  .hdm-header[data-state='megamenu-open'] .hdm-logo-variant--dark {
+    display: inline-flex;
+  }
+
+  .hdm-header__nav {
+    position: relative;
+  }
+  .hdm-megamenu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: #ffffff;
+    color: #18181b;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
+    border-top: 1px solid #e4e4e7;
+    z-index: 2;
+  }
+  .hdm-megamenu[hidden] {
+    display: none;
+  }
+
+  .hdm-pop__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #71717a;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .hdm-pop__close:hover {
+    background: #f4f4f5;
+    color: #18181b;
+  }
+  .hdm-pop--cep[data-cep-state='invite'] .hdm-cep-pane--form {
+    display: none;
+  }
+  .hdm-pop--cep[data-cep-state='form'] .hdm-cep-pane--invite {
+    display: none;
+  }
+  .hdm-cep-back {
+    background: transparent;
+    border: 0;
+    color: #71717a;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: inline-flex;
+  }
+  .hdm-cep-back:hover {
+    background: #f4f4f5;
+    color: #18181b;
+  }
+
+  .hdm-pop--account {
+    min-width: 300px;
+  }
+  .hdm-account__divider {
+    height: 1px;
+    background: #e4e4e7;
+    margin: 0;
+  }
+  .hdm-account__list {
+    padding: 8px 0 !important;
+  }
+  .hdm-account__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: #18181b;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 150ms ease;
+  }
+  .hdm-account__item:hover {
+    background: #f4f3ff;
+    color: #5a52cc;
+  }
+  .hdm-account__item--logout {
+    color: #dc2626;
+  }
+  .hdm-account__item--logout:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+  .hdm-account__icon {
+    flex-shrink: 0;
+    color: #766cff;
+  }
+  .hdm-account__item:hover .hdm-account__icon {
+    color: #5a52cc;
+  }
+  .hdm-account__item--logout .hdm-account__icon {
+    color: #dc2626;
+  }
+{% endstylesheet %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tailwindToggleBtn = document.querySelector('[data-action="open-drawer"]');
+    const shopifyNativeSummary = document.querySelector('#Details-menu-drawer-container summary');
+
+    if (tailwindToggleBtn && shopifyNativeSummary) {
+      tailwindToggleBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        // O botão Tailwind clica silenciosamente no botão nativo
+        shopifyNativeSummary.click();
+      });
+    }
+  });
+</script>
