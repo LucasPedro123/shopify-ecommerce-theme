@@ -168,42 +168,41 @@
     <h3 class="hdm-card__title">
       <a href="{{ product.url }}" itemprop="name">{{ title_clean }}</a>
     </h3>
-
-    {%- comment -%} ── Pricing + CTA sacola ── {%- endcomment -%}
-    <div class="hdm-card__pricing" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
-      <meta itemprop="price" content="{{ product.price | money_without_currency | replace: ',', '.' }}">
-      <meta itemprop="availability" content="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
-
-      <div class="hdm-card__pricing-text">
-        {%- if product.compare_at_price > product.price -%}
-          <s class="hdm-card__price-original" aria-label="Preço original {{ product.compare_at_price | money }}">
-            {{- product.compare_at_price | money -}}
-          </s>
-        {%- endif -%}
-        <span class="hdm-card__price-current" aria-label="Preço atual {{ product.price | money }}">
-          {{- product.price | money -}}
-        </span>
-        <span class="hdm-card__price-card">
-          ou {{ price_card | money }} no cartão
-        </span>
+    <div class="card-wrapper-info">
+      {%- comment -%} ── Pricing + CTA sacola ── {%- endcomment -%}
+      <div class="hdm-card__pricing" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+        <meta itemprop="price" content="{{ product.price | money_without_currency | replace: ',', '.' }}">
+        <meta itemprop="availability" content="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+  
+        <div class="hdm-card__pricing-text">
+          {%- if product.compare_at_price > product.price -%}
+            <s class="hdm-card__price-original" aria-label="Preço original {{ product.compare_at_price | money }}">
+              {{- product.compare_at_price | money -}}
+            </s>
+          {%- endif -%}
+          <span class="hdm-card__price-current" aria-label="Preço atual {{ product.price | money }}">
+            {{- product.price | money -}}
+          </span>
+          <span class="hdm-card__price-card">
+            ou {{ price_card | money }} no cartão
+          </span>
+        </div>
+  
+        <a
+          href="{{ product.url }}"
+          class="hdm-card__cta"
+          aria-label="Comprar {{ product.title | escape }}"
+        >
+          <img src="{{ 'icon-card-product.svg' | asset_url }}" width="25" height="28">
+        </a>
       </div>
+      {%- comment -%} ── Descrição curta ── {%- endcomment -%}
+      {%- if short_desc != blank -%}
+        <p class="hdm-card__description">{{ short_desc }}</p>
+      {%- endif -%}
 
-      <a
-        href="{{ product.url }}"
-        class="hdm-card__cta"
-        aria-label="Comprar {{ product.title | escape }}"
-      >
-        <svg class="hdm-card__cta-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6 7h12l-1.5 12.5a2 2 0 0 1-2 1.75H9.5a2 2 0 0 1-2-1.75L6 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
     </div>
-
-    {%- comment -%} ── Descrição curta ── {%- endcomment -%}
-    {%- if short_desc != blank -%}
-      <p class="hdm-card__description">{{ short_desc }}</p>
-    {%- endif -%}
   </article>
+
 {%- endif -%}

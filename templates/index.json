@@ -90,6 +90,18 @@
         "title": "Nossos Benefícios"
       }
     },
+    "hdm_product_showcase_GyeiXR": {
+      "type": "hdm-product-showcase",
+      "name": "HDM Product Showcase",
+      "settings": {
+        "title": "Novidades!",
+        "collection": "novidades",
+        "product_limit": 12,
+        "show_more_link": true,
+        "promo_link": "",
+        "installment_fee_pct": 11
+      }
+    },
     "custom_collection_list_UDXFm4": {
       "type": "custom-collection-list",
       "blocks": {
@@ -555,6 +567,7 @@
   "order": [
     "custom_hero_banner_bfYfEa",
     "hdm_benefits_carousel_G8Wfhj",
+    "hdm_product_showcase_GyeiXR",
     "custom_collection_list_UDXFm4",
     "custom_product_slider_bW4iAE",
     "product_hotspots_RzCyE8",
