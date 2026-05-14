@@ -763,7 +763,11 @@
   </details>
 </header-drawer>
 
-{% stylesheet %}
+<style>
+  header-drawer > details > summary.header__icon--summary {
+    display: none !important;
+  }
+
   .header__icon--menu {
     position: initial;
   }
@@ -1644,7 +1648,7 @@
 #hdm-native-nav-wrapper .menu-drawer__menu-item--child:hover {
   color: #7c79e7 !important;
 }
-{% endstylesheet %}
+</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
