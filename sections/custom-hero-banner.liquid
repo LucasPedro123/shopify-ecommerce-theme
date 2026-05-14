@@ -2,303 +2,257 @@
 
 {%- comment -%}
   ═══════════════════════════════════════════════════════════════
-  HDM BEAUTY — Hero Banner com Countdown Timer por Slide
-  Cada block (slide) tem seu próprio countdown independente.
+  HDM BEAUTY — Hero Banner (Native Swipe + LCP Otimizado)
   ═══════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
 <div
-  class="custom-hero-wrapper page-width"
+  class="custom-hero-wrapper tw-w-[100vw] tw-relative tw-left-1/2 -tw-translate-x-1/2"
+  style="margin-top: -193px;" 
   data-autoplay="{{ section.settings.autoplay }}"
   data-speed="{{ section.settings.speed | times: 1000 }}"
 >
-  <div class="custom-hero-slider-container">
+  <div class="custom-hero-slider-container tw-relative tw-w-full">
+    
+    {%- comment -%} O contêiner do slider nativo {%- endcomment -%}
     <div class="custom-hero-slider" id="HeroSlider-{{ section.id }}">
-
       {%- for block in section.blocks -%}
         {%- liquid
-          assign b            = block.settings
-          assign has_cd       = b.show_countdown
-          assign cd_end       = b.countdown_end
-          assign cd_valid     = false
-          if has_cd and cd_end != blank
-            assign cd_valid = true
+          assign b = block.settings
+          assign is_first = forloop.first
+          
+          assign image_loading = 'lazy'
+          assign fetch_priority = 'auto'
+          if is_first
+            assign image_loading = 'eager'
+            assign fetch_priority = 'high'
           endif
-          assign cd_id = 'hdm-cd-' | append: block.id
         -%}
 
-        <div class="custom-hero-slide" {{ block.shopify_attributes }}>
-
+        <div class="custom-hero-slide" {{ block.shopify_attributes }} data-index="{{ forloop.index0 }}">
           {%- if b.link != blank -%}
             <a href="{{ b.link }}" class="custom-hero-link" aria-label="Ir para a promoção">
           {%- endif -%}
 
-          {%- if b.image != blank -%}
-            <picture>
-              {%- if b.mobile_image != blank -%}
-                <source media="(max-width: 749px)" srcset="{{ b.mobile_image | image_url: width: 750 }}">
-              {%- endif -%}
-              {{- b.image | image_url: width: 1920 | image_tag:
-                  loading: 'lazy',
-                  class: 'custom-hero-image',
-                  alt: b.image.alt | default: 'Banner da loja'
-              -}}
-            </picture>
-          {%- else -%}
-            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg custom-hero-image' }}
-          {%- endif -%}
+          <picture class="tw-block tw-w-full tw-relative">
+            {%- if b.mobile_image != blank -%}
+              <source media="(max-width: 767px)" srcset="{{ b.mobile_image | image_url: width: 800 }}">
+            {%- endif -%}
+            {{- b.image | image_url: width: 2000 | image_tag:
+                loading: image_loading,
+                fetchpriority: fetch_priority,
+                class: 'custom-hero-image tw-w-full tw-object-cover tw-block',
+                alt: b.image.alt | default: shop.name
+            -}}
+          </picture>
 
-          {%- if b.link != blank -%}
-            </a>
-          {%- endif -%}
+          {%- if b.link != blank -%}</a>{%- endif -%}
 
-          {%- comment -%} ── COUNTDOWN deste slide ── {%- endcomment -%}
-          {%- if cd_valid -%}
-            <div
-              class="hdm-countdown"
-              id="{{ cd_id }}"
-              data-end="{{ cd_end }}"
-              aria-label="Contador regressivo da oferta"
-              style="
-                left:   {{ b.countdown_x }};
-                top:    {{ b.countdown_y }};
-                transform: translate(
-                  {%- if b.countdown_align_h == 'center' -%}-50%
-                  {%- elsif b.countdown_align_h == 'right' -%}-100%
-                  {%- else -%}0%{%- endif -%},
-                  {%- if b.countdown_align_v == 'center' -%}-50%
-                  {%- elsif b.countdown_align_v == 'bottom' -%}-100%
-                  {%- else -%}0%{%- endif -%}
-                );
-                --cd-box:   {{ b.countdown_box_size }}px;
-                --cd-num:   {{ b.countdown_num_size }}px;
-                --cd-label: {{ b.countdown_label_size }}px;
-                --cd-num-mobile: {{ b.countdown_num_size | times: 0.65 | round }}px;
-              "
+          {%- comment -%} Countdown {%- endcomment -%}
+          {%- if b.show_countdown and b.countdown_end != blank -%}
+            <div class="hdm-countdown" id="hdm-cd-{{ block.id }}" data-end="{{ b.countdown_end }}"
+              style="left:{{ b.countdown_x }}; top:{{ b.countdown_y }}; transform: translate({% if b.countdown_align_h == 'center' %}-50%{% elsif b.countdown_align_h == 'right' %}-100%{% else %}0%{% endif %}, {% if b.countdown_align_v == 'center' %}-50%{% elsif b.countdown_align_v == 'bottom' %}-100%{% else %}0%{% endif %}); --cd-box:{{ b.countdown_box_size }}px; --cd-num:{{ b.countdown_num_size }}px; --cd-label:{{ b.countdown_label_size }}px; --cd-num-mobile:{{ b.countdown_num_size | times: 0.65 | round }}px;"
             >
               <div class="hdm-countdown__inner">
-                <div class="hdm-countdown__unit" aria-live="polite">
-                  <span class="hdm-countdown__num" data-unit="h">00</span>
-                  <span class="hdm-countdown__label">Horas</span>
-                </div>
+                <div class="hdm-countdown__unit" aria-live="polite"><span class="hdm-countdown__num" data-unit="h">00</span><span class="hdm-countdown__label">Horas</span></div>
                 <span class="hdm-countdown__sep" aria-hidden="true">:</span>
-                <div class="hdm-countdown__unit" aria-live="polite">
-                  <span class="hdm-countdown__num" data-unit="m">00</span>
-                  <span class="hdm-countdown__label">Minutos</span>
-                </div>
+                <div class="hdm-countdown__unit" aria-live="polite"><span class="hdm-countdown__num" data-unit="m">00</span><span class="hdm-countdown__label">Minutos</span></div>
                 <span class="hdm-countdown__sep" aria-hidden="true">:</span>
-                <div class="hdm-countdown__unit" aria-live="polite">
-                  <span class="hdm-countdown__num" data-unit="s">00</span>
-                  <span class="hdm-countdown__label">Segundos</span>
-                </div>
+                <div class="hdm-countdown__unit" aria-live="polite"><span class="hdm-countdown__num" data-unit="s">00</span><span class="hdm-countdown__label">Segundos</span></div>
               </div>
             </div>
           {%- endif -%}
-
         </div>
       {%- endfor -%}
     </div>
 
+    {%- comment -%} Setas (Ocultas no Mobile via CSS) {%- endcomment -%}
     {%- if section.blocks.size > 1 -%}
-      <button class="custom-hero-arrow custom-hero-arrow--left" aria-label="Slide anterior">
-        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <button class="custom-hero-arrow custom-hero-arrow--left" aria-label="Slide anterior" data-action="prev">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <button class="custom-hero-arrow custom-hero-arrow--right" aria-label="Próximo slide">
-        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      <button class="custom-hero-arrow custom-hero-arrow--right" aria-label="Próximo slide" data-action="next">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </button>
     {%- endif -%}
   </div>
 
+  {%- comment -%} Dots {%- endcomment -%}
   {%- if section.blocks.size > 1 -%}
     <div class="custom-hero-controls">
       <div class="custom-hero-dots">
         {%- for block in section.blocks -%}
-          <button
-            class="custom-hero-dot {% if forloop.first %}is-active{% endif %}"
-            aria-label="Ir para o slide {{ forloop.index }}"
-            data-index="{{ forloop.index0 }}"
-          ></button>
+          <button class="custom-hero-dot {% if forloop.first %}is-active{% endif %}" aria-label="Ir para slide {{ forloop.index }}" data-index="{{ forloop.index0 }}"></button>
         {%- endfor -%}
       </div>
     </div>
   {%- endif -%}
 </div>
 
-{%- comment -%} ── CSS GLOBAL DO COUNTDOWN (gerado uma vez) ── {%- endcomment -%}
 <style>
-  /* ── Posicionamento sobre o slide ── */
-  .custom-hero-slide { position: relative; }
-
-  .hdm-countdown {
-    position: absolute;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  /* ── Layout interno ── */
-  .hdm-countdown__inner {
+  /* Base e Fuga de Grid */
+  .custom-hero-wrapper { display: flex; flex-direction: column; overflow: hidden; }
+  
+  /* Scroll Snap Nativo (Arrastar no Mobile) */
+  .custom-hero-slider {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  .custom-hero-slider::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+  /* Slides */
+  .custom-hero-slide {
+    flex: 0 0 100vw;
+    scroll-snap-align: center;
+    position: relative;
+    /* No desktop, a altura é ditada pela proporção da imagem (sem VH) */
   }
 
-  /* ── Caixa de cada unidade ── */
-  .hdm-countdown__unit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(20, 20, 20, 0.82);
-    border-radius: 8px;
-    padding: 10px 14px 8px;
-    min-width: var(--cd-box, 72px);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+  /* Imagens Desktop */
+  .custom-hero-image {
+    max-height: 800px; /* Trava de segurança para imagens gigantes no desktop */
+    object-fit: cover;
   }
 
-  /* ── Número ── */
-  .hdm-countdown__num {
-    font-family: var(--font-heading--family, sans-serif);
-    font-size: var(--cd-num, 40px);
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
+  /* Setas */
+  .custom-hero-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 95px;
+    background: rgba(255,255,255,0.7); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 20; color: #111;
+    backdrop-filter: blur(4px); transition: background 0.3s;
   }
+  .custom-hero-arrow:hover { background: rgba(255,255,255,1); }
+  .custom-hero-arrow--left { left: 24px; }
+  .custom-hero-arrow--right { right: 24px; }
 
-  /* ── Label ── */
-  .hdm-countdown__label {
-    font-family: var(--font-body--family, sans-serif);
-    font-size: var(--cd-label, 11px);
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.75);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-top: 4px;
-    white-space: nowrap;
-  }
+  /* Countdown CSS mantido */
+  .hdm-countdown { position: absolute; z-index: 15; pointer-events: none; }
+  .hdm-countdown__inner { display: flex; align-items: center; gap: 6px; }
+  .hdm-countdown__unit { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(20,20,20,0.82); border-radius: 8px; padding: 10px 14px 8px; min-width: var(--cd-box, 72px); backdrop-filter: blur(4px); }
+  .hdm-countdown__num { font-size: var(--cd-num, 40px); font-weight: 700; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hdm-countdown__label { font-size: var(--cd-label, 11px); color: rgba(255,255,255,0.75); text-transform: uppercase; margin-top: 4px; }
+  .hdm-countdown__sep { font-size: var(--cd-num, 40px); font-weight: 700; color: #fff; line-height: 1; align-self: flex-start; padding-top: 10px; opacity: 0.8; }
+  .hdm-countdown[data-expired] .hdm-countdown__inner { opacity: 0.35; }
 
-  /* ── Separador : ── */
-  .hdm-countdown__sep {
-    font-family: var(--font-heading--family, sans-serif);
-    font-size: var(--cd-num, 40px);
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1;
-    align-self: flex-start;
-    padding-top: 10px;
-    opacity: 0.8;
-  }
-
-  /* ── Expirado — esmaece ── */
-  .hdm-countdown[data-expired] .hdm-countdown__inner {
-    opacity: 0.35;
-  }
-
-  /* ── Mobile: reduz proporcionalmente ── */
-  @media screen and (max-width: 749px) {
-    .hdm-countdown__unit {
-      min-width: 44px;
-      padding: 6px 8px 5px;
-    }
-    .hdm-countdown__num,
-    .hdm-countdown__sep {
-      font-size: var(--cd-num-mobile, 26px);
-    }
-    .hdm-countdown__label {
-      font-size: 8px;
-    }
-  }
 </style>
 
-<script src="{{ 'custom-hero.js' | asset_url }}" defer="defer"></script>
-
-{%- comment -%} ── JS: inicializa um timer por countdown encontrado na página ── {%- endcomment -%}
 <script>
-(function () {
-  'use strict';
+document.addEventListener('DOMContentLoaded', () => {
+  /* ── 1. LÓGICA DO SLIDER (Scroll Nativo + Dots) ── */
+  const slider = document.querySelector('.custom-hero-slider');
+  const slides = document.querySelectorAll('.custom-hero-slide');
+  const dots = document.querySelectorAll('.custom-hero-dot');
+  const btnPrev = document.querySelector('.custom-hero-arrow--left');
+  const btnNext = document.querySelector('.custom-hero-arrow--right');
+  const wrapper = document.querySelector('.custom-hero-wrapper');
+  
+  if (!slider || slides.length <= 1) return;
 
+  let currentIndex = 0;
+  let autoplayTimer;
+  const autoplayEnabled = wrapper.dataset.autoplay === 'true';
+  const speed = parseInt(wrapper.dataset.speed) || 5000;
+
+  // Atualiza bolinhas via Intersection Observer (alta performance na rolagem)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentIndex = parseInt(entry.target.dataset.index);
+        updateDots(currentIndex);
+      }
+    });
+  }, { root: slider, threshold: 0.5 });
+
+  slides.forEach(slide => observer.observe(slide));
+
+  function updateDots(index) {
+    dots.forEach(dot => dot.classList.remove('is-active'));
+    if(dots[index]) dots[index].classList.add('is-active');
+  }
+
+  function scrollToSlide(index) {
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+    slides[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  }
+
+  // Eventos de clique
+  if (btnPrev) btnPrev.addEventListener('click', () => { scrollToSlide(currentIndex - 1); resetAutoplay(); });
+  if (btnNext) btnNext.addEventListener('click', () => { scrollToSlide(currentIndex + 1); resetAutoplay(); });
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { scrollToSlide(i); resetAutoplay(); });
+  });
+
+  // Autoplay
+  function startAutoplay() {
+    if (!autoplayEnabled) return;
+    autoplayTimer = setInterval(() => { scrollToSlide(currentIndex + 1); }, speed);
+  }
+  function resetAutoplay() {
+    clearInterval(autoplayTimer);
+    startAutoplay();
+  }
+  
+  // Pausa se o usuário interagir (tocar na tela)
+  slider.addEventListener('touchstart', () => clearInterval(autoplayTimer), { passive: true });
+  slider.addEventListener('touchend', startAutoplay, { passive: true });
+  slider.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
+  slider.addEventListener('mouseleave', startAutoplay);
+
+  startAutoplay();
+
+  /* ── 2. LÓGICA DO COUNTDOWN ── */
   function pad(n) { return String(n).padStart(2, '0'); }
+  function initCountdown(el) {
+    const endRaw = el.dataset.end;
+    if (!endRaw) return;
+    const endDate = new Date(endRaw.replace('T', ' '));
+    if (isNaN(endDate.getTime())) return;
 
- function initCountdown(wrapper) {
-  const endRaw = wrapper.dataset.end;
-  if (!endRaw) return;
+    const elH = el.querySelector('[data-unit="h"]');
+    const elM = el.querySelector('[data-unit="m"]');
+    const elS = el.querySelector('[data-unit="s"]');
+    if (!elH || !elM || !elS) return;
 
-  // Força interpretação como horário LOCAL (não UTC)
-  // Substitui o T por espaço — browsers interpretam "2025-05-15 23:59:00" como local
-  const endDate = new Date(endRaw.replace('T', ' '));
-  if (isNaN(endDate.getTime())) return;
+    el.removeAttribute('data-expired');
 
-  const elH = wrapper.querySelector('[data-unit="h"]');
-  const elM = wrapper.querySelector('[data-unit="m"]');
-  const elS = wrapper.querySelector('[data-unit="s"]');
-  if (!elH || !elM || !elS) return;
-
-  // Remove data-expired caso exista do SSR
-  wrapper.removeAttribute('data-expired');
-
-  function tick() {
-    const diff = endDate.getTime() - Date.now();
-
-    if (diff <= 0) {
-      elH.textContent = '00';
-      elM.textContent = '00';
-      elS.textContent = '00';
-      wrapper.setAttribute('data-expired', '');
-      return;
+    function tick() {
+      const diff = endDate.getTime() - Date.now();
+      if (diff <= 0) {
+        elH.textContent = '00'; elM.textContent = '00'; elS.textContent = '00';
+        el.setAttribute('data-expired', '');
+        return;
+      }
+      const total = Math.floor(diff / 1000);
+      elH.textContent = pad(Math.floor(total / 3600));
+      elM.textContent = pad(Math.floor((total % 3600) / 60));
+      elS.textContent = pad(total % 60);
+      setTimeout(tick, 1000);
     }
-
-    const total = Math.floor(diff / 1000);
-    elH.textContent = pad(Math.floor(total / 3600));
-    elM.textContent = pad(Math.floor((total % 3600) / 60));
-    elS.textContent = pad(total % 60);
-
-    setTimeout(tick, 1000);
+    tick();
   }
-
-  tick();
-}
-
-  // Inicializa todos os countdowns presentes no DOM
-  function initAll() {
-    document.querySelectorAll('.hdm-countdown[data-end]').forEach(initCountdown);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll);
-  } else {
-    initAll();
-  }
-})();
+  document.querySelectorAll('.hdm-countdown[data-end]').forEach(initCountdown);
+});
 </script>
 
 {% schema %}
 {
-  "name": "Hero Banner Principal",
+  "name": "Hero Banner HDM",
   "tag": "section",
-  "class": "section background-white",
+  "class": "section",
   "settings": [
     {
       "type": "header",
-      "content": "Slider"
+      "content": "Aviso de Layout: Full Bleed",
+      "info": "Este banner foi projetado para ignorar margens e ocupar 100% da tela, passando por trás do Header transparente."
     },
-    {
-      "type": "checkbox",
-      "id": "autoplay",
-      "label": "Habilitar transição automática",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "speed",
-      "min": 3,
-      "max": 10,
-      "step": 1,
-      "unit": "s",
-      "label": "Tempo entre os slides",
-      "default": 5
-    }
+    { "type": "checkbox", "id": "autoplay", "label": "Transição automática", "default": true },
+    { "type": "range", "id": "speed", "min": 3, "max": 10, "step": 1, "unit": "s", "label": "Tempo de transição", "default": 5 }
   ],
   "blocks": [
     {
@@ -306,124 +260,41 @@
       "name": "Slide",
       "limit": 5,
       "settings": [
-        {
-          "type": "header",
-          "content": "Imagens"
-        },
+        { "type": "header", "content": "Tamanhos Exigidos (Performance)" },
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Imagem Desktop (Sugerido: 1920x387px)"
+          "label": "Desktop: 1920x800px (Widescreen)",
+          "info": "Formato paisagem. Evite imagens quadradas aqui para não empurrar o site muito para baixo."
         },
         {
           "type": "image_picker",
           "id": "mobile_image",
-          "label": "Imagem Mobile (Sugerido: 1080x1080px)"
+          "label": "Mobile: 1080x1350px (Retrato)",
+          "info": "Formato vertical 4:5. Otimizado para ocupar a tela do celular."
         },
+        { "type": "url", "id": "link", "label": "Link do Banner" },
+        { "type": "header", "content": "⏱ Countdown Timer" },
+        { "type": "checkbox", "id": "show_countdown", "label": "Exibir countdown", "default": false },
+        { "type": "text", "id": "countdown_end", "label": "Término (Ex: 2025-05-15T23:59:00)" },
+        { "type": "text", "id": "countdown_x", "label": "Posição X (Ex: 75%)", "default": "75%" },
+        { "type": "text", "id": "countdown_y", "label": "Posição Y (Ex: 50%)", "default": "50%" },
         {
-          "type": "url",
-          "id": "link",
-          "label": "Link do Banner"
-        },
-        {
-          "type": "header",
-          "content": "⏱ Countdown Timer"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_countdown",
-          "label": "Exibir countdown neste slide",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "countdown_end",
-          "label": "Data e hora de término",
-          "info": "Formato: 2025-05-15T23:59:00",
-          "default": "2025-12-31T23:59:00"
-        },
-        {
-          "type": "header",
-          "content": "Posição"
-        },
-        {
-          "type": "text",
-          "id": "countdown_x",
-          "label": "Posição horizontal (ex: 75% ou 900px)",
-          "default": "75%",
-          "info": "Distância da borda esquerda do banner."
-        },
-        {
-          "type": "text",
-          "id": "countdown_y",
-          "label": "Posição vertical (ex: 50% ou 120px)",
-          "default": "50%",
-          "info": "Distância do topo do banner."
-        },
-        {
-          "type": "select",
-          "id": "countdown_align_h",
-          "label": "Âncora horizontal",
-          "options": [
-            { "value": "left",   "label": "Esquerda" },
-            { "value": "center", "label": "Centro"   },
-            { "value": "right",  "label": "Direita"  }
-          ],
+          "type": "select", "id": "countdown_align_h", "label": "Âncora X",
+          "options": [ { "value": "left", "label": "Esq" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Dir" } ],
           "default": "left"
         },
         {
-          "type": "select",
-          "id": "countdown_align_v",
-          "label": "Âncora vertical",
-          "options": [
-            { "value": "top",    "label": "Topo"   },
-            { "value": "center", "label": "Centro" },
-            { "value": "bottom", "label": "Base"   }
-          ],
+          "type": "select", "id": "countdown_align_v", "label": "Âncora Y",
+          "options": [ { "value": "top", "label": "Topo" }, { "value": "center", "label": "Centro" }, { "value": "bottom", "label": "Base" } ],
           "default": "center"
         },
-        {
-          "type": "header",
-          "content": "Visual"
-        },
-        {
-          "type": "range",
-          "id": "countdown_box_size",
-          "label": "Largura de cada caixa (px)",
-          "min": 50,
-          "max": 140,
-          "step": 2,
-          "default": 72
-        },
-        {
-          "type": "range",
-          "id": "countdown_num_size",
-          "label": "Tamanho do número (px)",
-          "min": 20,
-          "max": 80,
-          "step": 2,
-          "default": 40
-        },
-        {
-          "type": "range",
-          "id": "countdown_label_size",
-          "label": "Tamanho do label (px)",
-          "min": 8,
-          "max": 20,
-          "step": 1,
-          "default": 11
-        }
+        { "type": "range", "id": "countdown_box_size", "label": "Largura Caixa", "min": 50, "max": 140, "step": 2, "default": 72 },
+        { "type": "range", "id": "countdown_num_size", "label": "Tamanho Número", "min": 20, "max": 80, "step": 2, "default": 40 },
+        { "type": "range", "id": "countdown_label_size", "label": "Tamanho Label", "min": 8, "max": 20, "step": 1, "default": 11 }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Hero Banner Principal",
-      "blocks": [
-        { "type": "slide" },
-        { "type": "slide" }
-      ]
-    }
-  ]
+  "presets": [ { "name": "Hero Banner HDM", "blocks": [ { "type": "slide" } ] } ]
 }
 {% endschema %}
