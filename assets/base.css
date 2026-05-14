@@ -1395,7 +1395,6 @@ button.shopify-payment-button__button--unbranded {
 
 textarea,
 input:not([type='checkbox'], [type='radio']) {
-  background-color: var(--color-input-background);
   border-color: var(--color-input-border);
 }
 

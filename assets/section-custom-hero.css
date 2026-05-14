@@ -2,11 +2,16 @@
   background-color: #fff !important;
 }
 .custom-hero-wrapper {
-  padding-top: 29px;
   display: flex;
   flex-direction: column;
+  /* Fuga de Grid: Força a ocupar a tela toda ignorando os limites do tema */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Puxa o banner para o topo absoluto (atrás do header) */
+  margin-top: -193px; 
 }
-
 .custom-hero-slider-container {
   position: relative;
   width: 100%;
@@ -86,26 +91,42 @@
 .custom-hero-dots {
   display: flex;
   gap: 12px;
+  margin-top: -18px;
 }
-
 .custom-hero-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
   border: none;
-  background-color: #e0e0e0;
   cursor: pointer;
-  padding: 0;
-  transition: background-color 0.3s ease;
+  transition:  0.3s ease;
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.24);
+  border-radius: 40px;
 }
 
 .custom-hero-dot.is-active {
+  width: 24px;
+  height: 8px;
+  border-radius: 40px;
   background-color: #766CFF;
 }
 
 @media screen and (max-width: 749px) {
-  .custom-hero-slide { height: max-content; }
+  .custom-hero-wrapper {
+    margin-top: -110px; 
+  }
+  .custom-hero-slide { 
+    height: 80vh; 
+  }
   .custom-hero-arrow { display: none; }
   .custom-hero-arrow--left { left: -16px; }
   .custom-hero-arrow--right { right: -16px; }
+}
+
+.custom-hero-slide {
+  flex: 0 0 100vw;
+  scroll-snap-align: start;
+  /* Altura do Hero: 100vh ocupa a tela inteira. Pode ajustar para 80vh ou 90vh se quiser mostrar as seções de baixo. */
+  user-select: none;
+  height: 80vh; 
+  -webkit-user-drag: none;
 }

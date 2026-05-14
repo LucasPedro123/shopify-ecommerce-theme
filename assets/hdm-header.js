@@ -1,318 +1,269 @@
-'use strict';
+/**
+ * HDM Header — Web Component (Sprint 1 refactor)
+ *
+ * Comportamentos:
+ *   1. Scroll detection → data-state="scrolled" quando scrollY > 0
+ *   2. Megamenu hover/focus → abre dropdown + dim overlay + data-state
+ *   3. Dropdowns (CEP, Conta, Sacola) → toggle com aria-expanded
+ *   4. Nav chevrons → scrollBy smooth, oculta quando não há overflow
+ *   5. Mobile drawer → abre/fecha com focus básico
+ *   6. ESC fecha tudo, click fora também
+ *
+ * Auto-registra como <header-component>.
+ */
 
-/* ─────────────────────────────────────────────────────────────
-   UTILITÁRIOS
-   ───────────────────────────────────────────────────────────── */
-
-function debounce(fn, delay) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
-
-function formatCep(value) {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   1. HdmHeader — fixed + scroll hide/show
-   ───────────────────────────────────────────────────────────── */
-
-class HdmHeader extends HTMLElement {
-  #lastScrollY = 0;
-  #section     = null;
-
+class HDMHeaderComponent extends HTMLElement {
   connectedCallback() {
-    requestAnimationFrame(() => {
-      this.#section = this.closest('.hdm-header-section') ?? this.parentElement;
+    this._overlay = document.getElementById('hdm-header-overlay');
+    this._spacer  = document.getElementById('hdm-header-spacer');
+    this._drawer  = this.querySelector('#hdm-mobile-drawer');
+    this._nav     = this.querySelector('[data-nav-scroller]');
+    this._chevL   = this.querySelector('.hdm-nav__chevron--left');
+    this._chevR   = this.querySelector('.hdm-nav__chevron--right');
+    this._openDropdown = null;
+    this._openMega     = null;
 
-      const updatePadding = () => {
-        const headerH = this.#section?.offsetHeight ?? 0;
-        const annBar  = document.getElementById('hdm-announcement-bar')
-                     ?? document.querySelector('.hdm-announcement-section');
-        const annH    = annBar?.offsetHeight ?? 0;
-        const total   = headerH + annH;
-        document.documentElement.style.setProperty('--hdm-header-fixed-height', `${total}px`);
-        document.body.style.paddingTop = `${total}px`;
-      };
+    this._bindScroll();
+    this._bindDropdowns();
+    this._bindMegamenu();
+    this._bindChevrons();
+    this._bindDrawer();
+    this._bindGlobalDismiss();
+    this._syncSpacer();
+    window.addEventListener('resize', () => { this._syncSpacer(); this._updateChevronVisibility(); }, { passive: true });
+    this._updateChevronVisibility();
+  }
 
-      updatePadding();
-      window.addEventListener('resize', updatePadding);
+  /* ───────── 1. Scroll ───────── */
+  _bindScroll() {
+    if (this.dataset.sticky !== 'true') return;
+    let ticking = false;
+    const handler = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          this._setScrolled(window.scrollY > 0);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handler, { passive: true });
+    this._setScrolled(window.scrollY > 0);
+  }
 
-      this.#lastScrollY  = window.scrollY;
-      this._onScroll     = this.#handleScroll.bind(this);
-      window.addEventListener('scroll', this._onScroll, { passive: true });
+  _setScrolled(isScrolled) {
+    const current = this.getAttribute('data-state');
+    if (current === 'megamenu-open') return;
+    this.setAttribute('data-state', isScrolled ? 'scrolled' : 'initial');
+  }
+
+  /* ───────── 2. Dropdowns (CEP, Conta, Sacola) ───────── */
+  _bindDropdowns() {
+    this.querySelectorAll('[data-action="toggle-dropdown"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const popId = btn.getAttribute('aria-controls');
+        const pop = document.getElementById(popId);
+        if (!pop) return;
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        this._closeAllDropdowns();
+        if (!isOpen) {
+          btn.setAttribute('aria-expanded', 'true');
+          pop.hidden = false;
+          this._openDropdown = { btn, pop };
+          // Força white state + overlay enquanto dropdown estiver aberto
+          this.setAttribute('data-state', 'megamenu-open');
+          this._showOverlay();
+          // Reset CEP pra invite sempre que abrir
+          if (pop.classList.contains('hdm-pop--cep')) {
+            pop.setAttribute('data-cep-state', 'invite');
+          }
+          const focusable = pop.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+          focusable?.focus();
+        }
+      });
+    });
+
+    // Botão "fechar" dentro de qualquer popover
+    this.querySelectorAll('[data-action="close-dropdown"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._closeAllDropdowns();
+      });
+    });
+
+    // CEP: pane invite → form (click no botão "Informar CEP" dentro do popover)
+    this.querySelectorAll('.hdm-cep-show-form-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pop = btn.closest('.hdm-pop--cep');
+        if (!pop) return;
+        pop.setAttribute('data-cep-state', 'form');
+        pop.querySelector('#hdm-cep-input')?.focus();
+      });
+    });
+
+    // CEP: voltar para invite
+    this.querySelectorAll('[data-action="cep-back-to-invite"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pop = btn.closest('.hdm-pop--cep');
+        if (pop) pop.setAttribute('data-cep-state', 'invite');
+      });
     });
   }
 
-  disconnectedCallback() {
-    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
-  }
-
-  #handleScroll() {
-    const y     = window.scrollY;
-    const delta = y - this.#lastScrollY;
-    if (Math.abs(delta) < 8) return;
-
-    if (delta > 0 && y > 80) {
-      this.#section?.classList.add('hdm-header--hidden');
-    } else {
-      this.#section?.classList.remove('hdm-header--hidden');
+  _closeAllDropdowns() {
+    if (!this._openDropdown) return;
+    this._openDropdown.btn.setAttribute('aria-expanded', 'false');
+    this._openDropdown.pop.hidden = true;
+    // Reset CEP pra invite quando fecha
+    if (this._openDropdown.pop.classList.contains('hdm-pop--cep')) {
+      this._openDropdown.pop.setAttribute('data-cep-state', 'invite');
     }
-
-    this.#lastScrollY = y <= 0 ? 0 : y;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   2. HdmMegaMenu — mega menu desktop (portal pattern)
-   ───────────────────────────────────────────────────────────── */
-
-class HdmMegaMenu {
-  #openPanel  = null;
-  #closeTimer = null;
-  #closeDelay = 140;
-  #portals    = new Map();
-  #overlay    = null;
-  #header     = null;
-
-  constructor(header) {
-    this.#header  = header;
-    this.#overlay = document.getElementById('hdm-mega-overlay');
-    this.#setup();
-    document.addEventListener('click', this.#onDocClick.bind(this));
-    window.addEventListener('resize', debounce(this.#reposition.bind(this), 120));
-    window.addEventListener('keydown', this.#onKeyDown.bind(this));
+    this._openDropdown = null;
+    // Volta ao estado correto (scrolled ou initial) e esconde overlay
+    if (!this._openMega) {
+      this._setScrolledForce(window.scrollY > 0);
+      this._hideOverlay();
+    }
   }
 
-  #setup() {
-    const items = this.#header.querySelectorAll('.hdm-nav__item[data-has-submenu]');
+  /* Versão direta do setScrolled que não respeita o lock de megamenu-open */
+  _setScrolledForce(isScrolled) {
+    this.setAttribute('data-state', isScrolled ? 'scrolled' : 'initial');
+  }
 
+  /* ───────── 3. Megamenu ───────── */
+  _bindMegamenu() {
+    const items = this.querySelectorAll('[data-megamenu-trigger="true"]');
     items.forEach((item) => {
-      const panel = item.querySelector('.hdm-mega');
-      const link  = item.querySelector('.hdm-nav__link');
-      if (!panel || !link) return;
+      const trigger = item.querySelector('.hdm-nav__link');
+      const targetId = item.getAttribute('data-mega-target');
+      // Megamenu agora é IRMÃO do <ul> (não filho do <li>), busca por ID
+      const mega = targetId ? document.getElementById(targetId) : null;
+      if (!mega || !trigger) return;
 
-      document.body.appendChild(panel);
-      this.#portals.set(item, panel);
+      const open = () => {
+        this._closeMega();
+        mega.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        this._openMega = { item, mega, trigger };
+        this.setAttribute('data-state', 'megamenu-open');
+        this._showOverlay();
+      };
+      const scheduleClose = () => {
+        this._closeMegaTimeout = setTimeout(() => this._closeMega(), 120);
+      };
+      const cancelClose = () => clearTimeout(this._closeMegaTimeout);
 
-      item.addEventListener('pointerenter', () => {
-        this.#clearClose();
-        this.#open(panel, link);
-      });
-
-      item.addEventListener('pointerleave', (e) => {
-        if (e.relatedTarget && panel.contains(e.relatedTarget)) return;
-        this.#scheduleClose();
-      });
-
-      panel.addEventListener('pointerenter', () => this.#clearClose());
-      panel.addEventListener('pointerleave', (e) => {
-        if (e.relatedTarget && item.contains(e.relatedTarget)) return;
-        this.#scheduleClose();
-      });
+      item.addEventListener('mouseenter', () => { cancelClose(); open(); });
+      item.addEventListener('mouseleave', scheduleClose);
+      mega.addEventListener('mouseenter', cancelClose);
+      mega.addEventListener('mouseleave', scheduleClose);
+      trigger.addEventListener('focus', open);
     });
   }
 
-  #open(panel, link) {
-    if (this.#openPanel && this.#openPanel !== panel) this.#close(this.#openPanel);
-
-    this.#positionPanel(panel);
-    panel.classList.add('hdm-mega--open');
-    link.setAttribute('aria-expanded', 'true');
-    this.#openPanel = panel;
-
-    if (this.#overlay) this.#overlay.classList.add('hdm-mega-overlay--visible');
-  }
-
-  #close(panel) {
-    panel.classList.remove('hdm-mega--open');
-
-    this.#portals.forEach((p, item) => {
-      if (p === panel) item.querySelector('.hdm-nav__link')?.setAttribute('aria-expanded', 'false');
-    });
-
-    if (this.#openPanel === panel) this.#openPanel = null;
-    if (this.#overlay) this.#overlay.classList.remove('hdm-mega-overlay--visible');
-  }
-
-  #closeAll() {
-    if (this.#openPanel) this.#close(this.#openPanel);
-  }
-
-  #scheduleClose() {
-    this.#clearClose();
-    this.#closeTimer = setTimeout(() => this.#closeAll(), this.#closeDelay);
-  }
-
-  #clearClose() {
-    if (this.#closeTimer !== null) {
-      clearTimeout(this.#closeTimer);
-      this.#closeTimer = null;
+  _closeMega() {
+    if (!this._openMega) return;
+    this._openMega.mega.hidden = true;
+    this._openMega.trigger.setAttribute('aria-expanded', 'false');
+    this._openMega = null;
+    // Se ainda houver dropdown aberto, mantém white state
+    if (!this._openDropdown) {
+      this._setScrolledForce(window.scrollY > 0);
+      this._hideOverlay();
     }
   }
 
-  #positionPanel(panel) {
-    if (!this.#header) return;
-    const rect = this.#header.getBoundingClientRect();
-    panel.style.cssText = `position:fixed;top:${rect.bottom}px;left:0;right:0;width:100%;z-index:400;`;
+  _showOverlay() { if (this._overlay) { this._overlay.hidden = false; requestAnimationFrame(() => this._overlay.setAttribute('data-visible', 'true')); } }
+  _hideOverlay() {
+    if (!this._overlay) return;
+    this._overlay.removeAttribute('data-visible');
+    setTimeout(() => { if (!this._overlay.getAttribute('data-visible')) this._overlay.hidden = true; }, 260);
   }
 
-  #reposition() {
-    if (this.#openPanel) this.#positionPanel(this.#openPanel);
-  }
-
-  #onDocClick(e) {
-    if (this.#header?.contains(e.target)) return;
-    let inside = false;
-    this.#portals.forEach((p) => { if (p.contains(e.target)) inside = true; });
-    if (!inside) this.#closeAll();
-  }
-
-  #onKeyDown(e) {
-    if (e.key === 'Escape') this.#closeAll();
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   3. HdmNavArrows — scroll horizontal com setas
-   ───────────────────────────────────────────────────────────── */
-
-class HdmNavArrows {
-  #track;
-  #prev;
-  #next;
-  #scrollStep = 260;
-
-  constructor(navbar) {
-    this.#track = navbar.querySelector('.hdm-nav__track');
-    this.#prev  = navbar.querySelector('.hdm-nav__arrow--prev');
-    this.#next  = navbar.querySelector('.hdm-nav__arrow--next');
-    if (!this.#track) return;
-
-    this.#prev?.addEventListener('click', () => this.#track.scrollBy({ left: -this.#scrollStep, behavior: 'smooth' }));
-    this.#next?.addEventListener('click', () => this.#track.scrollBy({ left:  this.#scrollStep, behavior: 'smooth' }));
-
-    this.#track.addEventListener('scroll', debounce(this.#update.bind(this), 80), { passive: true });
-    new ResizeObserver(debounce(this.#update.bind(this), 80)).observe(this.#track);
-    this.#update();
-  }
-
-  #update() {
-    const t      = this.#track;
-    const atStart = t.scrollLeft <= 2;
-    const atEnd   = t.scrollLeft + t.clientWidth >= t.scrollWidth - 2;
-    const hasOvf  = t.scrollWidth > t.clientWidth + 4;
-
-    if (this.#prev) { this.#prev.disabled = atStart; this.#prev.style.display = hasOvf ? '' : 'none'; }
-    if (this.#next) { this.#next.disabled = atEnd;   this.#next.style.display = hasOvf ? '' : 'none'; }
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   4. HdmCepModal — CEP com localStorage
-   ───────────────────────────────────────────────────────────── */
-
-class HdmCepModal {
-  static #KEY = 'hdm_user_cep';
-  #modal; #label; #input;
-
-  constructor() {
-    this.#modal = document.getElementById('hdm-cep-modal');
-    this.#label = document.getElementById('hdm-cep-label');
-    this.#input = document.getElementById('hdm-cep-input');
-    if (!this.#modal) return;
-    this.#initLabel();
-    this.#bindEvents();
-  }
-
-  #initLabel() {
-    try {
-      const saved = localStorage.getItem(HdmCepModal.#KEY);
-      if (saved && this.#label) this.#label.textContent = saved;
-    } catch (_) {}
-  }
-
-  #bindEvents() {
-    document.getElementById('hdm-cep-trigger')?.addEventListener('click', () => this.#open());
-    document.getElementById('hdm-cep-backdrop')?.addEventListener('click', () => this.#close());
-    document.getElementById('hdm-cep-close')?.addEventListener('click', () => this.#close());
-    document.getElementById('hdm-cep-save')?.addEventListener('click', () => this.#save());
-
-    this.#input?.addEventListener('input', () => {
-      if (this.#input) this.#input.value = formatCep(this.#input.value);
+  /* ───────── 4. Nav chevrons ───────── */
+  _bindChevrons() {
+    if (!this._nav) return;
+    [this._chevL, this._chevR].forEach((btn) => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const dir = btn.dataset.direction === 'right' ? 1 : -1;
+        const delta = (this._nav.clientWidth * 0.6) * dir;
+        this._nav.scrollBy({ left: delta, behavior: 'smooth' });
+      });
     });
-    this.#input?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter')  this.#save();
-      if (e.key === 'Escape') this.#close();
-    });
+    this._nav.addEventListener('scroll', () => this._updateChevronVisibility(), { passive: true });
+  }
+
+  _updateChevronVisibility() {
+    if (!this._nav) return;
+    const { scrollLeft, scrollWidth, clientWidth } = this._nav;
+    const hasOverflow = scrollWidth > clientWidth + 2;
+    const atStart = scrollLeft <= 1;
+    const atEnd = scrollLeft + clientWidth >= scrollWidth - 1;
+    if (this._chevL) {
+      this._chevL.toggleAttribute('hidden', !hasOverflow || atStart);
+      this._chevL.setAttribute('data-visible', String(hasOverflow && !atStart));
+    }
+    if (this._chevR) {
+      this._chevR.toggleAttribute('hidden', !hasOverflow || atEnd);
+      this._chevR.setAttribute('data-visible', String(hasOverflow && !atEnd));
+    }
+  }
+
+  /* ───────── 5. Mobile drawer ───────── */
+  _bindDrawer() {
+    const openBtn  = this.querySelector('[data-action="open-drawer"]');
+    const closeBtn = this._drawer?.querySelector('[data-action="close-drawer"]');
+    openBtn?.addEventListener('click', () => this._openDrawerFn());
+    closeBtn?.addEventListener('click', () => this._closeDrawer());
+  }
+
+  _openDrawerFn() {
+    if (!this._drawer) return;
+    this._drawer.hidden = false;
+    requestAnimationFrame(() => this._drawer.setAttribute('data-open', 'true'));
+    document.body.style.overflow = 'hidden';
+    this._drawer.querySelector('a, button')?.focus();
+  }
+
+  _closeDrawer() {
+    if (!this._drawer) return;
+    this._drawer.removeAttribute('data-open');
+    setTimeout(() => { this._drawer.hidden = true; }, 310);
+    document.body.style.overflow = '';
+  }
+
+  /* ───────── 6. Global dismiss ───────── */
+  _bindGlobalDismiss() {
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !this.#modal.hidden) this.#close();
+      if (e.key === 'Escape') {
+        this._closeAllDropdowns();
+        this._closeMega();
+        this._closeDrawer();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (this._openDropdown) {
+        const within = this._openDropdown.btn.contains(e.target) || this._openDropdown.pop.contains(e.target);
+        if (!within) this._closeAllDropdowns();
+      }
+    });
+    this._overlay?.addEventListener('click', () => {
+      this._closeMega();
+      this._closeAllDropdowns();
     });
   }
 
-  #open() {
-    this.#modal.hidden = false;
-    try {
-      const saved = localStorage.getItem(HdmCepModal.#KEY);
-      if (saved && this.#input) this.#input.value = saved;
-    } catch (_) {}
-    setTimeout(() => this.#input?.focus(), 80);
-  }
-
-  #close() {
-    this.#modal.hidden = true;
-    if (this.#input) this.#input.value = '';
-  }
-
-  #save() {
-    const digits = (this.#input?.value ?? '').replace(/\D/g, '');
-    if (digits.length < 8) {
-      this.#input?.classList.add('hdm-cep-modal__input--error');
-      setTimeout(() => this.#input?.classList.remove('hdm-cep-modal__input--error'), 1200);
-      return;
-    }
-    const formatted = formatCep(digits);
-    try { localStorage.setItem(HdmCepModal.#KEY, formatted); } catch (_) {}
-    if (this.#label) this.#label.textContent = formatted;
-    this.#close();
+  _syncSpacer() {
+    if (!this._spacer) return;
+    this._spacer.style.height = this.offsetHeight + 'px';
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
-   BOOTSTRAP
-   ───────────────────────────────────────────────────────────── */
-
-function init() {
-  if (!customElements.get('hdm-header')) {
-    customElements.define('hdm-header', HdmHeader);
-  }
-
-  const headerEl = document.getElementById('hdm-header');
-  if (!headerEl) return;
-
-  const navbar = headerEl.querySelector('.hdm-header__navbar');
-
-  if (window.innerWidth > 989) new HdmMegaMenu(headerEl);
-
-  let megaInit = window.innerWidth > 989;
-  window.addEventListener('resize', debounce(() => {
-    if (window.innerWidth > 989 && !megaInit) {
-      new HdmMegaMenu(headerEl);
-      megaInit = true;
-    }
-  }, 200));
-
-  if (navbar) new HdmNavArrows(navbar);
-
-  new HdmCepModal();
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
+if (!customElements.get('header-component')) {
+  customElements.define('header-component', HDMHeaderComponent);
 }

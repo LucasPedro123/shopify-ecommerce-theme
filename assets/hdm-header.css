@@ -1,0 +1,823 @@
+/*
+ * HDM Header — state-driven styles
+ * Toda a inversão dark↔white é gerenciada por CSS custom properties
+ * trocadas conforme :hover ou [data-state] na <header-component>.
+ *
+ * Estados:
+ *   initial          → dark (cinza translúcido), texto/ícones claros
+ *   :hover           → white
+ *   [data-state=scrolled]       → white permanente
+ *   [data-state=megamenu-open]  → white permanente
+ */
+
+ul {
+  padding: 0;
+}
+
+.hdm-header {
+  /* Tokens default (estado initial — dark) */
+  --hdr-bg: rgba(76, 76, 76, 0.5);
+  --hdr-text: #ffffff;
+  --hdr-text-muted: rgba(255, 255, 255, 0.85);
+  --hdr-search-bg: rgba(42, 42, 42, 0.5);
+  --hdr-search-text: #ffffff;
+  --hdr-search-placeholder: #C2BFBF;
+  --hdr-action-bg: #ffffff;
+  --hdr-action-text: #18181B;
+  --hdr-action-border: transparent;
+  --hdr-action-hover-bg: #F4F4F5;
+  --hdr-nav-link: #ffffff;
+  --hdr-nav-link-hover: rgba(255, 255, 255, 0.7);
+  --hdr-chevron-bg: rgba(76, 76, 76, 0.5);
+  --hdr-chevron-color: #ffffff;
+
+  background-color: var(--hdr-bg);
+  color: var(--hdr-text);
+  transition: background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Inversão para light: hover, scrolled OU megamenu-open */
+.hdm-header:hover,
+.hdm-header[data-state="scrolled"],
+.hdm-header[data-state="megamenu-open"] {
+  --hdr-bg: #ffffff;
+  --hdr-text: #18181B;
+  --hdr-text-muted: #52525B;
+  --hdr-search-bg: #F2F2F2;
+  --hdr-search-text: #71717A;
+  --hdr-search-placeholder: #71717A;
+  --hdr-action-bg: transparent;
+  --hdr-action-text: #18181B;
+  --hdr-action-border: #E4E4E7;
+  --hdr-action-hover-bg: #F4F4F5;
+  --hdr-nav-link: #18181B;
+  --hdr-nav-link-hover: #766CFF;
+  --hdr-chevron-bg: #ffffff;
+  --hdr-chevron-color: #18181B;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.hdm-header__search {
+  height: stretch;
+}
+
+/* === Search input === */
+.hdm-header__search-input {
+  background-color: var(--hdr-search-bg);
+  color: var(--hdr-search-text);
+}
+
+.hdm-header__search-input::placeholder {
+  color: var(--hdr-search-placeholder);
+  opacity: 1;
+}
+
+.hdm-header__search-submit {
+  color: var(--hdr-search-text);
+}
+
+/* === Action buttons === */
+.hdm-action-btn {
+  background-color: var(--hdr-action-bg);
+  color: var(--hdr-action-text);
+  gap: 10px;
+  padding: 12px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.hdm-action-btn:hover {
+  background-color: var(--hdr-action-hover-bg);
+}
+
+.hdm-action-btn[aria-expanded="true"] .hdm-action-btn__chevron {
+  transform: rotate(180deg);
+}
+
+/* === Menu toggle (mobile) === */
+.hdm-header__menu-toggle {
+  color: var(--hdr-text);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+/* === Nav category === */
+.hdm-nav__link {
+  color: var(--hdr-nav-link);
+  text-decoration: none;
+}
+
+.hdm-nav__link:hover {
+  color: var(--hdr-nav-link-hover);
+}
+
+.hdm-nav__list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hdm-nav__list::-webkit-scrollbar {
+  display: none;
+}
+
+/* === Chevrons (botões scroll do nav) === */
+.hdm-nav__chevron {
+  background: var(--hdr-chevron-bg);
+  color: var(--hdr-chevron-color);
+  border: 0;
+  display: none;
+}
+
+.hdm-nav__chevron[data-visible="true"] {
+  display: flex;
+}
+
+.hdm-nav__chevron--left {
+  box-shadow: 8px 0 16px -4px var(--hdr-bg);
+}
+
+.hdm-nav__chevron--right {
+  box-shadow: -8px 0 16px -4px var(--hdr-bg);
+}
+
+/* === Dropdowns (CEP, conta, sacola) === */
+.hdm-dropdown {
+  position: relative;
+}
+
+.hdm-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 280px;
+  background: #ffffff;
+  color: #18181B;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.15);
+  z-index: 15;
+}
+
+.hdm-pop--wide {
+  min-width: 360px;
+}
+
+/* === Overlay === */
+.hdm-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hdm-overlay[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* === Mobile drawer === */
+.hdm-mobile-drawer {
+  position: fixed;
+  inset: 0;
+}
+
+.hdm-mobile-drawer[hidden] {
+  display: none;
+}
+
+.hdm-mobile-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(85vw, 360px);
+  background: #ffffff;
+  transform: translateX(100%);
+  overflow-y: auto;
+}
+
+.hdm-mobile-drawer[data-open="true"] .hdm-mobile-drawer__panel {
+  transform: translateX(0);
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+
+  .hdm-header,
+  .hdm-header__search-input,
+  .hdm-action-btn,
+  .hdm-nav__link,
+  .hdm-overlay,
+  .hdm-mobile-drawer__panel,
+  .hdm-action-btn__chevron {
+    transition: none;
+  }
+}
+
+.header-chevron-actions {
+  width: 12px;
+}
+
+.hdm-cart-badge {
+  position: absolute;
+  top: 2px;
+  left: 25px;
+  background-color: #000;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+}
+
+.icon-cart {
+  width: 24px;
+  height: 19.45px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Spacing horizontal global — aplicar em qualquer container que deva
+ * respeitar a "margem lateral padrão" do site. Não usar em:
+ *   - hdm-announcement-bar
+ *   - footer
+ *   - banners/hero full-bleed
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-spacing-x {
+  padding-inline: 16px;
+}
+
+@media (min-width: 768px) {
+  .hdm-spacing-x {
+    padding-inline: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hdm-spacing-x {
+    padding-inline: 48px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .hdm-spacing-x {
+    padding-inline: 64px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Z-index — header acima de tudo
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-header {
+  z-index: 999;
+}
+
+.hdm-overlay {
+  z-index: 990;
+}
+
+.hdm-mobile-drawer {
+  z-index: 1000;
+}
+/* ========================================================
+   📱 AJUSTES MOBILE: Fundo transparente e texto branco no Header Escuro
+   ======================================================== */
+@media screen and (max-width: 768px) {
+  /* 1. Modifica o estado inicial (Dark) APENAS no mobile */
+  .hdm-header {
+    --hdr-action-bg: transparent; /* Remove o fundo branco dos botões */
+    --hdr-action-text: #ffffff;   /* Deixa os textos e SVGs brancos */
+  }
+  
+  /* 2. Força o ícone da sacola (que é uma imagem) a ficar branco no Dark */
+  .hdm-header .icon-cart {
+    filter: brightness(0) invert(1);
+  }
+
+  .account-icon, .icon-cart{
+    height: 30px !important;
+  }
+
+  /* 3. Retorna a sacola para PRETO quando o header ficar Branco (Light) */
+  .hdm-header:hover .icon-cart,
+  .hdm-header[data-state="scrolled"] .icon-cart,
+  .hdm-header[data-state="megamenu-open"] .icon-cart {
+    filter: none;
+  }
+
+  .hdm-header__strip{
+    display: none;
+  }
+
+  .account-icon{
+    width: 30px;
+  }
+  
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Logo — duas variantes renderizadas, CSS troca conforme estado
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-logo-variant {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hdm-logo-variant--dark {
+  display: none;
+}
+
+.hdm-header:hover .hdm-logo-variant--light,
+.hdm-header[data-state="scrolled"] .hdm-logo-variant--light,
+.hdm-header[data-state="megamenu-open"] .hdm-logo-variant--light {
+  display: none;
+}
+
+.hdm-header:hover .hdm-logo-variant--dark,
+.hdm-header[data-state="scrolled"] .hdm-logo-variant--dark,
+.hdm-header[data-state="megamenu-open"] .hdm-logo-variant--dark {
+  display: inline-flex;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Megamenu — posicionado relativo ao <nav> (irmão do <ul>)
+ * O <ul> tem overflow-x:auto que cortaria filhos absolute
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-header__nav {
+  position: relative;
+}
+
+.hdm-megamenu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: #ffffff;
+  color: #18181B;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
+  border-top: 1px solid #E4E4E7;
+  z-index: 2;
+}
+
+.hdm-megamenu[hidden] {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Popovers — close button + CEP states
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-pop__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #71717A;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hdm-pop__close:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+/* CEP — 2 panes, JS toggla [data-cep-state] */
+.hdm-pop--cep[data-cep-state="invite"] .hdm-cep-pane--form {
+  display: none;
+}
+
+.hdm-pop--cep[data-cep-state="form"] .hdm-cep-pane--invite {
+  display: none;
+}
+
+.hdm-cep-back {
+  background: transparent;
+  border: 0;
+  color: #71717A;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: inline-flex;
+}
+
+.hdm-cep-back:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Account menu — layout Beleza na Web (CTA + lista com ícones)
+ * ═══════════════════════════════════════════════════════════════════ */
+.hdm-pop--account {
+  min-width: 300px;
+}
+
+.hdm-account__divider {
+  height: 1px;
+  background: #E4E4E7;
+  margin: 0;
+}
+
+.hdm-account__list {
+  padding: 8px 0 !important;
+}
+
+.hdm-account__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: #18181B;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.hdm-account__item:hover {
+  background: #F4F3FF;
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout {
+  color: #DC2626;
+}
+
+.hdm-account__item--logout:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.hdm-account__icon {
+  flex-shrink: 0;
+  color: #766CFF;
+}
+
+.hdm-account__item:hover .hdm-account__icon {
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout .hdm-account__icon {
+  color: #DC2626;
+}
+
+/* PATCH ADD via bash */
+.hdm-spacing-x {
+  padding-inline: 16px;
+}
+
+@media (min-width: 768px) {
+  .hdm-spacing-x {
+    padding-inline: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hdm-spacing-x {
+    padding-inline: 48px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .hdm-spacing-x {
+    padding-inline: 64px;
+  }
+}
+
+.hdm-header {
+  z-index: 999;
+}
+
+.hdm-overlay {
+  z-index: 990;
+}
+
+.hdm-mobile-drawer {
+  z-index: 1000;
+}
+
+.hdm-logo-variant {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hdm-logo-variant--dark {
+  display: none;
+}
+
+.hdm-header:hover .hdm-logo-variant--light,
+.hdm-header[data-state="scrolled"] .hdm-logo-variant--light,
+.hdm-header[data-state="megamenu-open"] .hdm-logo-variant--light {
+  display: none;
+}
+
+.hdm-header:hover .hdm-logo-variant--dark,
+.hdm-header[data-state="scrolled"] .hdm-logo-variant--dark,
+.hdm-header[data-state="megamenu-open"] .hdm-logo-variant--dark {
+  display: inline-flex;
+}
+
+.hdm-header__nav {
+  position: relative;
+}
+
+.hdm-megamenu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: #ffffff;
+  color: #18181B;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
+  border-top: 1px solid #E4E4E7;
+  z-index: 2;
+}
+
+.hdm-megamenu[hidden] {
+  display: none;
+}
+
+.hdm-pop__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #71717A;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hdm-pop__close:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+.hdm-pop--cep[data-cep-state="invite"] .hdm-cep-pane--form {
+  display: none;
+}
+
+.hdm-pop--cep[data-cep-state="form"] .hdm-cep-pane--invite {
+  display: none;
+}
+
+.hdm-cep-back {
+  background: transparent;
+  border: 0;
+  color: #71717A;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: inline-flex;
+}
+
+.hdm-cep-back:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+.hdm-pop--account {
+  min-width: 300px;
+}
+
+.hdm-account__divider {
+  height: 1px;
+  background: #E4E4E7;
+  margin: 0;
+}
+
+.hdm-account__list {
+  padding: 8px 0 !important;
+}
+
+.hdm-account__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: #18181B;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.hdm-account__item:hover {
+  background: #F4F3FF;
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout {
+  color: #DC2626;
+}
+
+.hdm-account__item--logout:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.hdm-account__icon {
+  flex-shrink: 0;
+  color: #766CFF;
+}
+
+.hdm-account__item:hover .hdm-account__icon {
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout .hdm-account__icon {
+  color: #DC2626;
+}
+
+top: 1px solid #E4E4E7;
+z-index: 2;
+}
+
+.hdm-megamenu[hidden] {
+  display: none;
+}
+
+/* === Popovers — close button + CEP states === */
+.hdm-pop__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #71717A;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hdm-pop__close:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+.hdm-pop--cep[data-cep-state="invite"] .hdm-cep-pane--form {
+  display: none;
+}
+
+.hdm-pop--cep[data-cep-state="form"] .hdm-cep-pane--invite {
+  display: none;
+}
+
+.hdm-cep-back {
+  background: transparent;
+  border: 0;
+  color: #71717A;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: inline-flex;
+}
+
+.hdm-cep-back:hover {
+  background: #F4F4F5;
+  color: #18181B;
+}
+
+/* === Account menu — layout Beleza na Web === */
+.hdm-pop--account {
+  min-width: 300px;
+}
+
+.hdm-account__divider {
+  height: 1px;
+  background: #E4E4E7;
+  margin: 0;
+}
+
+.hdm-account__list {
+  padding: 8px 0 !important;
+}
+
+.hdm-account__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: #18181B;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.hdm-account__item:hover {
+  background: #F4F3FF;
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout {
+  color: #DC2626;
+}
+
+.hdm-account__item--logout:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.hdm-account__icon {
+  flex-shrink: 0;
+  color: #766CFF;
+}
+
+.hdm-account__item:hover .hdm-account__icon {
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout .hdm-account__icon {
+  color: #DC2626;
+}
+
+/* Account menu */
+.hdm-pop--account {
+  min-width: 300px;
+}
+
+.hdm-account__divider {
+  height: 1px;
+  background: #E4E4E7;
+  margin: 0;
+}
+
+.hdm-account__list {
+  padding: 8px 0 !important;
+}
+
+.hdm-account__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: #18181B;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.hdm-account__item:hover {
+  background: #F4F3FF;
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout {
+  color: #DC2626;
+}
+
+.hdm-account__item--logout:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.hdm-account__icon {
+  flex-shrink: 0;
+  color: #766CFF;
+}
+
+.hdm-account__item:hover .hdm-account__icon {
+  color: #5A52CC;
+}
+
+.hdm-account__item--logout .hdm-account__icon {
+  color: #DC2626;
+}
+
+header-drawer > details > summary.header__icon--summary {
+  display: none !important;
+}
+
+/* ========================================================
+   📱 ANIMAÇÃO MOBILE: Esconder CEP no Scroll
+   ======================================================== */
+.hdm-mobile-cep-wrapper {
+  max-height: 100px; /* Altura suficiente para o botão */
+  opacity: 1;
+  transition: max-height 300ms ease, opacity 300ms ease, margin 300ms ease;
+}
+
+/* Quando o Header assume o estado 'scrolled', o CEP some suavemente */
+.hdm-header[data-state="scrolled"] .hdm-mobile-cep-wrapper {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
